@@ -1,0 +1,10 @@
+${DESC}/paintmaps/bodyFurMask
+${DESC}/../bodyFur/paintmaps/bodyFurMask
+
+
+${DESC}/paintmaps/clumpMask
+${DESC}/../lion_desc/paintmaps/clumpMask
+
+
+$a=map('${DESC}/../lion_desc/paintmaps/clumpMask');#3dpaint,10.0
+$a

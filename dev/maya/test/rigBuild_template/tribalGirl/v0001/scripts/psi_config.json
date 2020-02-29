@@ -1,0 +1,70 @@
+{
+    "L_shoulder_PSI": {
+        "interpolation": "gaussian",
+        "jnt": "L_shoulderPsiDriver_JNT",
+        "blendShapeNode": "C_body_BLS",
+        "eulerTwist": true,
+        "poses": {
+            "L_shoulderUp": {
+                "euler": [0, 0, 90],
+                "target": "L_shoulderUp"
+            },
+            "L_shoulderDown": {
+                "euler": [0, 0, -90],
+                "target": "L_shoulderDown"
+            },
+            "L_shoulderFront": {
+                "euler": [0, -90, 0],
+                "target": "L_shoulderFront"
+            },
+            "L_shoulderBack": {
+                "euler": [0, 90, 0],
+                "target": "L_shoulderBack"
+            },
+            "L_shoulderIn": {
+                "poseType":"twist",
+                "euler": [90, 0, 0],
+                "target": "L_shoulderIn"
+            },
+            "L_shoulderOut": {
+                "poseType":"twist",
+                "euler": [-90, 0, 0],
+                "target": "L_shoulderOut"
+            }
+        }
+    },
+    "R_shoulder_PSI": {
+        "interpolation": "gaussian",
+        "jnt": "R_shoulderPsiDriver_JNT",
+        "blendShapeNode": "C_body_BLS",
+        "eulerTwist": true,
+        "poses": {
+            "R_shoulderUp": {
+                "euler": [0, 0, 90],
+                "target": "R_shoulderUp"
+            },
+            "R_shoulderDown": {
+                "euler": [0, 0, -90],
+                "target": "R_shoulderDown"
+            },
+            "R_shoulderFront": {
+                "euler": [0, -90, 0],
+                "target": "R_shoulderFront"
+            },
+            "R_shoulderBack": {
+                "euler": [0, 90, 0],
+                "target": "R_shoulderBack"
+            },
+            "R_shoulderIn": {
+                "poseType":"twist",
+                "euler": [90, 0, 0],
+                "target": "R_shoulderIn"
+            },
+            "R_shoulderOut": {
+                "poseType":"twist",
+                "euler": [-90, 0, 0],
+                "target": "R_shoulderOut"
+            }
+        }
+    }
+}

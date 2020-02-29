@@ -1,0 +1,122 @@
+{
+    "mouthQuadrant": {
+        "LipTightner": {},
+        "LipPuff": {}, 
+        "LipSuck": {},
+        "LipPucker": {}, 
+        "LipPressor": {}, 
+        "LipFunneler": {},
+        "CheekPuff": {},
+        "LipFunneler_LipPucker": {}
+    }, 
+    "verticalSharp": {
+        "EyeUp": {}, 
+        "EyeDown": {},
+        "EyeWide": {},
+        "EyeCrossed": {
+            "l": "lEyeRight",
+            "r": "rEyeLeft" 
+        },
+        "EyeWalled": {
+            "l": "lEyeLeft",
+            "r": "rEyeRight" 
+        },
+        "EyeCrossed_EyeUp": {
+            "l": "lEyeRight_lEyeUp",
+            "r": "rEyeLeft_rEyeUp"
+        },
+        "EyeCrossed_EyeDown": {
+            "l": "lEyeDown_lEyeRight",
+            "r": "rEyeDown_rEyeLeft" 
+        },
+        "EyeUp_EyeWalled": {
+            "l": "lEyeLeft_lEyeUp",
+            "r": "rEyeRight_rEyeUp" 
+        },
+        "EyeDown_EyeWalled": {
+            "l": "lEyeLeft_lEyeDown",
+            "r": "rEyeRight_rEyeDown" 
+        },
+        "EyeClose": {
+            "l": "lUpperLidLowerer",
+            "r": "rUpperLidLowerer" 
+        },
+        "CheekSuck": {}, 
+        "CheekRaiser": {}, 
+        "NasolabialFurrow": {}, 
+        "NostrilCompressor": {}, 
+        "NasolabialFurrow_Wrinkler": {},
+        "Wrinkler": {}, 
+        "Squint": {},
+        "EyeClose_Squint": {},
+        "NostrilDialator": {}
+    }, 
+    "eyeQuadrant": {
+        "LidTightner": {}
+    }, 
+    "mouthHorizontal": {
+        "LipPart": {}
+    }, 
+    "verticalSoft": {
+        "SharpLipPuller": {}, 
+        "LipCornerPuller": {}, 
+        "InnerPlatysma": {}, 
+        "BrowLowerer": {}, 
+        "NeckTightner": {}, 
+        "InnerBrowRaiser": {}, 
+        "BrowLowerer_InnerBrowRaiser": {}, 
+        "LowerLipSuck": {}, 
+        "OuterPlatysma": {}, 
+        "LipCornerDepressor": {}, 
+        "Dimpler": {}, 
+        "OuterBrowRaiser": {}, 
+        "LipStretcher": {},
+        "UpperLipDepressor": {},
+        "LowerLipDepressor": {},
+        "UpperLipRaiser": {},
+        "LipCornerPuller_LipStretcher": {},
+        "LipStretcher_LowerLipDepressor": {}
+    },
+    "_mouthQuadrant": {
+        "JawOpen_LipFunneler": {
+            "_lUpper": "JawOpen_lUpperLipFunneler",
+            "_lLower": "JawOpen_lLowerLipFunneler",
+            "_rUpper": "JawOpen_rUpperLipFunneler",
+            "_rLower": "JawOpen_rLowerLipFunneler"
+        },
+        "JawOpen_LipTightner": {
+            "_lUpper": "JawOpen_lUpperLipTightner",
+            "_lLower": "JawOpen_lLowerLipTightner",
+            "_rUpper": "JawOpen_rUpperLipTightner",
+            "_rLower": "JawOpen_rLowerLipTightner"
+        },
+        "JawOpen_LipSuck": {
+            "_lUpper": "JawOpen_lUpperLipSuck",
+            "_lLower": "JawOpen_lLowerLipSuck",
+            "_rUpper": "JawOpen_rUpperLipSuck",
+            "_rLower": "JawOpen_rLowerLipSuck"
+        }
+    },
+    "_verticalSoft": {
+        "JawOpen_LipStretcher": {
+            "_l": "JawOpen_lLipStretcher",
+            "_r": "JawOpen_rLipStretcher"
+        },
+        "JawOpen_LipCornerPuller": {
+            "_l": "JawOpen_lLipCornerPuller",
+            "_r": "JawOpen_rLipCornerPuller"
+        },
+        "JawOpen_Dimpler": {
+            "_l": "JawOpen_lDimpler",
+            "_r": "JawOpen_rDimpler"
+        }
+    },
+    "verticalSharp_eyeQuadrant": {
+        "EyeClose_LidTightner": {
+            "l_lUpper": "lUpperLidLowerer_lUpperLidTightner",
+            "r_rUpper": "rUpperLidLowerer_rUpperLidTightner",
+            "l_lLower": "lUpperLidLowerer_lLowerLidTightner",
+            "r_rLower": "rUpperLidLowerer_rLowerLidTightner"
+        }
+    }
+}

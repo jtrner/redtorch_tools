@@ -1,0 +1,6 @@
+general -> target extension -> .mll
+c/c++ -> additional include directories -> C:\Program Files\Autodesk\Maya2019\include
+c/c++ -> preprocessor -> preprocessor definitions -> WIN32;NDEGUB;_WINDOWS;NT_PLUGIN;REQUIRE_IOSTREAM
+linker -> general -> additional library directories -> C:\Program Files\Autodesk\Maya2019\lib
+linker -> input -> Foundation.lib; OpenMaya.lib; OpenMayaUI.lib; OpenMayaAnim.lib; OpenMayaRender.lib; Image.lib; opengl32.lib; glu32.lib;
+linker -> Command Line -> /export:initializePlugin /export:uninitializePlugin

@@ -1,0 +1,11 @@
+# paint deformer weights in houdini
+
+- add blendWeight attribute to rest pose and paint it
+- then connect it to second input of attribute wrangler
+- connect deformed geo to first input of attribute wrangler
+- set VEXpression of attribute wrangler to below:
+
+
+@P *= (1-@opinput1_blendWeight * ch("intensity"));
+@P += (@opinput1_P * @opinput1_blendWeight * ch("intensity"));
+

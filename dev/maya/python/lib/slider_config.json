@@ -1,0 +1,161 @@
+{
+    "C_upperFunneler_CTL": {
+        "ty_pos": ["Lips_Upper_Curl_Out"], 
+        "ty_neg": ["Lips_Upper_Curl_In"], 
+        "Curl_Teeth": ["Lips_Upper_Curl_Teeth"], 
+        "Forward": ["Lips_Upper_Forward"], 
+        "Back": ["Lips_Upper_Back"], 
+        "Inflate": ["Lips_Upper_Inflate"]
+    },
+    "C_lowerFunneler_CTL": {
+        "ty_pos": ["Lips_Lower_Curl_Out"], 
+        "ty_neg": ["Lips_Lower_Curl_In"], 
+        "Curl_Teeth": ["Lips_Lower_Curl_Teeth"], 
+        "Forward": ["Lips_Lower_Forward"], 
+        "Back": ["Lips_Lower_Back"], 
+        "Inflate": ["Lips_Lower_Inflate"]
+    },
+    "L_lipCorner_CTL": {
+        "tx_pos": ["L_Flat_Smile"], 
+        "ty_pos": ["L_Mouth_Up"], 
+        "ty_neg": ["L_Mouth_Corner_Down"],
+        "Smile": ["L_Mouth_Corner_Up_Left"],
+        "Stretch": ["L_Mouth_Corner_Down_Left"]
+    }, 
+    "R_lipCorner_CTL": {
+        "tx_pos": ["R_Flat_Smile"], 
+        "ty_pos": ["R_Mouth_Up"], 
+        "ty_neg": ["R_Mouth_Corner_Down"],
+        "Smile": ["R_Mouth_Corner_Up_Right"],
+        "Stretch": ["R_Mouth_Corner_Down_Right"]
+    }, 
+    "L_cheek_CTL": {
+        "ty_pos": ["L_Cheek_Raiser"]
+    }, 
+    "R_cheek_CTL": {
+        "ty_pos": ["R_Cheek_Raiser"]
+    }, 
+    "L_squint_CTL": {
+        "ty_pos": ["L_Eye_Inner_Squint"]
+    }, 
+    "R_squint_CTL": {
+        "ty_pos": ["R_Eye_Inner_Squint"]
+    }, 
+    "L_cheekPuff_CTL": {
+        "ty_pos": ["L_Cheek_Inflate"], 
+        "ty_neg": ["L_Cheek_In"]
+    }, 
+    "R_cheekPuff_CTL": {
+        "ty_pos": ["R_Cheek_Inflate"], 
+        "ty_neg": ["R_Cheek_In"]
+    }, 
+    "L_lowerLid_CTL": {
+        "ty_pos": ["L_EyeLid_Lower_Up"]
+    }, 
+    "R_lowerLid_CTL": {
+        "ty_pos": ["R_EyeLid_Lower_Up"]
+    }, 
+    "L_upperLid_CTL": {
+        "ty_pos": ["L_Eye_Blink"]
+    }, 
+    "R_upperLid_CTL": {
+        "ty_pos": ["R_Eye_Blink"]
+    }, 
+    "L_outerBrow_CTL": {
+        "ty_pos": ["L_Brow_Outer_Up"], 
+        "ty_neg": ["L_Brow_Outer_Down"]
+    }, 
+    "R_outerBrow_CTL": {
+        "ty_pos": ["R_Brow_Outer_Up"], 
+        "ty_neg": ["R_Brow_Outer_Down"]
+    }, 
+    "L_innerBrow_CTL": {
+        "tx_neg": ["L_Brow_Furrow"], 
+        "ty_pos": ["L_Brow_Inner_Up"], 
+        "ty_neg": ["L_Brow_Inner_Down"]
+    }, 
+    "R_innerBrow_CTL": {
+        "tx_neg": ["R_Brow_Furrow"], 
+        "ty_pos": ["R_Brow_Inner_Up"], 
+        "ty_neg": ["R_Brow_Inner_Down"]
+    }, 
+    "C_upperLip_CTL": {
+        "ty_pos": ["C_Lip_Upper_Up"], 
+        "ty_neg": ["C_Lip_Upper_Down"], 
+        "Tight": ["C_Lip_Upper_Tight"]
+    }, 
+    "C_lowerLip_CTL": {
+        "ty_pos": ["C_Lip_Lower_Up"], 
+        "ty_neg": ["C_Lip_Lower_Down"], 
+        "Tight": ["C_Lip_Lower_Tight"]
+    }, 
+    "L_upperMidLip_CTL": {
+        "ty_pos": ["L_Lip_Upper_Mid_Up"], 
+        "ty_neg": ["L_Lip_Upper_Mid_Down"], 
+        "Tight": ["L_Lip_Upper_Mid_Tight"]
+    }, 
+    "R_upperMidLip_CTL": {
+        "ty_pos": ["R_Lip_Upper_Mid_Up"], 
+        "ty_neg": ["R_Lip_Upper_Mid_Down"], 
+        "Tight": ["R_Lip_Upper_Mid_Tight"]
+    }, 
+    "L_lowerMidLip_CTL": {
+        "ty_pos": ["L_Lip_Lower_Mid_Up"], 
+        "ty_neg": ["L_Lip_Lower_Mid_Down"], 
+        "Tight": ["L_Lip_Lower_Mid_Tight"]
+    }, 
+    "R_lowerMidLip_CTL": {
+        "ty_pos": ["R_Lip_Lower_Mid_Up"], 
+        "ty_neg": ["R_Lip_Lower_Mid_Down"], 
+        "Tight": ["R_Lip_Lower_Mid_Tight"]
+    }, 
+    "L_platysma_CTL": {
+        "ty_pos": ["L_Neck_Tense"]
+    }, 
+    "R_platysma_CTL": {
+        "ty_pos": ["R_Neck_Tense"]
+    }, 
+    "C_scalp_CTL": {
+        "ty_pos": ["Ears_Back"]
+    }, 
+    "C_nose_CTL": {
+        "ty_pos": ["Nose_Tip_Up"], 
+        "ty_neg": ["Nose_Down"]
+    }, 
+    "L_nose_CTL": {
+        "ty_pos": ["L_Sneer"]
+    }, 
+    "R_nose_CTL": {
+        "ty_pos": ["R_Sneer"]
+    }, 
+    "L_nostril_CTL": {
+        "ty_pos": ["L_Nose_Flare_Out"], 
+        "ty_neg": ["L_Nose_Flare_In"]
+    }, 
+    "R_nostril_CTL": {
+        "ty_pos": ["R_Nose_Flare_Out"], 
+        "ty_neg": ["R_Nose_Flare_In"]
+    },
+    "C_mouth_CTL": {
+        "tx_pos": ["Mouth_Muzzle_Left"], 
+        "tx_neg": ["Mouth_Muzzle_Right"], 
+        "ty_pos": ["Mouth_Muzzle_Up"], 
+        "ty_neg": ["Mouth_Muzzle_Down"],
+        "Purse": ["Lips_Purse"]
+    },
+    "C_pucker_CTL": {
+        "ty_pos": ["Lips_Pucker"]
+    },
+    "C_compress_CTL": {
+        "ty_pos": ["Lips_Compress"]
+    },
+    "C_chin_CTL": {
+        "ty_pos": ["Chin_Move"], 
+        "Chin_Roll": ["Chin_Roll"], 
+        "Double_Chin": ["Double_Chin"]
+    },
+    "C_apple_CTL": {
+        "ty_pos": ["Apple_Up"], 
+        "ty_neg": ["Apple_Down"]
+    }
+}

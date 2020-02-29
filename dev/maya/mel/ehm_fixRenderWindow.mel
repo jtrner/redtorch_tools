@@ -1,0 +1,5 @@
+global proc ehm_fixRenderWindow()
+{
+    deleteUI unifiedRenderGlobalsWindow;
+    buildNewSceneUI;
+}

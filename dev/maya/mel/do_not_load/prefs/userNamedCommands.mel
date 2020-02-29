@@ -1,0 +1,16 @@
+//Maya Preference 2018 (Release 1)
+//
+//
+
+nameCommand
+	-annotation "groom_tools_PressNameCommand"
+	-sourceType "mel"
+	-command ("groom_tools_Press")
+	groom_tools_PressNameCommand;
+
+nameCommand
+	-annotation "groom_tools_ReleaseNameCommand"
+	-sourceType "mel"
+	-command ("groom_tools_Release")
+	groom_tools_ReleaseNameCommand;
+

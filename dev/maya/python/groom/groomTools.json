@@ -1,0 +1,60 @@
+{
+"Display": {
+  "Preview": {
+    "command": "from python.groom import groomLib\nreload(groomLib)\ngroomLib.preview()",
+    "icon": "xgPreviewRefresh"
+  },
+  "Hide /Show": {
+    "command": "from python.groom import groomLib\nreload(groomLib)\ngroomLib.hideShow()",
+    "icon": "xgToggleGuide"
+  },
+  "Set Guide Width": {
+    "command": "from python.groom import groomLib\nreload(groomLib)\ngroomLib.setGuideWidth()",
+    "icon": "xgToggleWidth"
+  }
+},
+"Style": {
+  "Create Guide": {
+    "command": "from python.groom import groomLib\nreload(groomLib)\ngroomLib.createGuide()",
+    "icon": "xgGuideContext"
+  },
+  "Comb": {
+    "command": "from python.groom import groomLib\nreload(groomLib)\ngroomLib.comb()",
+    "icon": "xgGuideSculptTool"
+  },
+  "Length Lock / Unlock": {
+    "command": "from python.groom import groomLib\nreload(groomLib)\ngroomLib.lenLockToggle()",
+    "icon": "xgToggleGuideReference"
+  }
+},
+"Select": {
+    "Obj Mode": {
+        "command": "from python.groom import groomLib\nreload(groomLib)\ngroomLib.objMode()",
+        "icon": "objectMode"
+    },
+    "Edit Mode": {
+        "command": "from python.groom import groomLib\nreload(groomLib)\ngroomLib.editMode()",
+        "icon": "componentMode"
+    }
+},
+"Curve": {
+    "Average and Delete": {
+        "command": "from python.groom import groomLib\nreload(groomLib)\ngroomLib.averageAndDelete()",
+        "icon": ""
+    },
+    "Create Spiral": {
+        "command": "from python.groom import groomLib\nreload(groomLib)\ngroomLib.spiral_ui()",
+        "icon": ""
+    }
+},
+"Extra": {
+    "Export / Import": {
+        "command": "from python.groom import groomUI\nreload(groomUI)\ngroomUI.launch()",
+        "icon": ""
+    },
+    "Update xgen_Pref": {
+        "command": "from python.groom import groomLib\nreload(groomLib)\ngroomLib.updatePref()",
+        "icon": ""
+    }
+}
+}

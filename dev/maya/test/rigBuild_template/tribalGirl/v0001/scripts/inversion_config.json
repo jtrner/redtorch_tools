@@ -1,0 +1,20 @@
+{
+    "C_body_BLS": {
+        "L_shoulderUp": {
+            "ctl": "L_shoulderFk_CTL",
+            "pose": [
+                [0, 0, 0],
+                [0, 0, 90],
+                [1, 1, 1]
+            ]
+        },        
+        "R_shoulderUp": {
+            "ctl": "R_shoulderFk_CTL",
+            "pose": [
+                [0, 0, 0],
+                [0, 0, 90],
+                [1, 1, 1]
+            ]
+        }
+    }
+}

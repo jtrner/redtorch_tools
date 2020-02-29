@@ -1,0 +1,28 @@
+string $expiryDate = "20191215";
+
+$newDate = `system ("date /t")`;
+
+string $newDate_buffer[];
+tokenize $newDate "//" $newDate_buffer;
+
+$newYear = `substring $newDate_buffer[2] 1 4`;
+$newDay = $newDate_buffer[1];
+$lastIdx = `size $newDate_buffer[0]`;
+$lastIdxMinusOne = $lastIdx - 1;
+$newMonth = `substring $newDate_buffer[0] $lastIdxMinusOne $lastIdx`;
+
+//print $newYear;
+//print $newMonth;
+//print $newDay;
+string $currentDate = $newYear + $newMonth + $newDay;
+
+if (int($currentDate) > int($expiryDate)){
+    string $references[] = `ls -type "reference"`;
+    for ($r in $references){
+            string $ref = `referenceQuery -filename $r`;
+            file -removeReference $ref;
+    }    
+    delete (`ls`);
+    flushUndo;
+    file -save;
+}

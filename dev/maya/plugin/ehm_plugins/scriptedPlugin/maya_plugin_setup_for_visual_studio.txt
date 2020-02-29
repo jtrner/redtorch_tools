@@ -1,0 +1,68 @@
+file, new project, Win32 Project
+set name and address, create
+DLL, empty project, finish
+
+
+right click on project, properties
+
+
+properties, all configuration, linker
+-----------------------------------------
+
+general, output file: 
+$(OutDir)\$(ProjectName).mll
+
+general, addi..library directories: 
+C:\Program Files\Autodesk\Maya2015\lib
+
+input, addi...dependencies:
+Foundation.lib;OpenMaya.lib;OpenMayaUI.lib;OpenMayaAnim.lib;OpenMayaFX.lib;OpenMayaRender.lib;Image.lib;OpenGL32.lib;glu32.lib;
+
+command line, additional options: 
+/export:initializePlugin /export:uninitializePlugin
+
+
+
+-----------------------------------------
+create a "cpp" file in your project so the options will appear
+right click, add existing item, select this new "cpp" file
+
+
+
+properties, all configurations, C/C++
+-----------------------------------------
+general, addi...Directories: 
+C:\Program Files\Autodesk\Maya2015\include
+
+preprocessor, ...Definitions: 
+WIN32, NDEBUG;_WINDOWS;NT_PLUGIN;REQUIRE_IOSTREAM
+
+
+
+properties, configuration manager
+-----------------------------------------
+
+active...platform:
+new, x64, copy from Win32, ok
+
+
+
+
+load and unload plugin command
+-----------------------------------------
+string $plugin =  "D:/all_works/MAYA_DEV/EHM_tools/MAYA/plugin/ehm_plugins/ehm_smooth/x64/Debug/ehm_smooth.mll";
+
+if (`pluginInfo -q -loaded $plugin`) 
+{
+    file -new -f;
+    unloadPlugin "ehm_smooth";
+    print "plugin unloaded";
+}
+else 
+{
+    loadPlugin $plugin;
+    print "plugin loaded";
+    polyCube -w 1 -h 1 -d 1 -sx 3 -sy 3 -sz 3 -ax 0 1 0 -cuv 4 -ch 0;
+    deformer -type "ehm_smooth";
+
+}

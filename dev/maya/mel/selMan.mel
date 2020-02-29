@@ -1,0 +1,215 @@
+// Copyright (C) 2006 
+//
+// selMan v0.0.3
+//
+// ----------------------------------------------------------------------------------
+// Description:
+// 
+// A selection list manager, stores the active selection list and then you can
+// replace, add, deselect the stored list...
+// 
+// ----------------------------------------------------------------------------------
+// 
+// version tracker:
+// ------------------
+// 
+// v0.0.3
+// - fixed an interface bug which occurs when you delete a selection row by
+//   clicking "D" button
+// 
+// v0.0.2
+// - added description field
+//
+// v0.0.1
+// - initial version
+// 
+// 
+global proc selMan()
+{
+	
+	if ( `window -ex SelMan_Window` ){
+		deleteUI -wnd SelMan_Window;
+	}
+	
+	
+	window -wh 100 100 -t "SelMan v0.0.3" SelMan_Window;
+		
+		
+		string $formLayout1 = `formLayout -nd 100 FormLayout1`;
+			
+			string $button1, $button1Command;
+			$button1 = `button -l "Add selection to List"`;
+			
+			setParent..;
+			
+			string $scrollLayoutResizeCommand1;
+			string $scrollLayout1 = `scrollLayout -cr true ScrollLayout1`;
+
+//				string $formLayout2 = `formLayout -nd 100`;
+					string $gridLayout = `gridLayout -aec false -cr false -nc 1 -cwh (17*4+204) 22 GridLayout1`; 
+	
+//					setParent..;
+				setParent..;
+				
+			setParent..;
+			
+	setParent..;
+	
+	$button1Command = "string $gridLayout = \""+$gridLayout+"\";"+
+							"SelMan_AddButtonGrp($gridLayout);";
+	
+	button -e -c $button1Command $button1;
+	
+	formLayout -e
+		-attachForm $button1 "left" 0
+		-attachForm $button1 "right" 0
+		-attachForm $button1 "top" 0
+		-attachNone $button1 "bottom"
+		
+		-attachControl $scrollLayout1 "top" 0 $button1
+		-attachForm $scrollLayout1 "left" 0
+		-attachForm $scrollLayout1 "right" 0
+		-attachForm $scrollLayout1 "bottom" 0
+		
+		$formLayout1;
+	
+//	formLayout -e
+//		-af $gridLayout "left" 0
+//		-af $gridLayout "right" 0
+//		-af $gridLayout "bottom" 0
+//		-af $gridLayout "top" 0
+//		
+//		$formLayout2;
+	
+	showWindow SelMan_Window;
+	
+}
+
+
+
+
+
+global proc SelMan_AddButtonGrp(string $gridLayout)
+{
+	
+	int $gridLayoutWidth = `gridLayout -q -w $gridLayout`;
+	
+	string $formLayout = `formLayout -p $gridLayout -w $gridLayoutWidth -nd 100`;
+		
+		string $replaceButton, $replaceButtonCommand;
+		$replaceButton = `button -w 17 -l "R"`;
+		
+		string $addButton, $addButtonCommand;
+		$addButton = `button -w 17 -l "+"`;
+		
+		string $subtractButton, $subtractButtonCommand;
+		$subtractButton = `button -w 17 -l "-"`;
+		
+		string $deleteButton, $deleteButtonCommand;
+		$deleteButton = `button -w 17 -l "D"`;
+		
+		string $descriptionField;
+		$descriptionField = `textField -w 204 -text "Description..."`;
+		
+		string $storage, $storageText;
+		$storage = `text -m false -vis false`;
+		
+	setParent..;
+	
+	formLayout -e
+		-attachForm $replaceButton "left" 0
+		-attachForm $replaceButton "top" 0
+		-attachForm $replaceButton "bottom" 0
+		-attachPosition $replaceButton "right" 0 5
+		
+		-attachControl $addButton "left" 0 $replaceButton
+		-attachForm $addButton "top" 0
+		-attachForm $addButton "bottom" 0
+		-attachPosition $addButton "right" 0 10
+		
+		-attachControl $subtractButton "left" 0 $addButton
+		-attachForm $subtractButton "top" 0
+		-attachForm $subtractButton "bottom" 0
+		-attachPosition $subtractButton "right" 0 15
+		
+		-attachControl $deleteButton "left" 0 $subtractButton
+		-attachForm $deleteButton "top" 0
+		-attachForm $deleteButton "bottom" 0
+		-attachPosition $deleteButton "right" 0 20
+		
+		-attachControl $descriptionField "left" 0 $deleteButton
+		-attachForm $descriptionField "top" 0
+		-attachForm $descriptionField  "bottom" 0
+		-attachForm $descriptionField  "right" 0
+		
+	$formLayout;
+	
+	string $temp[] = `ls -sl`;
+	$storageText = stringArrayToString ($temp , "," );
+	
+	text -e -l $storageText $storage;
+	
+	$replaceButtonCommand = "string $text = \""+$storage+"\";"+
+										"string $tempText = `text -q -l $text`;"+
+										"string $storedSelList[] = stringToStringArray ( $tempText , \",\" );"+
+										"select -r $storedSelList;";
+										
+	$addButtonCommand = "string $text = \""+$storage+"\";"+
+										"string $tempText = `text -q -l $text`;"+
+										"string $storedSelList[] = stringToStringArray ( $tempText , \",\" );"+
+										"select -add $storedSelList;";
+	
+	$subtractButtonCommand = "string $text = \""+$storage+"\";"+
+										"string $tempText = `text -q -l $text`;"+
+										"string $storedSelList[] = stringToStringArray ( $tempText , \",\" );"+
+										"select -d $storedSelList;";
+	
+	$deleteButtonCommand = "string $formLayout = \""+$formLayout+"\";"+
+										"string $gridLayout = \""+$gridLayout+"\";"+
+										"deleteUI -layout $formLayout;"+
+										"SelMan_AdjustGridLayoutSize( $gridLayout );";
+										
+	button -e -c $replaceButtonCommand $replaceButton;
+	button -e -c $addButtonCommand $addButton;
+	button -e -c $subtractButtonCommand $subtractButton;
+	button -e -c $deleteButtonCommand $deleteButton;
+	
+//	print (`formLayout -q -w $formLayout`);
+	
+	SelMan_AdjustGridLayoutSize( $gridLayout );
+	
+}
+
+
+
+
+
+global proc SelMan_AdjustGridLayoutSize( string $gridLayout )
+{
+	
+	int $gridNumOfColumn = `gridLayout -q -nc $gridLayout`;
+	int $gridNumOfChildren = `gridLayout -q -nch $gridLayout`;
+	int $gridNumOfRealRows = ($gridNumOfChildren - 1) / $gridNumOfColumn + 1;
+	int $gridCellHeight = `gridLayout -q -ch $gridLayout`;
+	int $gridRealHeight = $gridCellHeight * $gridNumOfRealRows;
+	
+	
+	$gridRealHeight = max(1,$gridRealHeight);
+	$gridNumOfRealRows = max(1,$gridNumOfRealRows);
+	
+	
+	// end of debug
+	gridLayout -e -h $gridRealHeight -nr $gridNumOfRealRows $gridLayout;
+	
+	
+	// debug
+	// adjust child formLayouts size
+	string $gridChilds[] = `gridLayout -q -ca $gridLayout`;
+	int $i;
+	for ( $i = 0 ; $i < size($gridChilds) ; $i++ )
+	{
+		formLayout -e -h 22 -w 380 $gridChilds[$i];
+	}
+	
+	
+}

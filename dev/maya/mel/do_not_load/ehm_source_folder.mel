@@ -1,0 +1,29 @@
+/*global proc source_folder( string $dir_path )
+{
+    string $subFolder = "";
+    string $subFolders[];
+    $subFolders = `getFileList -folder $dir_path`;   
+    if ( !`size $subFolders` )
+    {
+        return;
+    }
+    for ( $subFolder in $subFolders )
+    {
+        if( $subFolder==".git" || $subFolder=="" ){continue;}
+        string $mel_files[] = {};           
+        $mel_files = `getFileList -folder ( $dir_path + "/" ) -filespec "*.mel"`;
+        print ( $dir_path + "/" );
+        if ( `size($mel_files)` )
+        {
+            for ($mel_file in $mel_files){
+                //$melPath =  substituteAllString( ($dir_path + "/" + $mel_file) , "/", "/");
+                $melPath =  `fromNativePath($dir_path + "/" + $mel_file)` ;
+                $melPath = "\"" + $melPath + "\";";
+                //print ("\nSourcing............" + $melPath);                
+                catch( eval( "source " + $melPath ) );
+            }
+        }
+        source_folder( $dir_path + $subFolder + "/" );
+    }
+}
+source_folder ("D:/all_works/MAYA_DEV/EHM_tools/MAYA/codes/mel");*/

@@ -1,0 +1,10 @@
+install numpy and scipy
+
+
+- download and install python C:/Python27
+- download and install pip
+- download compiled numpy and scipy for Maya
+- open command prompt
+- navigate to C:/Python27
+- python -m pip install "Address to numpy.whl file" 
+- copy folder "C:\Python27\Lib\site-packages\scipy" to "C:\Program Files\Autodesk\Maya2018\Python\Lib\site-packages"

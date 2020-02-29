@@ -1,0 +1,29 @@
+global proc ehm_selectVerticesOnLeft( string $obj, int $vertexOnCenter )
+{
+    float $epsilon = 0.001;
+    int $numOfVtx[] = `polyEvaluate -vertex $obj`;
+    string $vtxOnLeftList[];
+    string $vtx;
+    float $pos[];
+    int $i;
+    for($i=0;$i<$numOfVtx[0];$i++)
+    {    
+        $vtx = ($obj + ".vtx[" + $i + "]");
+        $pos = `xform -q -ws -t $vtx`;
+        if($vertexOnCenter==1)
+        {
+            if($pos[0]<=$epsilon) // include vertices on center line
+            {
+                $vtxOnLeftList[size($vtxOnLeftList)]=$vtx;
+            }
+         }
+        else
+        {
+            if($pos[0]<-$epsilon)   // include only vertices left side and not on center line
+             {
+                 $vtxOnLeftList[size($vtxOnLeftList)]=$vtx;
+             }
+         }
+    }
+    select $vtxOnLeftList;
+}

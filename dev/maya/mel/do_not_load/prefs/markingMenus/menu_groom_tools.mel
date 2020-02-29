@@ -1,0 +1,163 @@
+
+    menuItem
+        -label "Create Guide" 
+        -divider 0
+        -subMenu 0
+        -tearOff 0
+        -command "XgGuideTool;\n" 
+        -optionBox 0
+        -enable 1
+        -data 0
+        -radialPosition "NW" 
+        -allowOptionBoxes 1
+        -postMenuCommandOnce 0
+        -enableCommandRepeat 1
+        -echoCommand 0
+        -italicized 0
+        -boldFont 1
+        -sourceType "mel" 
+        -longDivider 1
+        menuEditorMenuItem1;
+
+    menuItem
+        -label "Comb" 
+        -divider 0
+        -subMenu 0
+        -tearOff 0
+        -command "python(\"xgui.createDescriptionEditor(False).guideSculptContext(False)\");\n" 
+        -optionBox 0
+        -enable 1
+        -data 0
+        -radialPosition "N" 
+        -allowOptionBoxes 1
+        -postMenuCommandOnce 0
+        -enableCommandRepeat 1
+        -echoCommand 0
+        -italicized 0
+        -boldFont 1
+        -sourceType "mel" 
+        -longDivider 1
+        menuEditorMenuItem3;
+
+    menuItem
+        -label "Hide / Show" 
+        -divider 0
+        -subMenu 0
+        -tearOff 0
+        -command "python(\"xgen.toggleGuideDisplay(xgui.createDescriptionEditor(False).currentDescription())\");\n" 
+        -optionBox 0
+        -enable 1
+        -data 0
+        -radialPosition "NE" 
+        -allowOptionBoxes 1
+        -postMenuCommandOnce 0
+        -enableCommandRepeat 1
+        -echoCommand 0
+        -italicized 0
+        -boldFont 1
+        -sourceType "mel" 
+        -longDivider 1
+        menuEditorMenuItem2;
+
+    menuItem
+        -label "Edit Mode" 
+        -divider 0
+        -subMenu 0
+        -tearOff 0
+        -command "selectMode -component;\nselectType -vertex true;\nhilite `ls -sl`;" 
+        -optionBox 0
+        -enable 1
+        -data 0
+        -radialPosition "W" 
+        -allowOptionBoxes 1
+        -postMenuCommandOnce 0
+        -enableCommandRepeat 1
+        -echoCommand 0
+        -italicized 0
+        -boldFont 1
+        -sourceType "mel" 
+        -longDivider 1
+        menuEditorMenuItem4;
+
+    menuItem
+        -label "Object Mode" 
+        -divider 0
+        -subMenu 0
+        -tearOff 0
+        -command "selectMode -object;\n" 
+        -optionBox 0
+        -enable 1
+        -data 0
+        -radialPosition "E" 
+        -allowOptionBoxes 1
+        -postMenuCommandOnce 0
+        -enableCommandRepeat 1
+        -echoCommand 0
+        -italicized 0
+        -boldFont 1
+        -sourceType "mel" 
+        -longDivider 1
+        menuEditorMenuItem5;
+
+    menuItem
+        -label "Length Lock / Unlock " 
+        -divider 0
+        -subMenu 0
+        -tearOff 0
+        -command "string $lockCtx = `currentCtx`;\nint $lockState = `xgmGuideSculptContext -q -lockLength $lockCtx`;\nif ($lockState == 1)\n{\n    xgmGuideSculptContext -e -lockLength 0 `currentCtx`;\n}\nelse\n{\n    xgmGuideSculptContext -e -lockLength 1 `currentCtx`;\n}" 
+        -optionBox 0
+        -enable 1
+        -data 0
+        -radialPosition "S" 
+        -allowOptionBoxes 1
+        -postMenuCommandOnce 0
+        -enableCommandRepeat 1
+        -echoCommand 0
+        -italicized 0
+        -boldFont 1
+        -sourceType "mel" 
+        -longDivider 1
+        menuEditorMenuItem6;
+
+    menuItem
+        -label "Preview" 
+        -divider 0
+        -subMenu 0
+        -tearOff 0
+        -command "XgPreview;\n" 
+        -optionBox 0
+        -enable 1
+        -data 0
+        -radialPosition "SW" 
+        -allowOptionBoxes 1
+        -postMenuCommandOnce 0
+        -enableCommandRepeat 1
+        -echoCommand 0
+        -italicized 0
+        -boldFont 0
+        -sourceType "mel" 
+        -longDivider 1
+        menuEditorMenuItem7;
+
+    menuItem
+        -label "Clear Preview" 
+        -divider 0
+        -subMenu 0
+        -tearOff 0
+        -command "python(\"xgui.createDescriptionEditor(False).preview(True)\");" 
+        -optionBox 0
+        -enable 1
+        -data 0
+        -radialPosition "SE" 
+        -allowOptionBoxes 1
+        -postMenuCommandOnce 0
+        -enableCommandRepeat 1
+        -echoCommand 0
+        -italicized 0
+        -boldFont 0
+        -sourceType "mel" 
+        -longDivider 1
+        menuEditorMenuItem8;
+
+setParent -m ..;
+

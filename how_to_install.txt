@@ -1,0 +1,14 @@
+1- Put "redtorch_tools" folder somewhere in your computer
+
+2- Make a python shelf button from code below: ( do not use \ in the path, use / instead! )
+
+import sys
+path = "D:/all_works/redtorch_tools/dev/maya"
+if path in sys.path:
+    sys.path.remove(path)
+sys.path.insert(0, path)
+from python.toolbox import toolboxUI
+reload(toolboxUI)
+toolboxUI.launch()
+
+3- enjoy

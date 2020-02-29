@@ -1,0 +1,56 @@
+{
+    "L_cheekRaiser_CTL": {
+        "ty_pos": ["lCheekRaiser"]
+    },
+    "R_cheekRaiser_CTL": {
+        "ty_pos": ["rCheekRaiser"]
+    },
+    "L_squint_CTL": {
+        "ty_pos": ["lSquint"]
+    },
+    "R_squint_CTL": {
+        "ty_pos": ["rSquint"]
+    },
+    "L_innerBrowLowerer_CTL": {
+        "ty_pos": ["lInnerBrowLowerer"]
+    }, 
+    "R_innerBrowLowerer_CTL": {
+        "ty_pos": ["rInnerBrowLowerer"]
+    }, 
+    "L_innerBrowRaiser_CTL": {
+        "ty_pos": ["lInnerBrowRaiser"]
+    }, 
+    "R_innerBrowRaiser_CTL": {
+        "ty_pos": ["rInnerBrowRaiser"]
+    },  
+    "L_outerBrowRaiser_CTL": {
+        "ty_pos": ["lOuterBrowRaiser"]
+    }, 
+    "R_outerBrowRaiser_CTL": {
+        "ty_pos": ["rOuterBrowRaiser"]
+    },
+    "L_upperLipRaiser_CTL": {
+        "ty_pos": ["lUpperLipRaiser"]
+    },
+    "R_upperLipRaiser_CTL": {
+        "ty_pos": ["rUpperLipRaiser"]
+    },
+    "L_noseWrinkler_CTL": {
+        "ty_pos": ["lNoseWrinkler"]
+    }, 
+    "R_noseWrinkler_CTL": {
+        "ty_pos": ["rNoseWrinkler"]
+    },
+    "L_nostrilDialator_CTL": {
+        "ty_pos": ["lNostrilDialator"]
+    }, 
+    "R_nostrilDialator_CTL": {
+        "ty_pos": ["rNostrilDialator"]
+    },
+    "L_nostrilCompressor_CTL": {
+        "ty_pos": ["lNostrilCompressor"]
+    }, 
+    "R_nostrilCompressor_CTL": {
+        "ty_pos": ["rNostrilCompressor"]
+    }
+}

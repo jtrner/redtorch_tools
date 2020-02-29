@@ -1,0 +1,146 @@
+cut
+=========================
+amount: rand(0.0,1.6)*$cLength
+
+or
+
+amount: 
+$min = 0.0000;
+$max = 1.0000;
+$a = rand(1-$min, 1-$max) * $cLength;
+$a
+
+or 
+
+amount:
+$affectedPercentage=80;
+$min = 0.0000;
+$max = 1.0000;
+$value = rand(1.0-$min, 1.0-$max) * $cLength;
+rand() < $affectedPercentage/100.0 ? $value : 0
+
+
+noise
+=========================
+magnitude: stray()?1:0
+
+
+=========
+magnitude: stray()?rand(2,5):0
+
+
+=========
+manginude: 
+$percentStray = 34;
+$value = 11;
+rand() < $percentStray/100.0 ? $value : 0
+
+
+=========
+magnitude:
+$nonStrayValue = 0.0000;
+$strayValue = 0.5000;
+$percent = 12.0000;
+$stray = hash($id) <= $percent/100.0 ? $strayValue : $nonStrayValue; 
+$stray
+
+
+=========
+mask
+$a=map('${DESC}/paintmaps/fuzz_mask');#3dpaint,100.0
+$nonStrayValue = 0.0000;#0.0,1.0 
+$strayValue = 1.0000;#0.0,1.0 
+$percent = 40.0000;#0.0,100.0 
+$stray = hash($id) <= $percent/100.0 ? $strayValue : $nonStrayValue; 
+$stray * $a
+
+magnitude
+$hi =1.0000;
+$lo =0.0600;
+$contrast =0.9743;
+$freq =5.0000; #.1,30
+$mult = 2.0000;
+(smoothstep(noise($P*$freq), $lo, $hi) -> contrast($contrast)) * $mult
+
+
+=========
+new noise from Michael Todd
+
+$min=0.8;#0.00,1.0
+$max=1;#1.0,10.0
+$seed=4;#0,100
+$scale=5.1100;#0.00,100.00
+$smin=0.1800;#0.00,1.00
+$smax=0.5850;#0.00,1.00
+rand($min,$max,$seed)*fbm($Prefgw*$scale)->smoothstep($smin, $smax)
+
+ 
+Or this one:
+ 
+$freq_fine = 0.49648; #0.00,1.00
+$freq_coarse = 7; # 0,100
+$X = 1; #0.00,10.00
+$Y = 1; #0.00,10.00
+$Z = 1; #0.00,10.00
+$frequency = ($freq_fine+$freq_coarse) * [$X,$Y,$Z];
+$Strength=1;
+$Contrast = 0.89437;
+$Color = 0; #0,1
+$Cnew = choose($Color, noise($Prefgw*$frequency), cnoise($Prefgw*$frequency)) -> contrast($Contrast);
+mix($Cs,$Cnew,$Strength)
+
+
+=========
+Batch Render Descriptions
+In the XGen window, click the Preview/Output.
+In the Output Settings section, set:
+Operation to Render.
+Renderer to your installed renderer.
+Primitive Bound to 1 or greater than 1.
+For long primitives, set this value higher. If you know the Length of the primitives, set Primitive Bound .
+
+In the renderer specific Settings section, set Render Mode to Batch Render.
+(Optional) To render with motion blur, enable it in the Maya Render Settings Window, and set other desired motion blur options.
+Export the XGen patches for rendering, by selecting File > Export Patches for Batch Render in the XGen Editor.
+If the patches are animated, turn on Animated and set the Frame Range required for the render.
+Note: If you are rendering with motion blur, set the frame range of the patch export so that it includes the frame before and after the frame range you want to render.
+Click Export File.
+Maya saves the bound geometry as an Alembic (.abc) file. The file is saved to the set project's scene folder and uses the following file naming conventions:
+_scene name_collection name_plt.abc.
+
+
+
+
+=================================================
+How to have color choose in xgen
+
+Under Global expression:
+--------------------------------------------------------------------------------
+*create float rnkHairColorToggle_G()
+
+
+--------------------------------------------------------------------------------
+*create color hairColor_G
+
+#variant colors
+$blond = [0.925001907378,0.799206530861,0.48101014725]; #color
+$brown = [0.424994277867,0.253345540551,0.0252079041733]; #color
+$black = [0.0500038147555,0.0370489051652,0.0259555962463]; #color
+
+#Slider control set for 1-4 for four maps.
+$variant=rnkHairColorToggle_G();
+#Sets selection range.
+$fit=expand($variant,0,3);
+#choose() functon chooses a selection choice based on the range.
+choose($fit,$blond,$brown,$black)
+
+--------------------------------------------------------------------------------
+
+Under Preview/Output:
+Add "hairColor_G()" to Primitive Color slot
+- this will allow view port hair color change when hairColorToggle is switched.
+
+Add float hairColorToggle to Custom Shader parameters and put in "rnkHairColorToggle_G()" in it
+
+In hypershade:
+- add a rsUserDataInteger node, and key in "hairColorToggle"

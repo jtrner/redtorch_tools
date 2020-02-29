@@ -1,0 +1,20 @@
+//Maya Preference 2018 (Release 1)
+//
+//
+
+runTimeCommand
+	-annotation "groom_tools (Press)"
+	-category "Other items.User Marking Menus"
+	-hotkeyCtx ""
+	-commandLanguage "mel"
+	-command ("if (`popupMenu -exists tempMM`) { deleteUI tempMM; }\npopupMenu -button 1 -ctl false -alt true -sh false -allowOptionBoxes true -parent `findPanelPopupParent` -mm 1 tempMM; \nsource \"menu_groom_tools\";\n")
+	groom_tools_Press;
+
+runTimeCommand
+	-annotation "groom_tools (Release)"
+	-category "Other items.User Marking Menus"
+	-hotkeyCtx ""
+	-commandLanguage "mel"
+	-command ("if (`popupMenu -exists tempMM`) { deleteUI tempMM; }")
+	groom_tools_Release;
+

@@ -1,0 +1,3 @@
+$paths = `getenv "MAYA_PLUG_IN_PATH"`;
+$paths += ";E:/all_works/redtorch_tools/dev/maya/plugin/ehm_plugins/scriptedPlugin;";
+putenv "MAYA_PLUG_IN_PATH" $paths;

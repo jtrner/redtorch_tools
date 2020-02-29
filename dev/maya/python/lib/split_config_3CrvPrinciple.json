@@ -1,0 +1,45 @@
+{
+    "start": {
+        "R": {
+            "targets": [
+                "C_mouth_GRP_BS_up",
+                "C_mouth_GRP_BS_down",
+                "C_mouth_GRP_BS_left",
+                "C_mouth_GRP_BS_right"
+            ],
+            "baseWeightsPath": null
+        }
+    },
+    "mid": {
+        "U": {
+            "targets": [
+                "C_mouth_GRP_BS_up",
+                "C_mouth_GRP_BS_down",
+                "C_mouth_GRP_BS_left",
+                "C_mouth_GRP_BS_right"
+            ],
+            "baseWeightsPath": "C:/Users/hmehs/OneDrive/Desktop/blendShape1.json"
+        },
+        "D": {
+            "targets": [
+                "C_mouth_GRP_BS_up",
+                "C_mouth_GRP_BS_down",
+                "C_mouth_GRP_BS_left",
+                "C_mouth_GRP_BS_right"
+            ],
+            "baseWeightsPath": "C:/Users/hmehs/OneDrive/Desktop/blendShape1.json",
+            "invertWeights": true
+        }
+    },
+    "end": {
+        "L": {
+            "targets": [
+                "C_mouth_GRP_BS_up",
+                "C_mouth_GRP_BS_down",
+                "C_mouth_GRP_BS_left",
+                "C_mouth_GRP_BS_right"
+            ],
+            "baseWeightsPath": null
+        }
+    }
+}

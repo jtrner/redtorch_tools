@@ -1,0 +1,69 @@
+bodyFur:
+{
+generate primitives: randomly across the surface
+
+density: 20000
+modifier cv count: 8
+width ramp: {pos:0, val:0.237}, {pos:1, val:0.01}
+
+length: 
+{
+    $LengthMin=0.9;
+    $LengthMax=1.0;
+    rand($LengthMin, $LengthMax)
+}
+
+width:
+{   
+    $nonStrayValue = 0.100;
+    $strayValue = 0.2000;
+    $percent = 25.0000;
+    $stray = hash($id) <= $percent/100.0 ? $strayValue : $nonStrayValue; 
+    $stray
+}
+
+clumping1:
+{
+    - clump:
+        $nonStrayValue = 0.0000;
+        $strayValue = 1.0000;
+        $percent = 25.0000;
+        $stray = hash($id) <= $percent/100.0 ? $strayValue : $nonStrayValue; 
+        $stray
+    - at guide position
+}
+
+
+clumping2:
+{   
+    - clump:
+        $nonStrayValue = 0.0000;
+        $strayValue = 1.0000;
+        $percent = 35.0000;
+        $stray = hash($id) <= $percent/100.0 ? $strayValue : $nonStrayValue; 
+        $stray
+    - density: 2000
+    - radius variance: 0.5
+    - use control maps: True
+    - control mask: ${DESC}/paintmaps/clump1MaskMap
+    - control map: ${DESC}/Clumping1/Maps/
+}
+
+noise1:
+{
+    - frequency: 3.0
+    - magnitude: 
+        $nonStrayValue = 0.1000;
+        $strayValue = 1.0000;
+        $percent = 35.0000;
+        $stray = hash($id) <= $percent/100.0 ? $strayValue : $nonStrayValue; 
+        $stray
+}
+
+cut1:
+{
+    amount: clamp(rand(0.0,0.01),0.0,$cLength*0.95)
+    rebuild type: reparam
+}
+
+}

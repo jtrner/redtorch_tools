@@ -1,0 +1,152 @@
+{
+"L_outerLip_CTL": {
+                    "tx_pos": ["L_Flat_Smile"],
+                    "ty_pos": ["L_Mouth_Up"],
+                    "ty_neg": ["L_Mouth_Corner_Down"]
+                  },
+"R_outerLip_CTL": {
+                    "tx_pos": ["R_Flat_Smile"],
+                    "ty_pos": ["R_Mouth_Up"],                    
+                    "ty_neg": ["R_Mouth_Corner_Down"]
+                  },
+"L_cheek_CTL": {
+                 "ty": ["L_Cheek_Raiser"],
+                 "tx_neg": ["L_Eye_Inner_Squint"]
+               },
+"R_cheek_CTL": {
+                 "ty": ["R_Cheek_Raiser"],
+                 "tx_neg": ["R_Eye_Inner_Squint"]
+               },
+"L_cheekPuff_CTL": {
+                    "tx_pos": ["L_Cheek_Inflate"],
+                    "tx_neg": ["L_Cheek_In"]
+                  },
+"R_cheekPuff_CTL": {
+                    "tx_pos": ["R_Cheek_Inflate"],
+                    "tx_neg": ["R_Cheek_In"]
+                  },
+"L_lowerLid_CTL": {
+                    "ty": ["L_EyeLid_Lower_Up"]
+                  },
+"R_lowerLid_CTL": {
+                    "ty": ["R_EyeLid_Lower_Up"]
+                  },
+"L_upperLid_CTL": {
+                    "ty_neg": ["L_Eye_Blink"]
+                  },
+"R_upperLid_CTL": {
+                    "ty_neg": ["R_Eye_Blink"]
+                  },
+"L_outerBrow_CTL": {
+                     "ty_pos": ["L_Brow_Outer_Up"],
+                     "ty_neg": ["L_Brow_Outer_Down"]
+                  },
+"R_outerBrow_CTL": {
+                     "ty_pos": ["R_Brow_Outer_Up"],
+                     "ty_neg": ["R_Brow_Outer_Down"]
+                  },
+"L_innerBrow_CTL": {
+                     "tx_neg": ["L_Brow_Furrow"],
+                     "ty_pos": ["L_Brow_Inner_Up"],
+                     "ty_neg": ["L_Brow_Inner_Down"]
+                   },
+"R_innerBrow_CTL": {
+                     "tx_neg": ["R_Brow_Furrow"],
+                     "ty_pos": ["R_Brow_Inner_Up"],
+                     "ty_neg": ["R_Brow_Inner_Down"]
+                   },
+"C_upperLip_CTL": {
+                     "ty_pos": ["C_Lip_Upper_Up"],
+                     "ty_neg": ["C_Lip_Upper_Down"],
+                     "tx_pos": ["Lips_Upper_Curl_Out"],
+                     "tx_neg": ["Lips_Upper_Curl_In"],
+                     "tz_pos": ["Lips_Upper_Forward"],
+                     "tz_neg": ["Lips_Upper_Back"]
+                     
+                  },
+"C_lowerLip_CTL": {
+                     "ty_pos": ["C_Lip_Lower_Up"],
+                     "ty_neg": ["C_Lip_Lower_Down"],
+                     "tx_pos": ["Lips_Lower_Curl_Out"],
+                     "tx_neg": ["Lips_Lower_Curl_In"],
+                     "tz_pos": ["Lips_Lower_Forward"],
+                     "tz_neg": ["Lips_Lower_Back"]                    
+                  },
+"L_upperMidLip_CTL": {
+                        "ty_pos": ["L_Lip_Upper_Mid_Up"],
+                        "ty_neg": ["L_Lip_Upper_Mid_Down"]
+                      },
+"R_upperMidLip_CTL": {
+                        "ty_pos": ["R_Lip_Upper_Mid_Up"],
+                        "ty_neg": ["R_Lip_Upper_Mid_Down"]
+                      },
+"L_lowerMidLip_CTL": {
+                        "ty_pos": ["L_Lip_Lower_Mid_Up"],
+                        "ty_neg": ["L_Lip_Lower_Mid_Down"]
+                      },
+"R_lowerMidLip_CTL": {
+                        "ty_pos": ["R_Lip_Lower_Mid_Up"],
+                        "ty_neg": ["R_Lip_Lower_Mid_Down"]
+                      },
+"L_lipStretcher_CTL": {
+                        "ty_neg": ["L_Mouth_Corner_Down_Left"],
+                        "tx_pos": ["L_Neck_Tense"]
+                      },
+"R_lipStretcher_CTL": {
+                        "ty_neg": ["R_Mouth_Corner_Down_Right"],
+                        "tx_pos": ["R_Neck_Tense"]
+                      },
+"L_lipPuller_CTL": {  
+                     "ty_pos": ["L_Mouth_Corner_Up_Left"]
+                   },
+"R_lipPuller_CTL": {
+                     "ty_pos": ["R_Mouth_Corner_Up_Right"]
+                   },
+"C_lipPressor_CTL": {
+                      "tz_pos": ["Lips_Pucker"],
+                      "tx_neg": ["Lips_Purse"],
+                      "ty_pos": ["R_Lip_Upper_Mid_Tight",
+                                 "R_Lip_Lower_Mid_Tight",
+                                 "L_Lip_Upper_Mid_Tight",
+                                 "L_Lip_Lower_Mid_Tight",
+                                 "C_Lip_Lower_Tight",
+                                 "C_Lip_Upper_Tight"],
+                      "ty_neg": ["Lips_Compress"]
+                    },
+"C_nose_CTL": {
+                "ty_pos": ["Nose_Tip_Up"],
+                "ty_neg": ["Nose_Down"]
+              },
+"L_nostril_CTL": {
+                   "tx_pos": ["L_Nose_Flare_Out"],
+                   "tx_neg": ["L_Nose_Flare_In"],
+                   "ty_pos": ["L_Sneer"]
+                 },
+"R_nostril_CTL": {
+                   "tx_pos": ["R_Nose_Flare_Out"],
+                   "tx_neg": ["R_Nose_Flare_In"],
+                   "ty_pos": ["R_Sneer"]
+                 },
+"C_mouth_CTL": {
+                "tx_pos": ["Mouth_Muzzle_Left"],
+                "tx_neg": ["Mouth_Muzzle_Right"],
+                "ty_pos": ["Mouth_Muzzle_Up"],
+                "ty_neg": ["Mouth_Muzzle_Down"]
+               },
+"C_jawMicro_CTL": {
+               "tx_pos": ["Jaw_Left", "Jaw_Tilt_Left"],
+               "tx_neg": ["Jaw_Right", "Jaw_Tilt_Right"],
+               "ty_neg": ["Jaw_Open"],
+               "tz_pos": ["Jaw_Forward"],
+               "tz_neg": ["Jaw_Back"]
+             },
+"C_chin_CTL": {
+                 "tx_pos": ["Chin_Roll"],
+                 "ty_pos": ["Chin_Move"]
+               },
+"C_apple_CTL": {
+                 "ty_pos": ["Apple_Up"],
+                 "ty_neg": ["Apple_Down"],
+                 "tx_pos": ["Double_Chin"]
+               }
+}

@@ -1,0 +1,432 @@
+{
+"EYES":{
+        "L_UpperLidOpenClose": {
+                        "transformLimits": [-1, 1],
+                        "negList": ["lUpperLidRaiser"],
+                        "posList": ["lUpperLidLowerer"]
+                       },
+        "R_UpperLidapenClose": {
+                        "transformLimits": [-1, 1],
+                        "negList": ["rUpperLidRaiser"],
+                        "posList": ["rUpperLidLowerer"]
+                       },
+        "L_LowerLidOpenClose": {
+                        "transformLimits": [-1, 1],
+                        "negList": ["lLowerLidLowerer"],
+                        "posList": ["lLowerLidRaiser"]
+                       },
+        "R_LowerLidOpenClose": {
+                        "transformLimits": [-1, 1],
+                        "negList": ["rLowerLidLowerer"],
+                        "posList": ["rLowerLidRaiser"]
+                       },
+        "L_UpperLidTightner": {
+                                "transformLimits": [0, 1],
+                                "negList": [],
+                                "posList": ["lUpperLidTightner"]
+                               },
+        "R_UpperLidTightner": {
+                                "transformLimits": [0, 1],
+                                "negList": [],
+                                "posList": ["rUpperLidTightner"]
+                               },
+        "L_LowerLidTightner": {
+                                "transformLimits": [0, 1],
+                                "negList": [],
+                                "posList": ["lLowerLidTightner"]
+                               },
+        "R_LowerLidTightner": {
+                                "transformLimits": [0, 1],
+                                "negList": [],
+                                "posList": ["rLowerLidTightner"]
+                               },
+        "L_squint": {
+                     "transformLimits": [0, 1],
+                     "negList": [],
+                     "posList": ["lSquint"]
+                    },
+        "R_squint": {
+                     "transformLimits": [0, 1],
+                     "negList": [],
+                     "posList": ["rSquint"]
+                    }
+       },
+"BROWS":{
+        "L_InnerBrowRaiser": {
+                              "transformLimits": [0, 1],
+                              "negList": [],
+                              "posList": ["lInnerBrowRaiser"]
+                             },
+        "R_InnerBrowRaiser": {
+                              "transformLimits": [0, 1],
+                              "negList": [],
+                              "posList": ["rInnerBrowRaiser"]
+                             },
+        "L_OuterBrowRaiser": {
+                              "transformLimits": [0, 1],
+                              "negList": [],
+                              "posList": ["lOuterBrowRaiser"]
+                             },
+        "R_OuterBrowRaiser": {
+                              "transformLimits": [0, 1],
+                              "negList": [],
+                              "posList": ["rOuterBrowRaiser"]
+                             },
+        "L_BrowLowerer": {
+                          "transformLimits": [0, 1],
+                          "negList": [],
+                          "posList": ["lBrowLowerer"]
+                         },
+        "R_BrowLowerer": {
+                          "transformLimits": [0, 1],
+                          "negList": [],
+                          "posList": ["rBrowLowerer"]
+                         },
+        "Procerus": {
+                     "transformLimits": [0, 1],
+                     "negList": [],
+                     "posList": ["Procerus"]
+                    }
+        },
+"NOSE":{
+        "L_wrinkler": {
+                       "transformLimits": [0, 1],
+                       "negList": [],
+                       "posList": ["lWrinkler"]
+                      },
+        "R_wrinkler": {
+                       "transformLimits": [0, 1],
+                       "negList": [],
+                       "posList": ["rWrinkler"]
+                      },
+        "L_nasolabialFurrow": {
+                                       "transformLimits": [0, 1],
+                                       "negList": [],
+                                       "posList": ["lNasolabialFurrow"]
+                                      },
+        "R_nasolabialFurrow": {
+                                       "transformLimits": [0, 1],
+                                       "negList": [],
+                                       "posList": ["rNasolabialFurrow"]
+                                      },
+        "L_NostrilDialator": {
+                              "transformLimits": [0, 1],
+                              "negList": [],
+                              "posList": ["lNostrilDialator"]
+                             },
+        "R_NostrilDialator": {
+                              "transformLimits": [0, 1],
+                              "negList": [],
+                              "posList": ["rNostrilDialator"]
+                             },
+        "L_Nostril_Compressor": {
+                                 "transformLimits": [0, 1],
+                                 "negList": [],
+                                 "posList": ["lNostrilCompressor"]
+                                },
+        "R_Nostril_Compressor": {
+                                 "transformLimits": [0, 1],
+                                 "negList": [],
+                                 "posList": ["rNostrilCompressor"]
+                                }
+       },
+"CHEEKS":{
+          "L_cheekRaiser": {
+                            "transformLimits": [0, 1],
+                            "negList": [],
+                            "posList": ["lCheekRaiser"]
+                           },
+          "R_cheekRaiser": {
+                            "transformLimits": [0, 1],
+                            "negList": [],
+                            "posList": ["rCheekRaiser"]
+                           },
+          "L_UpperCheekPuff": {
+                               "transformLimits": [0, 1],
+                               "negList": [],
+                               "posList": ["lUpperCheekPuff"]
+                              },
+          "R_UpperCheekPuff": {
+                               "transformLimits": [0, 1],
+                               "negList": [],
+                               "posList": ["rUpperCheekPuff"]
+                              },
+          "L_LowerCheekPuff": {
+                               "transformLimits": [-1, 1],
+                               "negList": ["lCheekSuck"],
+                               "posList": ["lLowerCheekPuff"]
+                              },
+          "R_LowerCheekPuff": {
+                               "transformLimits": [-1, 1],
+                               "negList": ["rCheekSuck"],
+                               "posList": ["rLowerCheekPuff"]
+                              }
+         },
+"JAW":{
+       "JawOpenClose": {
+                        "transformLimits": [-1, 1],
+                        "negList": ["JawClose"],
+                        "posList": ["JawOpen"]
+                       },
+       "JawThrust": {
+                  "transformLimits": [-1, 1],
+                  "negList": [],
+                  "posList": ["JawThrust"]
+                 },
+       "JawLeftRight": {
+                "transformLimits": [-1, 1],
+                "negList": ["JawRight"],
+                "posList": ["JawLeft"]
+               },
+       "JawClench": {
+                  "transformLimits": [0, 1],
+                  "negList": [],
+                  "posList": ["JawClench"]
+                 }
+      },
+"LIP_PARTS":{
+             "UpperLipPart": {
+                               "transformLimits": [0, 1],
+                               "negList": [],
+                               "posList": ["UpperLipPart"]
+                              },
+             "LowerLipPart": {
+                               "transformLimits": [0, 1],
+                               "negList": [],
+                               "posList": ["LowerLipPart"]
+                              },
+             "L_UpperLipRaiser": {
+                               "transformLimits": [0, 1],
+                               "negList": [],
+                               "posList": ["lUpperLipRaiser"]
+                              },
+             "R_UpperLipRaiser": {
+                               "transformLimits": [0, 1],
+                               "negList": [],
+                               "posList": ["rUpperLipRaiser"]
+                              },
+             "L_LowerLipDepressor": {
+                               "transformLimits": [0, 1],
+                               "negList": [],
+                               "posList": ["lLowerLipDepressor"]
+                              },
+             "R_LowerLipDepressor": {
+                               "transformLimits": [0, 1],
+                               "negList": [],
+                               "posList": ["rLowerLipDepressor"]
+                              },
+             "C_LipsTogether": {
+                               "transformLimits": [0, 1],
+                               "negList": [],
+                               "posList": ["LipsTogether"]
+                              },
+             "C_LipZipper": {
+                               "transformLimits": [0, 1],
+                               "negList": [],
+                               "posList": ["LipZipper"]
+                              }
+            },
+"LIP_PULLERS":{
+               "L_LipCornerPuller": {
+                                 "transformLimits": [0, 1],
+                                 "negList": [],
+                                 "posList": ["lLipCornerPuller"]
+                                },
+               "R_LipCornerPuller": {
+                                 "transformLimits": [0, 1],
+                                 "negList": [],
+                                 "posList": ["rLipCornerPuller"]
+                                },
+               "L_SharpLipPuller": {
+                                 "transformLimits": [0, 1],
+                                 "negList": [],
+                                 "posList": ["lSharpLipPuller"]
+                                },
+               "R_SharpLipPuller": {
+                                 "transformLimits": [0, 1],
+                                 "negList": [],
+                                 "posList": ["rSharpLipPuller"]
+                                },
+               "L_LipStretcher": {
+                                 "transformLimits": [0, 1],
+                                 "negList": [],
+                                 "posList": ["lLipStretcher"]
+                                },
+               "R_LipStretcher": {
+                                 "transformLimits": [0, 1],
+                                 "negList": [],
+                                 "posList": ["rLipStretcher"]
+                                },
+               "L_LipCornerDepressor": {
+                                 "transformLimits": [0, 1],
+                                 "negList": [],
+                                 "posList": ["lLipCornerDepressor"]
+                                },
+               "R_LipCornerDepressor": {
+                                 "transformLimits": [0, 1],
+                                 "negList": [],
+                                 "posList": ["rLipCornerDepressor"]
+                                },
+                "L_Dimpler": {
+                                  "transformLimits": [0, 1],
+                                  "negList": [],
+                                  "posList": ["lDimpler"]
+                                 },
+                "R_Dimpler": {
+                                  "transformLimits": [0, 1],
+                                  "negList": [],
+                                  "posList": ["rDimpler"]
+                                 }
+              },
+"LIP_PRESSORS":{
+                "ChinRaiser": {
+                                  "transformLimits": [-1, 1],
+                                  "negList": ["ChinLowerer"],
+                                  "posList": ["ChinRaiser"]
+                                 },
+                "L_UpperLipPressor": {
+                                  "transformLimits": [0, 1],
+                                  "negList": [],
+                                  "posList": ["lUpperLipPressor"]
+                                 },
+                "R_UpperLipPressor": {
+                                  "transformLimits": [0, 1],
+                                  "negList": [],
+                                  "posList": ["rUpperLipPressor"]
+                                 },
+                "L_LowerLipPressor": {
+                                  "transformLimits": [0, 1],
+                                  "negList": [],
+                                  "posList": ["lLowerLipPressor"]
+                                 },
+                "R_LowerLipPressor": {
+                                  "transformLimits": [0, 1],
+                                  "negList": [],
+                                  "posList": ["rLowerLipPressor"]
+                                 },
+                "L_UpperLipTightner": {
+                                  "transformLimits": [0, 1],
+                                  "negList": [],
+                                  "posList": ["lUpperLipTightner"]
+                                 },
+                "R_UpperLipTightner": {
+                                  "transformLimits": [0, 1],
+                                  "negList": [],
+                                  "posList": ["rUpperLipTightner"]
+                                 },
+                "L_LowerLipTightner": {
+                                  "transformLimits": [0, 1],
+                                  "negList": [],
+                                  "posList": ["lLowerLipTightner"]
+                                 },
+                "R_LowerLipTightner": {
+                                  "transformLimits": [0, 1],
+                                  "negList": [],
+                                  "posList": ["rLowerLipTightner"]
+                                 },
+                "L_UpperLipPucker": {
+                                  "transformLimits": [0, 1],
+                                  "negList": [],
+                                  "posList": ["lUpperLipPucker"]
+                                 },
+                "R_UpperLipPucker": {
+                                  "transformLimits": [0, 1],
+                                  "negList": [],
+                                  "posList": ["rUpperLipPucker"]
+                                 },
+                "L_LowerLipPucker": {
+                                  "transformLimits": [0, 1],
+                                  "negList": [],
+                                  "posList": ["lLowerLipPucker"]
+                                 },
+                "R_LowerLipPucker": {
+                                  "transformLimits": [0, 1],
+                                  "negList": [],
+                                  "posList": ["rLowerLipPucker"]
+                                 },
+                "L_UpperLipFunneler": {
+                                  "transformLimits": [0, 1],
+                                  "negList": [],
+                                  "posList": ["lUpperLipFunneler"]
+                                 },
+                "R_UpperLipFunneler": {
+                                  "transformLimits": [0, 1],
+                                  "negList": [],
+                                  "posList": ["rUpperLipFunneler"]
+                                 },
+                "L_LowerLipFunneler": {
+                                  "transformLimits": [0, 1],
+                                  "negList": [],
+                                  "posList": ["lLowerLipFunneler"]
+                                 },
+                "R_LowerLipFunneler": {
+                                  "transformLimits": [0, 1],
+                                  "negList": [],
+                                  "posList": ["rLowerLipFunneler"]
+                                 },
+                "L_UpperLipPuff": {
+                                  "transformLimits": [0, 1],
+                                  "negList": [],
+                                  "posList": ["lUpperLipPuff"]
+                                 },
+                "R_UpperLipPuff": {
+                                  "transformLimits": [0, 1],
+                                  "negList": [],
+                                  "posList": ["rUpperLipPuff"]
+                                 },
+                "L_LowerLipPuff": {
+                                  "transformLimits": [0, 1],
+                                  "negList": [],
+                                  "posList": ["lLowerLipPuff"]
+                                 },
+                "R_LowerLipPuff": {
+                                  "transformLimits": [0, 1],
+                                  "negList": [],
+                                  "posList": ["rLowerLipPuff"]
+                                 }
+                },
+"SWALLOW": {
+            "UpDown": {
+                        "transformLimits": [-1, 1],
+                        "negList": ["SwallowUp"],
+                        "posList": ["SwallowDown"]
+                       },
+            "InOut": {
+                        "transformLimits": [-1, 1],
+                        "negList": ["SwallowIn"],
+                        "posList": ["SwallowOut"]
+                       }
+           },
+"NECK": {
+         "L_NeckTightner": {
+                        "transformLimits": [0, 1],
+                        "negList": [],
+                        "posList": ["lNeckTightner"]
+                       },
+         "R_NeckTightner": {
+                        "transformLimits": [0, 1],
+                        "negList": [],
+                        "posList": ["rNeckTightner"]
+                       },
+         "L_InnerPlatysma": {
+                        "transformLimits": [0, 1],
+                        "negList": [],
+                        "posList": ["lInnerPlatysma"]
+                       },
+         "R_InnerPlatysma": {
+                        "transformLimits": [0, 1],
+                        "negList": [],
+                        "posList": ["rInnerPlatysma"]
+                       },
+         "L_OuterPlatysma": {
+                        "transformLimits": [0, 1],
+                        "negList": [],
+                        "posList": ["lOuterPlatysma"]
+                       },
+         "R_OuterPlatysma": {
+                        "transformLimits": [0, 1],
+                        "negList": [],
+                        "posList": ["rOuterPlatysma"]
+                       }
+        }
+}
