@@ -5,6 +5,7 @@ import maya.mel as mm
 import xgenm
 
 from ..lib import crvLib
+reload(crvLib)
 
 
 def isclose(a, b, rel_tol=0.0001, abs_tol=0.0):
@@ -81,6 +82,14 @@ def spiral_ui():
 
 def averageAndDelete():
     crvLib.averageAndDelete()
+
+
+def increaseCrvLen():
+    [crvLib.increaseCrvLen(crv=x, percent=5) for x in mc.ls(sl=True)]
+
+
+def decreaseCrvLen():
+    [crvLib.decreaseCrvLen(crv=x, percent=5) for x in mc.ls(sl=True)]
 
 
 def updatePref(nodes=None, useSelection=True):

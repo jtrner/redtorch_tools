@@ -1034,6 +1034,9 @@ def averageAndDelete():
         wts.append((i, 1.0 / len(crvs[1:])))
     mc.blendShape(crvs[1:], crvs[0], w=wts)
     mc.delete(loc, crvs[1:])
+    mc.delete(crvs[0], constructionHistory=True)
+    print crvs[0]
+    mc.select(crvs[0])
 
 
 def setLength(crv, length):
@@ -1042,6 +1045,8 @@ def setLength(crv, length):
     reload(crvLib)
     [crvLib.setLength(crv=x, length=1) for x in mc.ls(sl=True)]
     """
+    sel = mc.ls(sl=True)
+
     spans = mc.getAttr(crv + '.spans')
     degree = mc.getAttr(crv + '.degree')
 
@@ -1053,6 +1058,7 @@ def setLength(crv, length):
         mc.delete(result[0])
     else:
         mc.extendCurve(crv,
+                       ch=False,
                        extendMethod=0,
                        extensionType=2,
                        distance=length - origLen,
@@ -1062,8 +1068,32 @@ def setLength(crv, length):
                        replaceOriginal=True)
 
     mc.rebuildCurve(crv,
+                    ch=False,
                     spans=spans,
                     degree=degree,
                     kr=0)
 
-    print mc.arclen(crv)
+    if sel:
+        mc.select(sel)
+
+    # print mc.arclen(crv)
+
+
+def increaseLen(crv, percent=5):
+    """
+    from python.lib import crvLib
+    reload(crvLib)
+    [crvLib.increaseLen(crv=x, percent=5) for x in mc.ls(sl=True)]
+    """
+    origLen = mc.arclen(crv)
+    extendAmount = origLen / 100.0 * percent
+    setLength(crv, length=origLen + extendAmount)
+
+
+def decreaseLen(crv, percent=5):
+    """
+    from python.lib import crvLib
+    reload(crvLib)
+    [crvLib.decreaseLen(crv=x, percent=5) for x in mc.ls(sl=True)]
+    """
+    increaseLen(crv, percent=-percent)

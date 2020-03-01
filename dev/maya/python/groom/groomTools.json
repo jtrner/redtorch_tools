@@ -38,12 +38,20 @@
     }
 },
 "Curve": {
-    "Average and Delete": {
+    "Average Curves": {
         "command": "from python.groom import groomLib\nreload(groomLib)\ngroomLib.averageAndDelete()",
         "icon": ""
     },
-    "Create Spiral": {
+    "Spiral...": {
         "command": "from python.groom import groomLib\nreload(groomLib)\ngroomLib.spiral_ui()",
+        "icon": ""
+    },
+    "Shorter": {
+        "command": "from python.groom import groomLib\nreload(groomLib)\ngroomLib.decreaseLen()",
+        "icon": ""
+    },
+    "Longer": {
+        "command": "from python.groom import groomLib\nreload(groomLib)\ngroomLib.increaseLen()",
         "icon": ""
     }
 },
