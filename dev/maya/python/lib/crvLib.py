@@ -1051,9 +1051,19 @@ def setLength(crv, length):
         u = (maxV - minV) * length / origLen
         result = mc.detachCurve('{}.u[{}]'.format(crv, u), rpo=True)
         mc.delete(result[0])
-    elif origLen < length:
-        mc.warning('curve extension is not implemented yet!')
+    else:
+        mc.extendCurve(crv,
+                       extendMethod=0,
+                       extensionType=2,
+                       distance=length - origLen,
+                       start=0,
+                       join=True,
+                       removeMultipleKnots=True,
+                       replaceOriginal=True)
 
-    mc.rebuildCurve(crv, s=spans-degree, d=degree, kr=0)
+    mc.rebuildCurve(crv,
+                    spans=spans,
+                    degree=degree,
+                    kr=0)
 
     print mc.arclen(crv)
