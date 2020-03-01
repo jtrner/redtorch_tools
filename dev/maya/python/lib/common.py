@@ -111,7 +111,6 @@ def rename(objs=None, name=None, pad=None, startNum=1, prefix='', suffix='', hie
     #
     renamedObjects = []
     for i, obj in enumerate(objs):
-        print( i + 1)
         newName = ""
         if prefix:
             newName = prefix + "_"
@@ -132,7 +131,7 @@ def rename(objs=None, name=None, pad=None, startNum=1, prefix='', suffix='', hie
         #     i += 1
         #     if i > safe:
         #         break
-        print( objs[i], newName)
+        print(objs[i], newName)
         renamedObjects.append(mc.rename(objs[i], newName))
     return renamedObjects
 

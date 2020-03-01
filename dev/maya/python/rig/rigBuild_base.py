@@ -1,8 +1,7 @@
 # python modules
-import pkgutil
 import sys
 import os
-import imp
+# import imp
 
 # maya modules
 import maya.cmds as mc
@@ -52,23 +51,6 @@ job = os.getenv('JOB', '')
 shot = os.getenv('SHOT', '')
 
 
-def importPackage(package, forceReload=False, doNotLoad=[], loadOnly=[]):
-    prefix = package.__name__ + "."
-    for importer, modname, ispkg in pkgutil.iter_modules(package.__path__, prefix):
-        print ispkg
-        if any([x in modname for x in doNotLoad]):
-            continue
-        if not forceReload and modname in sys.modules:
-            continue
-        if all([x not in modname for x in loadOnly]):
-            continue
-        module = __import__(modname, fromlist=['dummy'])
-        reload(module)
-        print "Imported: ", modname
-        if ispkg:
-            importPackage(module, forceReload=forceReload)
-
-
 class RigBuild_base(object):
 
     def __init__(self, **kwargs):
@@ -87,7 +69,7 @@ class RigBuild_base(object):
         self.forceReload = kwargs.get('forceReload', False)
 
     def pre(self):
-        print 'pre success'
+        print('pre success')
 
     def importModel(self, namespace=None):
         modelPath = workspace.getLatestAsset(jobDir=self.JOBS_DIR, job=self.job,
@@ -115,7 +97,7 @@ class RigBuild_base(object):
             except:
                 pass
 
-        print 'importModel success'
+        print('importModel success')
 
     def importSkeleton(self, namespace=None):
         skeletonFile = '{0}/{1}/{2}/{3}/task/rig/users/{4}/{5}/data/skeleton.ma'
@@ -141,7 +123,7 @@ class RigBuild_base(object):
         if mc.objExists("skeleton_GRP") and mc.objExists("setup_GRP"):
             mc.parent("skeleton_GRP", "setup_GRP")
 
-        print 'importSkeleton success'
+        print('importSkeleton success')
 
     def importBlueprint(self, namespace=None):
         blueprintFile = '{0}/{1}/{2}/{3}/task/rig/users/{4}/{5}/data/blueprint.ma'
@@ -162,7 +144,7 @@ class RigBuild_base(object):
         else:
             self.blueprintFileContents = mc.file(blueprintFile, i=True, iv=True, returnNewNodes=True)
 
-        print 'importBlueprint success'
+        print('importBlueprint success')
 
     def initBlueprints(self):
         bluGrps = mc.ls('*_blueprint_GRP')
@@ -188,20 +170,20 @@ class RigBuild_base(object):
             self.INSTANCES[bluGrp]['data'] = info['data']
             self.INSTANCES[bluGrp]['type'] = info['type']
 
-        print 'initBlueprints success'
+        print('initBlueprints success')
 
     def build(self):
         for bluGrp, data in self.INSTANCES.items():
             data['class'].build()
-        print 'build success'
+        print('build success')
 
     def connect(self):
         for bluGrp, data in self.INSTANCES.items():
             data['class'].connect()
-        print 'connect success'
+        print('connect success')
 
     def importConstraints(self):
-        print 'importConstraints success'
+        print('importConstraints success')
 
     def deform(self):
         # import skinClusters
@@ -210,7 +192,7 @@ class RigBuild_base(object):
                                                  self.shot, self.user, self.version)
 
         skincluster.importData(dataPath=skincluster_dir)
-        print 'deform success'
+        print('deform success')
 
     def post(self):
         # hide rig
@@ -233,4 +215,4 @@ class RigBuild_base(object):
         if mc.objExists('blueprint_GRP'):
             mc.delete('blueprint_GRP')
 
-        print 'post success'
+        print('post success')
