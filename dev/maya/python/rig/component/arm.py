@@ -82,7 +82,8 @@ class Arm(template.Template):
 
         self.orientJnts(self.blueprints)
 
-        attrLib.addString(self.blueprintGrp, ln='blu_inputs', v=str(self.blueprints))
+        attrLib.addString(self.blueprintGrp, ln='blu_inputs', v=self.blueprints)
+        attrLib.setAttr(self.blueprintGrp + '.blu_inputs', self.blueprints)
 
     def createJoints(self):
         """

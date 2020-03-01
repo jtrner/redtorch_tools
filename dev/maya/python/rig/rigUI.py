@@ -41,6 +41,7 @@ from . import rigLib
 from ..general import workspace
 from ..general import utils as generalUtils
 from .. import package
+from . import component
 
 reload(qtLib)
 reload(control)
@@ -49,6 +50,10 @@ reload(rigLib)
 reload(workspace)
 reload(generalUtils)
 reload(package)
+reload(component)
+
+
+# rigLib.importComponents()
 
 # CONSTANTS
 ICON_DIR = os.path.abspath(os.path.join(__file__, '../../../../icon'))
@@ -93,6 +98,9 @@ class UI(QtWidgets.QDialog):
         self.lastClicked = None
         self.closed = False
         self.mainJobsDir = ''
+
+        #
+        self.cmpInstances = {}
 
         # main layout
         self.mainWidget = QtWidgets.QVBoxLayout()
@@ -232,26 +240,47 @@ class UI(QtWidgets.QDialog):
 
         # all buttons layout
         comp_buttons_vl = qtLib.createVLayout(blu_frame, margins=1, spacing=4)
-        # comp_btns_hl = qtLib.createHLayout(comp_buttons_vl, margins=1, spacing=4)
+
+        # bluprint refresh button
+        bluRefreshIconPath = os.path.join(ICON_DIR, 'refresh.png')
+        bluRefreshIcon = QtGui.QIcon(bluRefreshIconPath)
+        self.bluRefresh_btn = QtWidgets.QPushButton(bluRefreshIcon, '')
+        # self.bluRefresh_btn.setFixedSize(100, 100)
+        comp_buttons_vl.layout().addWidget(self.bluRefresh_btn)
+        self.bluRefresh_btn.clicked.connect(self.bluRefresh)
 
         self.importModel_btn = QtWidgets.QPushButton('Import Model')
         comp_buttons_vl.layout().addWidget(self.importModel_btn)
         self.importModel_btn.clicked.connect(self.importModel)
 
+        # skeleton button
         self.openSkel_btn = QtWidgets.QPushButton('Open Skeleton')
         comp_buttons_vl.layout().addWidget(self.openSkel_btn)
         self.openSkel_btn.clicked.connect(self.openSkeletonFile)
+        self.openSkel_btn.clicked.connect(
+            lambda: self.openSkeletonFile(importFile=False, fileName='skeleton'))
 
         skelBtnOptions = OrderedDict()
-        skelBtnOptions['Import Skeleton'] = lambda: self.openSkeletonFile(True)
-        skelBtnOptions['Save Skeleton'] = self.saveSkeletonFile
+        skelBtnOptions['Import Skeleton'] = \
+            lambda: self.openSkeletonFile(importFile=True, fileName='skeleton')
+        skelBtnOptions['Save Skeleton'] = \
+            lambda: self.saveSkeletonFile('skeleton')
         skelBtnOptions['Export Selected As Skeleton'] = self.exportAsSkeletonFile
         self.addRightClickMenu(self.openSkel_btn, rmb_data=skelBtnOptions)
 
-        # refresh and build
+        # Blueprint button
         self.openBlueprint_btn = QtWidgets.QPushButton('Open Blueprint')
         comp_buttons_vl.layout().addWidget(self.openBlueprint_btn)
-        self.openBlueprint_btn.clicked.connect(lambda: self.openSkeletonFile(fileName='blueprint'))
+        self.openBlueprint_btn.clicked.connect(
+            lambda: self.openSkeletonFile(importFile=False, fileName='blueprint'))
+
+        blueprintBtnOptions = OrderedDict()
+        blueprintBtnOptions['Import Blueprint'] = \
+            lambda: self.openSkeletonFile(importFile=True, fileName='blueprint')
+        blueprintBtnOptions['Save Blueprint'] = \
+            lambda: self.saveSkeletonFile('blueprint')
+        # blueprintBtnOptions['Export Selected As Blueprint'] = self.exportAsSkeletonFile
+        self.addRightClickMenu(self.openBlueprint_btn, rmb_data=blueprintBtnOptions)
 
         # ======================================================================
         # buildTree frame
@@ -491,10 +520,13 @@ class UI(QtWidgets.QDialog):
 
     def addComponent(self):
         cmp = qtLib.getSelectedItemAsText(self.availableComponents_tw)
-        python_rig_component = globals()['python.rig.component']
+        python_rig_component = globals()['component']
         cmpModule = getattr(python_rig_component, cmp)
-        print cmpModule
-        print 'New component of type {} was added.'.format(cmp)
+        cmpClass = getattr(cmpModule, cmp[0].upper() + cmp[1:])
+        cmpInstance = cmpClass()
+        self.cmpInstances[cmpInstance.name] = cmpInstance
+        qtLib.printMessage(self.info_lb,
+                           'New component of type "{}" was added.'.format(cmp))
 
     def openDirectoy(self):
         """
@@ -702,6 +734,12 @@ class UI(QtWidgets.QDialog):
         msg = 'Ready! Codes were loaded in: {}'.format(str(time_elapsed).split('.')[0])
         qtLib.printMessage(self.info_lb, msg, mode='info')
 
+    def bluRefresh(self):
+        bluGrps = mc.listRelatives('blueprint_GRP')
+        for bluGrp in blueprintGrps:
+            blu_name = ''
+        print('todo: add instance properties to rigUI')
+
     def getAllItems(self, tree):
         items = []
         for i in range(tree.topLevelItemCount()):
@@ -771,13 +809,16 @@ class UI(QtWidgets.QDialog):
         if not all([self.job, self.seq, self.shot, self.user, self.version]):
             msg = 'Please select job, seq, shot, user and version first!'
             qtLib.printMessage(self.info_lb, msg, mode='error')
+            raise OSError(msg)
 
         # skeleton file for current asset
         skelFile = os.path.join(self.mainJobsDir, self.job, self.seq, self.shot,
                                 'task', 'rig', 'users', self.user, self.version,
                                 'data', fileName + '.ma')
         if not os.path.lexists(skelFile):
-            raise OSError('"{}" does not exist!'.format(skelFile))
+            msg = '"{}" does not exist!'.format(skelFile)
+            qtLib.printMessage(self.info_lb, msg, mode='error')
+            raise OSError(msg)
         if importFile:
             mc.file(skelFile, i=True, f=True)
         else:
@@ -787,7 +828,7 @@ class UI(QtWidgets.QDialog):
             if answer:
                 mc.file(skelFile, open=True, f=True)
 
-    def saveSkeletonFile(self):
+    def saveSkeletonFile(self, fileName='skeleton'):
         # get input from UI
         self.job = qtLib.getSelectedItemAsText(self.jobs_tw) or ''
         self.seq = qtLib.getSelectedItemAsText(self.seqs_tw) or ''
@@ -800,9 +841,12 @@ class UI(QtWidgets.QDialog):
             qtLib.printMessage(self.info_lb, msg, mode='error')
 
         # skeleton file for current asset
-        skelFile = os.path.join(self.mainJobsDir, self.job, self.seq, self.shot,
+        skelDir = os.path.join(self.mainJobsDir, self.job, self.seq, self.shot,
                                 'task', 'rig', 'users', self.user, self.version,
-                                'data', 'skeleton.ma')
+                                'data')
+        if not os.path.lexists(skelDir):
+            os.makedirs(skelDir)
+        skelFile = os.path.join(skelDir, fileName + '.ma')
         answer = qtLib.confirmDialog(self, msg='Save current scene to "{}"?'.format(skelFile))
         if answer:
             mc.file(rename=skelFile)

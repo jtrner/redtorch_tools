@@ -32,11 +32,13 @@ from ..lib import qtLib
 from . import modelLib
 from ..general import workspace
 from ..general import utils as generalUtils
+from .. import package
 
 reload(qtLib)
 reload(workspace)
 reload(generalUtils)
 reload(modelLib)
+reload(package)
 
 # CONSTANTS
 ICON_DIR = os.path.abspath(os.path.join(__file__, '../../../../icon'))
@@ -50,8 +52,7 @@ STEPS = OrderedDict([
     ('Add Model Info to Top Node ', 'modelLib.addModelInfoToTopNode()'),
 ])
 SETTINGS_PATH = os.path.join(os.getenv("HOME"), 'modelUI.uiconfig')
-VERSION = '1.0.0'
-os.environ['MODEL_UI_VERSION'] = VERSION
+os.environ['MODEL_UI_VERSION'] = package.__version__
 
 
 def setBGColor(widget, color):
@@ -78,7 +79,7 @@ def getMayaWindow():
 
 class UI(QtWidgets.QDialog):
 
-    def __init__(self, title='Model UI - v{}'.format(VERSION), parent=getMayaWindow()):
+    def __init__(self, title='Model UI - v{}'.format(package.__version__), parent=getMayaWindow()):
 
         # create window
         super(UI, self).__init__(parent=parent)

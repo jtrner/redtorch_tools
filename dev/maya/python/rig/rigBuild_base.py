@@ -125,8 +125,9 @@ class RigBuild_base(object):
         # import file
         if not skeletonFile:
             return
-        if not (mc.file(skeletonFile, q=True, exists=True)):
-            mc.error('"{}" is not a valid Maya file path'.format(skeletonFile))
+        if not os.path.lexists(skeletonFile):
+            print('"{}" does not exsit!'.format(skeletonFile))
+            return
 
         # namespace
         if namespace:
@@ -150,8 +151,8 @@ class RigBuild_base(object):
         # import file
         if not blueprintFile:
             return
-        if not (mc.file(blueprintFile, q=True, exists=True)):
-            mc.error('"{}" is not a valid Maya file path'.format(blueprintFile))
+        if not os.path.lexists(blueprintFile):
+            mc.error('"{}" does not exsit!'.format(blueprintFile))
 
         # namespace
         if namespace:

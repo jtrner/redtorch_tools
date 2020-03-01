@@ -4,6 +4,7 @@ import sys
 import maya.cmds as mc
 
 from python.rig import rigBuild_base
+reload(rigBuild_base)
 
 
 

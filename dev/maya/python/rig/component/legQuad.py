@@ -57,6 +57,7 @@ class LegQuad(template.Template):
                         'foot': 'foot',
                         'ball': 'ball',
                         'ballEnd': 'ballEnd',
+                        'tip': 'tip',
                         'heel': 'heel',
                         'footInside': 'footInside',
                         'footOutside': 'footOutside',
@@ -69,6 +70,7 @@ class LegQuad(template.Template):
                             'foot': 'hand',
                             'ball': 'meta',
                             'ballEnd': 'metaEnd',
+                            'tip': 'tip',
                             'heel': 'palm',
                             'footInside': 'handInside',
                             'footOutside': 'handOutside',
@@ -88,37 +90,37 @@ class LegQuad(template.Template):
 
         par = self.blueprintGrp
         if self.isFront:
-            self.blueprints['scap'] = '{}_{}_BLU'.format(self.name, self.aliases['scap'])
+            self.blueprints['scap'] = '{}_scap_BLU'.format(self.name)
             if not mc.objExists(self.blueprints['scap']):
                 mc.joint(self.blueprintGrp, name=self.blueprints['scap'])
                 mc.xform(self.blueprints['scap'], ws=True, t=(2 * mult, 11, 4))
             par = self.blueprints['scap']
 
-        self.blueprints['hip'] = '{}_{}_BLU'.format(self.name, self.aliases['hip'])
+        self.blueprints['hip'] = '{}_hip_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['hip']):
             mc.joint(par, name=self.blueprints['hip'])
             t = (2 * mult, 9, 5) if self.isFront else (2 * mult, 9, -5)
             mc.xform(self.blueprints['hip'], ws=True, t=t)
 
-        self.blueprints['knee'] = '{}_{}_BLU'.format(self.name, self.aliases['knee'])
+        self.blueprints['knee'] = '{}_knee_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['knee']):
             mc.joint(self.blueprints['hip'], name=self.blueprints['knee'])
             t = (2 * mult, 7, 4) if self.isFront else (2 * mult, 6, -4)
             mc.xform(self.blueprints['knee'], ws=True, t=t)
 
-        self.blueprints['foot'] = '{}_{}_BLU'.format(self.name, self.aliases['foot'])
+        self.blueprints['foot'] = '{}_foot_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['foot']):
             mc.joint(self.blueprints['knee'], name=self.blueprints['foot'])
             t = (2 * mult, 3.5, 4) if self.isFront else (2 * mult, 3, -6)
             mc.xform(self.blueprints['foot'], ws=True, t=t)
 
-        self.blueprints['ball'] = '{}_{}_BLU'.format(self.name, self.aliases['ball'])
+        self.blueprints['ball'] = '{}_ball_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['ball']):
             mc.joint(self.blueprints['foot'], name=self.blueprints['ball'])
             t = (2 * mult, 1.3, 4) if self.isFront else (2 * mult, 1.3, -5)
             mc.xform(self.blueprints['ball'], ws=True, t=t)
 
-        self.blueprints['ballEnd'] = '{}_{}_BLU'.format(self.name, self.aliases['ballEnd'])
+        self.blueprints['ballEnd'] = '{}_ballEnd_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['ballEnd']):
             mc.joint(self.blueprints['ball'], name=self.blueprints['ballEnd'])
             t = (2 * mult, 0.5, 4.5) if self.isFront else (2 * mult, 0.5, -4.5)
@@ -131,21 +133,21 @@ class LegQuad(template.Template):
             mc.xform(self.blueprints['tip'], ws=True, t=t)
             display.setColor(self.blueprints['tip'], 'pink')
 
-        self.blueprints['heel'] = '{}_{}_BLU'.format(self.name, self.aliases['heel'])
+        self.blueprints['heel'] = '{}_heel_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['heel']):
             mc.joint(self.blueprints['ballEnd'], name=self.blueprints['heel'])
             t = (2 * mult, 0, 4) if self.isFront else (2 * mult, 0, -5)
             mc.xform(self.blueprints['heel'], ws=True, t=t)
             display.setColor(self.blueprints['heel'], 'pink')
 
-        self.blueprints['footInside'] = '{}_{}_BLU'.format(self.name, self.aliases['footInside'])
+        self.blueprints['footInside'] = '{}_footInside_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['footInside']):
             mc.joint(self.blueprints['ballEnd'], name=self.blueprints['footInside'])
             t = (1.5 * mult, 0, 4.5) if self.isFront else (1.5 * mult, 0, -4.5)
             mc.xform(self.blueprints['footInside'], ws=True, t=t)
             display.setColor(self.blueprints['footInside'], 'pink')
 
-        self.blueprints['footOutside'] = '{}_{}_BLU'.format(self.name, self.aliases['footOutside'])
+        self.blueprints['footOutside'] = '{}_footOutside_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['footOutside']):
             mc.joint(self.blueprints['ballEnd'], name=self.blueprints['footOutside'])
             t = (2.5 * mult, 0, 4.5) if self.isFront else (2.5 * mult, 0, -4.5)
@@ -166,7 +168,8 @@ class LegQuad(template.Template):
         for alias, blu in self.blueprints.items():
             if alias in ('heel', 'footInside', 'footOutside'):
                 continue
-            jnt = blu.replace('BLU', 'JNT')
+            jnt = '{}_{}_JNT'.format(self.name, self.aliases[alias])
+            # jnt = blu.replace('BLU', 'JNT')
             jnt = mc.joint(par, n=jnt)
             trsLib.setTRS(jnt, self.blueprintPoses[alias], space='world')
             self.joints[alias] = jnt

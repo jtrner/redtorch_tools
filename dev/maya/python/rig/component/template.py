@@ -51,8 +51,8 @@ class Template(object):
         self.blueprintPoses = OrderedDict()
         self.joints = OrderedDict()
         self.controls = OrderedDict()
-        self.side = side
-        self.prefix = prefix
+        self.__side = side
+        self.__prefix = prefix
         self.name = side + '_' + prefix
         self.verbose = verbose
 
@@ -149,19 +149,19 @@ class Template(object):
 
     def getName(self, v=None):
         """
-        creates and returns a name based on self.side, self.prefix and given value
+        creates and returns a name based on self.__side, self.__prefix and given value
         eg: getName('hello')
             # result: "c_root_hello"
         """
         # get name based on side and prefix
-        n = self.side + '_' + self.prefix
+        n = self.__side + '_' + self.__prefix
         if v:
             n = n + '_' + v
         return n
 
     def createBlueprint(self):
         if self.verbose:
-            print '\t# {}.createBlueprint(), "{}"'.format(self.__class__.__name__, self.prefix)
+            print '\t# {}.createBlueprint(), "{}"'.format(self.__class__.__name__, self.__prefix)
 
         if not mc.objExists('blueprint_GRP'):
             mc.createNode('transform', n='blueprint_GRP')
@@ -191,7 +191,7 @@ class Template(object):
         """
 
         if self.verbose:
-            print '\t# {}.build(), "{}_{}"'.format(self.__class__.__name__, self.side, self.prefix)
+            print '\t# {}.build(), "{}_{}"'.format(self.__class__.__name__, self.__side, self.__prefix)
 
         # read attrs from blueprint group
         self.getAttrsFromBlueprint()
@@ -207,7 +207,7 @@ class Template(object):
         connection of created nodes
         """
         if self.verbose:
-            print '\t# {}.connect(), "{}_{}"'.format(self.__class__.__name__, self.side, self.prefix)
+            print '\t# {}.connect(), "{}_{}"'.format(self.__class__.__name__, self.__side, self.__prefix)
 
         name = self.getName()
         controlGrp = name + '_control_GRP'
@@ -297,7 +297,77 @@ class Template(object):
         attrLib.addString(self.blueprintGrp, 'blu_type', v=self.__class__.__name__, lock=True)
         attrLib.addInt(self.blueprintGrp, 'blu_order', lock=True)
         attrLib.addBool(self.blueprintGrp, 'blu_verbose', v=self.verbose)
-        attrLib.addString(self.blueprintGrp, 'blu_side', v=self.side)
-        attrLib.addString(self.blueprintGrp, 'blu_prefix', v=self.prefix)
+        attrLib.addString(self.blueprintGrp, 'blu_side', v=self.__side)
+        attrLib.addString(self.blueprintGrp, 'blu_prefix', v=self.__prefix)
 
         attrLib.setAttr(self.blueprintGrp + '.blu_order', self.getLastTemplateNumber() + 1)
+
+    @property
+    def side(self):
+        return self.__side
+
+    @side.setter
+    def side(self, val):
+        # update instance properties
+        self.__side = val
+        self.name = self.getName()
+
+        # rename bluprint group
+        self.blueprintGrp = mc.rename(self.blueprintGrp, val + self.blueprintGrp[1:])
+
+        # rename bluprints
+        for obj in mc.listRelatives(self.blueprintGrp, ad=True):
+            mc.rename(obj, val + obj[1:])
+
+        # update blueprint attributes in Maya
+        attrLib.setAttr(self.blueprintGrp + '.blu_side', val)
+
+        # update bluprint dictionary
+        self.createBlueprint()
+
+    @property
+    def prefix(self):
+        return self.__prefix
+
+    @prefix.setter
+    def prefix(self, val):
+        # update instance properties
+        self.__prefix = val
+        self.name = self.getName()
+
+        # rename bluprint group
+        tokens = self.blueprintGrp.split('_')
+        newName = '_'.join([self.name] + tokens[2:])
+        self.blueprintGrp = mc.rename(self.blueprintGrp, newName)
+
+        # rename bluprints
+        for obj in mc.listRelatives(self.blueprintGrp, ad=True):
+            tokens = obj.split('_')
+            newName = '_'.join([self.name] + tokens[2:])
+            mc.rename(obj, newName)
+
+        # update blueprint attributes in Maya
+        attrLib.setAttr(self.blueprintGrp + '.blu_prefix', val)
+
+        # update bluprint dictionary
+        self.createBlueprint()
+
+    # @property
+    # def prefix(self):
+    #     return self.__prefix
+    #
+    # @prefix.setter
+    # def prefix(self, val):
+    #     old_val = self.__prefix
+    #     self.__prefix = val
+    #     self.renameBluprint(search=old_val, replace=self.__prefix)
+    #     self.name = self.getName()
+
+    def renameBluprint(self, search, replace):
+
+        objs = mc.listRelatives(self.blueprintGrp, ad=True)
+        print objs
+        for obj in objs:
+            mc.rename(obj, obj.replace(search, replace, 1))
+
+        self.blueprintGrp = mc.rename(self.blueprintGrp, obj.replace(search, replace))

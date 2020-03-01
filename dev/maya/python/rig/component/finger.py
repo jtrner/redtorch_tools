@@ -29,7 +29,7 @@ class Finger(template.Template):
     class for creating finger
     """
 
-    def __init__(self, side="L", prefix="finger", numOfJnts=4, movable=False, lockHideAttrs=['s', 'v'], **kwargs):
+    def __init__(self, side="L", prefix="index", numOfJnts=4, movable=False, lockHideAttrs=['s', 'v'], **kwargs):
         kwargs['side'] = side
         kwargs['prefix'] = prefix
         self.lockHideAttrs = lockHideAttrs
@@ -42,6 +42,7 @@ class Finger(template.Template):
 
         name = self.getName()
 
+        z = 0
         if self.prefix == 'thumb':
             z = 1
         elif self.prefix == 'index':
