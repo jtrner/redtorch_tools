@@ -142,6 +142,7 @@ class Leg(template.Template):
         mc.move(0, mult, 0, upLoc, r=True, ls=True)
         jntLib.orientUsingAim(jnts=jnts.values()[2:5], upAim=upLoc,
                               aimAxes='x', upAxes='y', inverseUpAxes=inverseUpAxes)
+        mc.delete(upLoc)
 
     def build(self):
         """

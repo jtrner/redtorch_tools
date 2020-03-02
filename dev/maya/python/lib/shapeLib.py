@@ -1046,7 +1046,12 @@ def extractTargets(bls, neutral='neutral', prefix='', targets=None, splitConfig=
                                                     "rLower": "rLowerLidLowerer"
                                                 }}
     }
-    
+
+    :usage:
+    from python.lib import shapeLib
+    reload(shapeLib)
+    shapeLib.extractTargets(bls='blendShape1', neutral='C_body_GEO')
+
     """
     if mc.objExists('temp_animLayer'):
         mc.delete('temp_animLayer')

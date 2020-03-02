@@ -84,12 +84,12 @@ def averageAndDelete():
     crvLib.averageAndDelete()
 
 
-def increaseCrvLen():
-    [crvLib.increaseCrvLen(crv=x, percent=5) for x in mc.ls(sl=True)]
+def increaseLen():
+    [crvLib.increaseLen(crv=x, percent=5) for x in mc.ls(sl=True)]
 
 
-def decreaseCrvLen():
-    [crvLib.decreaseCrvLen(crv=x, percent=5) for x in mc.ls(sl=True)]
+def decreaseLen():
+    [crvLib.decreaseLen(crv=x, percent=5) for x in mc.ls(sl=True)]
 
 
 def updatePref(nodes=None, useSelection=True):

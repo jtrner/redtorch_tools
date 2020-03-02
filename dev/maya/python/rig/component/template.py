@@ -321,6 +321,7 @@ class Template(object):
 
         # update blueprint attributes in Maya
         attrLib.setAttr(self.blueprintGrp + '.blu_side', val)
+        self.updateInputVal()
 
         # update bluprint dictionary
         self.createBlueprint()
@@ -348,26 +349,22 @@ class Template(object):
 
         # update blueprint attributes in Maya
         attrLib.setAttr(self.blueprintGrp + '.blu_prefix', val)
+        self.updateInputVal()
 
         # update bluprint dictionary
         self.createBlueprint()
 
-    # @property
-    # def prefix(self):
-    #     return self.__prefix
-    #
-    # @prefix.setter
-    # def prefix(self, val):
-    #     old_val = self.__prefix
-    #     self.__prefix = val
-    #     self.renameBluprint(search=old_val, replace=self.__prefix)
-    #     self.name = self.getName()
-
     def renameBluprint(self, search, replace):
 
         objs = mc.listRelatives(self.blueprintGrp, ad=True)
-        print objs
         for obj in objs:
             mc.rename(obj, obj.replace(search, replace, 1))
 
         self.blueprintGrp = mc.rename(self.blueprintGrp, obj.replace(search, replace))
+
+    def updateInputVal(self):
+        for k, v in self.blueprints.items():
+            tokens = v.split('_')
+            newName = '_'.join([self.name] + tokens[2:])
+            self.blueprints[k] = newName
+        attrLib.setAttr(self.blueprintGrp + '.blu_inputs', self.blueprints)

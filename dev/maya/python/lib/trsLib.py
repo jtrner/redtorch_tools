@@ -1022,3 +1022,26 @@ def rotationFrom3Objs(objA, objB, objC, invertX=False, invertZ=False):
     vecZ = (vecX ^ vecY).normal()
 
     return rotationFrom3Vectors(vecX, vecY, vecZ)
+
+
+def getBoundingBox(objs):
+    objs = mc.ls(objs)
+    objs = list(set([getTransform(x) for x in objs]))
+    finalBB = [0, 0, 0, 0, 0, 0]
+    for obj in objs:
+        bb = mc.xform(obj, q=True, boundingBox=True)
+        finalBB[0] = min(finalBB[0], bb[0])
+        finalBB[1] = max(finalBB[1], bb[1])
+        finalBB[2] = min(finalBB[2], bb[2])
+        finalBB[3] = max(finalBB[3], bb[3])
+        finalBB[4] = min(finalBB[4], bb[4])
+        finalBB[5] = max(finalBB[5], bb[5])
+    return finalBB
+
+
+def getSizeFromBoundingBox(objs):
+    bb = getBoundingBox(objs)
+    a = bb[1] - bb[0]
+    b = bb[3] - bb[2]
+    c = bb[5] - bb[4]
+    return max(a, b, c)

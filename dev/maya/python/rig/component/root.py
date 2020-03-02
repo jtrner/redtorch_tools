@@ -69,25 +69,32 @@ class Root(template.Template):
             except:
                 pass
 
-        # create main controls
+        # get size
+        if mc.objExists('model_GRP'):
+            # get size from geos under model_GRP
+            objs = mc.listRelatives('model_GRP', ad=True, type='mesh')
+            size = trsLib.getSizeFromBoundingBox(objs=objs)
+        else:
+            # use Y position of bluprint to calculate size of control
+            size = self.blueprintPoses['base'][0][1] * 0.8
+
+        # create controls
         mainCtl = control.Control(
             side="c",
             descriptor="main",
             shape="triangle",
             color="purple",
+            scale=[size*0.1, size*0.1, size*0.1],
             parent=self.ctlGrp,
             lockHideAttrs=['v'],
             verbose=self.verbose).name
         self.setOut('mainCtl', mainCtl)
 
-        # use Y position of bluprint to calculate size of control
-        size = self.blueprintPoses['base'][0][1] * 0.8
-
         bodyCtl = control.Control(
             side="c",
             descriptor="body",
             shape="square",
-            scale=[size, size, size],
+            scale=[size*0.6, size*0.6, size*0.6],
             trs=self.blueprintPoses['base'],
             lockHideAttrs=['s', 'v'],
             parent=mainCtl,
