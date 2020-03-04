@@ -7,7 +7,7 @@ path = "D:/all_works/redtorch_tools/dev/maya"
 if path in sys.path:
     sys.path.remove(path)
 sys.path.insert(0, path)
-from python.toolbox import toolboxUI
+from rt_python.toolbox import toolboxUI
 reload(toolboxUI)
 toolboxUI.launch()
 
