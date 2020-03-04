@@ -75,13 +75,21 @@ class Spine(template.Template):
         crv = crvLib.fromJnts(jnts=blueprints, degree=1, fit=False)[0]
         mc.rebuildCurve(crv, degree=3, spans=2)
 
+        # create spine base joint and move it a bit lower than first spine joint
+        # to avoid skin mirroring issues when joints are on top of each other
+        self.joints['baseJnt'] = mc.joint(moduleGrp, n=self.name + '_base_JNT')
+        trsLib.setTRS(self.joints['baseJnt'], self.blueprintPoses['start'], space='world')
+        mc.move(0, -0.01, 0, self.joints['baseJnt'], ws=True, r=True)
+
+        # create other spine joints
         self.joints['spineJnts'] = []
         jnts = jntLib.create_on_curve(curve=crv, numOfJoints=self.numOfJnts, parent=True)
-        mc.parent(jnts[0], moduleGrp)
+        mc.parent(jnts[0], self.joints['baseJnt'])
         for i in range(self.numOfJnts):
             jnt = '{}_{:02d}_JNT'.format(self.name, i+1)
             jnt = mc.rename(jnts[i], jnt)
             self.joints['spineJnts'].append(jnt)
+
 
         mc.delete(crv)
 
@@ -190,6 +198,13 @@ class Spine(template.Template):
             chestCtl, midCtl, chestTanZro, mo=True, blendNode=chestTanCtl,
             blendAttr='followMid', type='parentConstraint')
         mc.setAttr(chestTanCtl+'.followMid', 0.5)
+
+        # drive base joint
+        firstJntDrvr = mc.parentConstraint(self.joints['spineJnts'][0], q=True, targetList=True)[0]
+        mc.parentConstraint(firstJntDrvr, self.joints['baseJnt'],
+                            mo=True, sr=('x', 'y', 'z'))
+        mc.parentConstraint(hipCtl, self.joints['baseJnt'],
+                            mo=True, st=('x', 'y', 'z'))
 
         # pevlis jnt
         guessed = 'C_pelvis_JNT'

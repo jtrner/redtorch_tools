@@ -14,6 +14,7 @@ from ...lib import attrLib
 from ...lib import control
 from ...lib import connect
 from ...lib import strLib
+from ...lib import crvLib
 from ...lib import space
 from . import template
 
@@ -22,6 +23,7 @@ reload(attrLib)
 reload(control)
 reload(connect)
 reload(strLib)
+reload(crvLib)
 reload(space)
 reload(template)
 
@@ -41,28 +43,14 @@ class Eyes(template.Template):
         """
         super(Eyes, self).build()
 
-        # estimate icon size based on eyes distance
-        self.eyeAimCtls = self.getOut('eyeAimCtls')
-        print self.eyeAimCtls
-        iconSize = 1
-        pos = mc.xform(self.eyeAimCtls[0], q=True, ws=True, t=True)
-        if len(self.eyeAimCtls) > 1:
-            iconSize = trsLib.getDistance(self.eyeAimCtls[0], self.eyeAimCtls[-1])
-            pos = trsLib.getPoseBetween(self.eyeAimCtls[0], self.eyeAimCtls[-1])
-
         # add controls
         self.eyesCtl = control.Control(
             descriptor=self.prefix + 'master',
             side=self.side,
             parent=self.ctlGrp,
             shape="square",
-            translate=pos,
             rotateShape=[90, 0, 0],
-            scale=[iconSize * 2, iconSize * 2, iconSize / 1.5],
             verbose=self.verbose).name
-        for x in self.eyeAimCtls:
-            xZero = x.replace('CTL', 'ZRO')
-            connect.matrix(self.eyesCtl, xZero)
 
         # keep in asset node for later use
         self.setOut('eyesCtl', self.eyesCtl)
@@ -72,6 +60,22 @@ class Eyes(template.Template):
         connection of created nodes 
         """
         super(Eyes, self).connect()
+
+        # estimate icon size based on eyes distance
+        self.eyeAimCtls = self.getOut('eyeAimCtls')
+        iconSize = 1
+        pos = mc.xform(self.eyeAimCtls[0], q=True, ws=True, t=True)
+        if len(self.eyeAimCtls) > 1:
+            iconSize = trsLib.getDistance(self.eyeAimCtls[0], self.eyeAimCtls[-1])
+            pos = trsLib.getPoseBetween(self.eyeAimCtls[0], self.eyeAimCtls[-1])
+        zro = self.eyesCtl.replace('CTL', 'ZRO')
+        mc.xform(zro, ws=True, t=pos)
+        crvLib.scaleShape(curve=self.eyesCtl,
+                          scale=[iconSize * 2, iconSize * 2, iconSize / 1.5])
+
+        for x in self.eyeAimCtls:
+            xZero = x.replace('CTL', 'ZRO')
+            connect.matrix(self.eyesCtl, xZero)
 
         # attach controls
         headCtl = self.getOut('globalScale')
@@ -87,8 +91,7 @@ class Eyes(template.Template):
                 drivers=parentDrivers,
                 drivens=[eyesZero],
                 control=self.eyesCtl,
-                name=self.name + 'ParentSpace',
-            )
+                name=self.name + 'ParentSpace')
 
         # vis switch
         attrLib.addSeparator(self.eyesCtl, 'settings')
@@ -112,6 +115,6 @@ class Eyes(template.Template):
         attrLib.addString(self.blueprintGrp, 'blu_eyeAimCtls',
                           v=['L_eye.eyeAimCtl', 'R_eye.eyeAimCtl'])
         attrLib.addString(self.blueprintGrp, 'blu_space',
-                          v={'drivers': ['C_neck.headCtl',
+                          v={'drivers': ['C_neck.headJnt',
                                          'C_root.mainCtl'],
                              'dv': 0})

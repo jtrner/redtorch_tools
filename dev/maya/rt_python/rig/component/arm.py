@@ -232,7 +232,7 @@ class Arm(template.Template):
             self.joints['clavicle'],
             self.joints['shoulder'],
             search="_JNT",
-            replace="_ik_JNT")
+            replace="_ik_TRS")
         self.clavJnt = clavicleJnts[0]
         self.clavEnd = mc.rename(clavicleJnts[1], self.name + '_clavEnd_JNT')
         self.setOut('clavEnd', self.clavEnd)
@@ -290,7 +290,7 @@ class Arm(template.Template):
             self.joints['shoulder'],
             self.joints['handEnd'],
             search="_JNT",
-            replace="_ik_JNT")
+            replace="_ik_TRS")
         self.setOut('ikJntList', str(self.ikJntList))
 
         self.ikCtlList, ikHandleList = ikArm.IkArm(
@@ -323,7 +323,7 @@ class Arm(template.Template):
             self.joints['shoulder'],
             self.joints['handEnd'],
             search="_JNT",
-            replace="_fk_JNT")
+            replace="_fk_TRS")
 
         # add controls
         self.fkCtlList = fk.Fk(

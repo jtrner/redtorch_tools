@@ -138,4 +138,4 @@ class Eye(template.Template):
         """
         super(Eye, self).createSettings()
         
-        attrLib.addString(self.blueprintGrp, 'blu_ctlParent', v='C_neck.ctlParent')
+        attrLib.addString(self.blueprintGrp, 'blu_ctlParent', v='C_neck.headJnt')

@@ -82,6 +82,8 @@ class Neck(template.Template):
             jnt = mc.rename(jnts[i], jnt)
             self.joints['neckJnts'].append(jnt)
 
+        self.setOut('headJnt', self.joints['neckJnts'][-1])
+
         mc.delete(crv)
 
     def build(self):
@@ -89,7 +91,7 @@ class Neck(template.Template):
 
         self.baseCtl, crvGrp, rsltGrp, ctls = rope.run(
             jnts=self.joints['neckJnts'], numCtls=5, guides=None, numJnts=None,
-            addSpaces=False, description='neck')
+            addSpaces=False, description=self.prefix)
 
         iconSize = trsLib.getDistance(self.joints['neckJnts'][0], self.joints['neckJnts'][-1])
 
@@ -129,7 +131,9 @@ class Neck(template.Template):
         midZro = midCtl.replace('CTL', 'ZRO')
         midZro = mc.rename(mc.listRelatives(midCtl, p=1)[0], midZro)
 
-        connect.pointAim(start=self.startCtl, end=self.endCtl, driven=midZro, addAttrTo=midCtl)
+        # keep mid control between hip and chest
+        n = midZro + '_POC'
+        mc.parentConstraint(self.startCtl, self.endCtl, midZro, mo=True, name=n)
 
         # neckStart and end tanget control properties
         neckStartTanCtl = mc.rename(ctls[1], self.name + '_start_tangent_CTL')
@@ -173,7 +177,6 @@ class Neck(template.Template):
         cns = headJnt + '_ORI'
         [attrLib.disconnectAttr(headJnt + '.r' + x) for x in 'xyz']
         mc.orientConstraint(self.headCtl, headJnt, mo=True, name=cns)
-        self.setOut('headJnt', headJnt)
 
         # outliner clean up
         mc.parent(crvGrp, rsltGrp, self.originGrp)

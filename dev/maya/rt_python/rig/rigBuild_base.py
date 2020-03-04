@@ -164,7 +164,7 @@ class RigBuild_base(object):
 
         for bluGrp, info in modules.items():
             self.INSTANCES[bluGrp] = {}
-            package = sys.modules['python.rig.component.' + info['name']]
+            package = sys.modules['rt_python.rig.component.' + info['name']]
             classObj = getattr(package, info['type'])
             self.INSTANCES[bluGrp]['class'] = classObj(**info['data'])
             self.INSTANCES[bluGrp]['data'] = info['data']
@@ -213,6 +213,7 @@ class RigBuild_base(object):
         mc.setAttr('geometry_GRP.inheritsTransform', 0)
 
         if mc.objExists('blueprint_GRP'):
-            mc.delete('blueprint_GRP')
+            mc.parent('blueprint_GRP', 'setup_GRP')
+            mc.hide('blueprint_GRP')
 
         print('post success')

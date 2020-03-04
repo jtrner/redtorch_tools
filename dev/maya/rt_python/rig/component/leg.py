@@ -252,7 +252,7 @@ class Leg(template.Template):
             self.joints['hip'],
             self.joints['ballEnd'],
             search="_JNT",
-            replace="_ik_JNT")
+            replace="_ik_TRS")
         self.setOut('ikJntList', str(self.ikJntList))
 
         self.ikCtlList, ikHandleList = ikLeg.IkLeg(joints=self.ikJntList,
@@ -278,7 +278,7 @@ class Leg(template.Template):
     def rig_fk(self):
         # fk rig joints
         self.fkJntList = jntLib.extract_from_to(self.joints['hip'], self.joints['ballEnd'],
-                                                search="_JNT", replace="Fk_JNT")
+                                                search="_JNT", replace="_fk_TRS")
         self.setOut('fkJntList', self.fkJntList)
 
         # add controls

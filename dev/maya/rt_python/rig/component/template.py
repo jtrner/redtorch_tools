@@ -115,7 +115,7 @@ class Template(object):
         if len(tokens) == 2:  # value is the output of another component
             node = tokens[0] + '_blueprint_GRP'
             a = 'out_' + tokens[1]
-            if mc.objExists(node + '.' + a):
+            if mc.attributeQuery(a, node=node, exists=True):
                 value = mc.getAttr(node + '.' + a)
             else:
                 logger.warning('"{}.{}" does not exist!'.format(node, a))

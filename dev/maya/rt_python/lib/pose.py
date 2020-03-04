@@ -18,26 +18,26 @@ from . import attrLib
 
 
 # constants
-BIPED_LEG_FK_CTLS = {'L': ['L_hipFk_CTL', 'L_kneeFk_CTL', 'L_footFk_CTL', 'L_ballFk_CTL'],
-                     'R': ['R_hipFk_CTL', 'R_kneeFk_CTL', 'R_footFk_CTL', 'R_ballFk_CTL']}
+BIPED_LEG_fk_CTLS = {'L': ['L_leg_hip_fk_CTL', 'L_leg_knee_fk_CTL', 'L_leg_foot_fk_CTL', 'L_leg_ball_fk_CTL'],
+                     'R': ['R_leg_hip_fk_CTL', 'R_leg_knee_fk_CTL', 'R_leg_foot_fk_CTL', 'R_leg_ball_fk_CTL']}
 
-BIPED_LEG_IK_CTLS = {'L': ['L_footIk_CTL', 'L_kneeIk_CTL'],
-                     'R': ['R_footIk_CTL', 'R_kneeIk_CTL']}
+BIPED_LEG_ik_CTLS = {'L': ['L_leg_foot_ik_CTL', 'L_leg_knee_ik_CTL'],
+                     'R': ['R_leg_foot_ik_CTL', 'R_leg_knee_ik_CTL']}
 
-BIPED_ARM_FK_CTLS = {'L': ['L_shoulderFk_CTL', 'L_elbowFk_CTL', 'L_handFk_CTL'],
-                     'R': ['R_shoulderFk_CTL', 'R_elbowFk_CTL', 'R_handFk_CTL']}
+BIPED_ARM_fk_CTLS = {'L': ['L_arm_shoulder_fk_CTL', 'L_arm_elbow_fk_CTL', 'L_arm_hand_fk_CTL'],
+                     'R': ['R_arm_shoulder_fk_CTL', 'R_arm_elbow_fk_CTL', 'R_arm_hand_fk_CTL']}
 
-BIPED_ARM_IK_CTLS = {'L': ['L_handIk_CTL', 'L_elbowIk_CTL'],
-                     'R': ['R_handIk_CTL', 'R_elbowIk_CTL']}
+BIPED_ARM_ik_CTLS = {'L': ['L_arm_hand_ik_CTL', 'L_arm_elbow_ik_CTL'],
+                     'R': ['R_arm_hand_ik_CTL', 'R_arm_elbow_ik_CTL']}
 
-BIPED_IK_HAND = {'L': 'L_handIk_CTL',
-                 'R': 'R_handIk_CTL'}
+BIPED_IK_HAND = {'L': 'L_arm_hand_ik_CTL',
+                 'R': 'R_arm_hand_ik_CTL'}
 
-BIPED_IK_ELBOW = {'L': 'L_elbowIk_CTL',
-                  'R': 'R_elbowIk_CTL'}
+BIPED_IK_ELBOW = {'L': 'L_arm_elbow_ik_CTL',
+                  'R': 'R_arm_elbow_ik_CTL'}
 
-BIPED_ARM_JNTS = {'L': ['L_shoulderFk_JNT', 'L_elbowFk_JNT', 'L_handFk_JNT'],
-                  'R': ['R_shoulderFk_JNT', 'R_elbowFk_JNT', 'R_handFk_JNT']}
+BIPED_ARM_JNTS = {'L': ['L_arm_shoulder_fk_SRT', 'L_arm_elbow_fk_SRT', 'L_arm_hand_fk_SRT'],
+                  'R': ['R_arm_shoulder_fk_SRT', 'R_arm_elbow_fk_SRT', 'R_arm_hand_fk_SRT']}
 
 
 def getAllCtlOnRig(node=None):
@@ -65,15 +65,15 @@ def bipedRecordTPose():
 
 def bipedArmRecordTPose():
     for side in ['L', 'R']:
-        for ctl in (BIPED_ARM_FK_CTLS[side] + \
-                    BIPED_ARM_IK_CTLS[side]):
+        for ctl in (BIPED_ARM_fk_CTLS[side] + \
+                    BIPED_ARM_ik_CTLS[side]):
             recordPose(ctl, 'tPose')
 
 
 def bipedLegRecordTPose():
     for side in ['L', 'R']:
-        for ctl in (BIPED_LEG_FK_CTLS[side] + \
-                    BIPED_LEG_IK_CTLS[side]):
+        for ctl in (BIPED_LEG_fk_CTLS[side] + \
+                    BIPED_LEG_ik_CTLS[side]):
             recordPose(ctl, 'tPose')
 
 
@@ -86,7 +86,7 @@ def bipedArmSetToTPose():
     for side in ['L', 'R']:
         # inputs
         jnts = BIPED_ARM_JNTS[side]
-        fkCtls = BIPED_ARM_FK_CTLS[side]
+        fkCtls = BIPED_ARM_fk_CTLS[side]
         ikCtl = BIPED_IK_HAND[side]
         pvCtl = BIPED_IK_ELBOW[side]
         
@@ -141,7 +141,7 @@ def bipedArmGoToTPose(node=None):
     """
     ns = trsLib.getNS(node)
     for side in ['L', 'R']:
-        nodes = BIPED_ARM_FK_CTLS[side] + BIPED_ARM_IK_CTLS[side]
+        nodes = BIPED_ARM_fk_CTLS[side] + BIPED_ARM_ik_CTLS[side]
         _genericGoToTPose(ns, nodes)
 
 
@@ -151,7 +151,7 @@ def bipedLegGoToTPose(node=None):
     """
     ns = trsLib.getNS(node)
     for side in ['L', 'R']:
-        nodes = BIPED_LEG_FK_CTLS[side] + BIPED_LEG_IK_CTLS[side]
+        nodes = BIPED_LEG_fk_CTLS[side] + BIPED_LEG_ik_CTLS[side]
         _genericGoToTPose(ns, nodes)
 
 
@@ -204,7 +204,7 @@ def bipedArmGoToAPose(node=None):
     """
     ns = trsLib.getNS(node)
     for side in ['L', 'R']:
-        nodes = BIPED_ARM_FK_CTLS[side] + BIPED_ARM_IK_CTLS[side]
+        nodes = BIPED_ARM_fk_CTLS[side] + BIPED_ARM_ik_CTLS[side]
         _genericGoToAPose(ns, nodes)
 
 
@@ -214,7 +214,7 @@ def bipedLegGoToAPose(node=None):
     """
     ns = trsLib.getNS(node)
     for side in ['L', 'R']:
-        nodes = BIPED_LEG_FK_CTLS[side] + BIPED_LEG_IK_CTLS[side]
+        nodes = BIPED_LEG_fk_CTLS[side] + BIPED_LEG_ik_CTLS[side]
         _genericGoToAPose(ns, nodes)
 
 
