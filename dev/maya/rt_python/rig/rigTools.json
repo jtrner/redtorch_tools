@@ -1,0 +1,78 @@
+{
+"Pose": {
+    "resetAsset": {
+        "command": "from rt_python.lib import pose\nreload(pose)\npose.resetAsset()",
+        "icon": "resetAsset"
+    },
+    "bipedArmGoToTPose": {
+        "command": "from rt_python.lib import pose\nreload(pose)\npose.bipedArmGoToTPose()",
+        "icon": "bipedArmGoToTPose"
+    },
+    "bipedArmGoToTPoseSelected": {
+        "command": "import maya.cmds as mc\nfrom rt_python.lib import pose\nreload(pose)\npose.bipedArmGoToTPose(mc.ls(sl=True)[0])",
+        "icon": "bipedArmGoToTPoseSelected"
+    },
+    "bipedArmGoToAPose": {
+        "command": "from rt_python.lib import pose\nreload(pose)\npose.bipedArmGoToAPose()",
+        "icon": "bipedArmGoToAPose"
+    },
+    "bipedArmGoToAPoseSelected": {
+        "command": "import maya.cmds as mc\nfrom rt_python.lib import pose\nreload(pose)\npose.bipedArmGoToAPose(mc.ls(sl=True)[0])",
+        "icon": "bipedArmGoToAPoseSelected"
+    },
+    "resetTransforms": {
+        "command": "import maya.cmds as mc\nfrom rt_python.lib import trsLib\nreload(trsLib)\n[trsLib.resetTRS(x) for x in mc.ls(sl=1)]",
+        "icon": "resetTransforms"
+    },
+    "match": {
+        "command": "import maya.cmds as mc\nfrom rt_python.lib import trsLib\nreload(trsLib)\ntrsLib.match(*mc.ls(sl=True))",
+        "icon": "match"
+    },
+    "mirrorLikeJnt": {
+        "command": "from rt_python.lib import trsLib\nreload(trsLib)\ntrsLib.mirrorLikeJnt()",
+        "icon": "mirrorLikeJnt"
+    },
+    "createOffsetGroup": {
+        "command": "from rt_python.lib import trsLib\nreload(trsLib)\ntrsLib.insert(mode='allChilds', search='_GRP', replace='_OFS')",
+        "icon": "createOffsetGroup"
+    },
+    "lock": {
+        "command": "import maya.cmds as mc\nfrom rt_python.lib import attrLib\nreload(attrLib)\nfor node in mc.ls(sl=1):\n\tattrLib.lockHideAttrs(node=node, attrs=['t', 'r', 's', 'v'], lock=True, hide=True)",
+        "icon": "lock"
+    },
+    "unlock": {
+        "command": "import maya.cmds as mc\nfrom rt_python.lib import attrLib\nreload(attrLib)\nfor node in mc.ls(sl=1):\n\tattrLib.unlock(nodes=node, attrs=['t', 'r', 's', 'v'])",
+        "icon": "unlock"
+    }
+},
+"Deformation": {
+    "MirrorSkinCluster": {
+        "command": "from rt_python.lib import deformer\nreload(deformer)\ndeformer.mirrorSkin(useSelection=True)",
+        "icon": ""
+    },
+    "CopySkinCluster": {
+        "command": "from rt_python.lib import deformer\nreload(deformer)\ndeformer.copySkin(useSelection=True)",
+        "icon": ""
+    },
+    "ExportSkinCluster": {
+        "command": "from rt_python.lib import skincluster\nreload(skincluster)\nskincluster.exportSkinToDesktop()",
+        "icon": ""
+    },
+    "ImportSkinCluster": {
+        "command": "from rt_python.lib import skincluster\nreload(skincluster)\nskincluster.importSkinToDesktop()",
+        "icon": ""
+    }
+},
+"Joints": {
+    "OrientUsingAim": {
+        "command": "import maya.cmds as mc\nfrom rt_python.lib import jntLib\nreload(jntLib)\nsels=mc.ls(sl=1)\njntLib.orientUsingAim(jnts=sels[:-1] , upAim=sels[-1], aimAxes='x')",
+        "icon": "OrientUsingAim"
+    }
+},
+"Misc": {
+    "RemoveContainers": {
+        "command": "from rt_python.lib import container\nreload(container)\ncontainer.removeAll()",
+        "icon": "RemoveContainers"
+    }
+}
+}

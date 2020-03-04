@@ -31,10 +31,10 @@ print mc.getAttr(scatter + '.outPoints')
 
 
 
-from python.lib import deformer
+from rt_python.lib import deformer
 deformer.copySkin(useSelection=True)
 
-from python.lib import meshLib
+from rt_python.lib import meshLib
 meshLib.blendShapeGeosUnderTwoGroups(originalGroup='model_GRP', editedGroup='output_model_GRP', deleteHistory=True)
 
 # twist joints display local axis
@@ -65,7 +65,7 @@ display.setColor(color='yellow')
 display.setColor(color='maroon')
 display.setColor(obj=mc.ls(sl=True)[0], color='yellow')
 
-from python.lib import deformer
+from rt_python.lib import deformer
 deformer.copySkin(useSelection=True)
 
 planarizeJnts.adjustFingers()
@@ -103,7 +103,7 @@ workspace.publishAsset(jobDir='D:/all_works/01_projects', job='behnam_for_turbos
 
 
 # anim export import
-from python.anim import exportImportAnim
+from rt_python.anim import exportImportAnim
 reload(exportImportAnim)
 animUI = exportImportAnim.ExportImportAnim()
 animUI.UI()
