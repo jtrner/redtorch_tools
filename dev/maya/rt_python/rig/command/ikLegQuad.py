@@ -99,19 +99,9 @@ def IkLegQuad(joints=None,
         endEffector=spring_jnts[-1],
         name=name + "_spring_IKH")
     sIkh = spring_ikh_and_eff[0]
-    springPv = mc.createNode('transform', n=name + '_spring_pv_VEC', p=scapEndJnt)
-    trsLib.setTRS(springPv, [[0, 0, mult], [0, 0, 0], [1, 1, 1]])
-    mc.poleVectorConstraint(springPv, sIkh, name=name + "_spring_ikh_PVC")
     mc.setAttr(sIkh + '.poleVector', 0, 1, 0)
     sIkZro = trsLib.insert(sIkh, name=name + '_spring_ikh_ZRO')
     mc.parent(sIkZro, moduleGrp)
-
-    # # check if limb is flipped (temp solution)
-    # tmp = mc.getAttr(spring_jnts[0] + '.rotate')[0]
-    # for v in tmp:
-    #     if v > 10 or v < -10:  # if joint has rotation more than 10 degrees assume it's flipped
-    #         mc.setAttr(sIkh + '.twist', 180)
-    #         break
 
     # leg ik handle
     leg_ikh_and_eff = mc.ikHandle(
@@ -162,11 +152,19 @@ def IkLegQuad(joints=None,
         verbose=verbose)
     mc.parentConstraint(footCtl.name, sIkZro, mo=True, sr=['x', 'y', 'z'])
 
+    # # check if limb is flipped (temp solution)
+    # tmp = mc.getAttr(spring_jnts[0] + '.rotate')[0]
+    # mult = 1
+    # for v in tmp:
+    #     if v > 10 or v < -10:  # if joint has rotation more than 10 degrees assume it's flipped
+    #         mult = -1
+    #         break
+
     # twist
     kneeTwist = attrLib.addFloat(footCtl.name, 'kneeTwist')
-    ankleTwist = attrLib.addFloat(footCtl.name, 'ankleTwist')
     mc.connectAttr(kneeTwist, ikh + '.twist')
-    connect.withAddedValue(ankleTwist, sIkh + '.twist', addedValue=mult * -90)
+    # mc.connectAttr(ankleTwist, sIkh + '.twist')
+    # connect.withAddedValue(ankleTwist, sIkh + '.twist', addedValue=mult * 90)
 
     # spring end grp
     spring_end_trs = mc.createNode('transform', n=name + '_spring_end_TRS')
@@ -224,7 +222,7 @@ def IkLegQuad(joints=None,
                    spring=spring_jnts[-1],
                    legLength=legLength,
                    globalScaleAttr=globalScaleAttr,
-                   name=name + '_spring_')
+                   name=name + '_heel')
 
     # # workaround for spring IK flipping when first joint's
     # # parent rotates more than 180 away from last joint
@@ -250,28 +248,41 @@ def setupAutoAnkle(ikCtl, aimTo, heelCtl, static, spring, legLength, globalScale
     when leg is stright, it's better for heel to match ikSpring
     and when len is not straight, it's better for heel to aim to scapicle
     """
+    # top auto ankle system group
     heelZro = mc.listRelatives(heelCtl, p=True)[0]
-    heelGrp = trsLib.insert(heelZro, mode='parent', name=name + '_GRP')[0]
+    heelGrp = trsLib.insert(heelZro, mode='parent', name=name + '_auto_GRP')[0]
+
+    # ankle manual twist group that matches foot position but points to knee
+    heelTwistZro = mc.createNode('transform', name=name + '_manual_twist_ZRO', p=heelGrp)
+    trsLib.match(heelTwistZro, ikCtl)
+    ankleJnt = trsLib.getParent(spring)
+    kneeJnt = trsLib.getParent(ankleJnt)
+    mc.delete(mc.aimConstraint(kneeJnt, heelTwistZro))
+
+    heelTwistGrp = trsLib.insert(heelTwistZro, mode='child', name=name + '_manual_twist_GRP')[0]
+    ankleTwist = attrLib.addFloat(ikCtl, 'ankleTwist')
+    connect.negative(ankleTwist, heelTwistGrp + '.rx')
+    mc.parent(heelZro, heelTwistGrp)
 
     # create automation method swtich
-    a = mc.spaceLocator(n=name + '_start_LOC')[0]
+    a = mc.spaceLocator(n=name + '_spring_start_LOC')[0]
     mc.parent(a, aimTo)
     trsLib.match(a, aimTo)
-    b = mc.spaceLocator(n=name + '_end_LOC')[0]
+    b = mc.spaceLocator(n=name + '_spring_end_LOC')[0]
     mc.parent(b, ikCtl)
     trsLib.match(b, ikCtl)
     mc.hide(a, b)
-    dist = mc.createNode('distanceBetween', n=name + '_len_DSB')
+    dist = mc.createNode('distanceBetween', n=name + '_spring_len_DSB')
     mc.connectAttr(a + '.worldMatrix', dist + '.inMatrix1')
     mc.connectAttr(b + '.worldMatrix', dist + '.inMatrix2')
 
     # gs
-    gs = mc.createNode('multiplyDivide', n=name + '_global_scale_MDN')
+    gs = mc.createNode('multiplyDivide', n=name + '_spring_global_scale_MDN')
     mc.setAttr(gs + '.operation', 2)
     mc.connectAttr(dist + '.distance', gs + '.input1X')
     mc.connectAttr(globalScaleAttr, gs + '.input2X')
 
-    mdn = mc.createNode('multiplyDivide', n=name + '_len_MDN')
+    mdn = mc.createNode('multiplyDivide', n=name + '_spring_len_MDN')
     mc.connectAttr(gs + '.outputX', mdn + '.input1X')
     mc.setAttr(mdn + '.input2X', legLength)
     mc.setAttr(mdn + '.operation', 2)
@@ -294,7 +305,7 @@ def setupAutoAnkle(ikCtl, aimTo, heelCtl, static, spring, legLength, globalScale
                      mo=True)
 
     # spring grp
-    springGrp = trsLib.insert(heelGrp, mode='child', name=name + '_spring_TRS')[0]
+    springGrp = trsLib.insert(heelGrp, mode='child', name=name + '_match_to_spring_TRS')[0]
     mc.parentConstraint(spring, springGrp, mo=True)
 
     # auto ankle
@@ -309,5 +320,5 @@ def setupAutoAnkle(ikCtl, aimTo, heelCtl, static, spring, legLength, globalScale
 
     # result
     attrLib.addSeparator(heelCtl, 'behavior')
-    connect.blendConstraint(static, autoAnkle, heelZro, blendNode=heelCtl,
+    connect.blendConstraint(static, autoAnkle, heelGrp, blendNode=heelCtl,
                             blendAttr='autoAnkle', type='orientConstraint')
