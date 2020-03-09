@@ -69,15 +69,6 @@ class Template(object):
         self.createSettings()
 
     @staticmethod
-    def getLastTemplateNumber():
-        bluGrps = mc.ls('*blueprint_GRP')
-        orders = []
-        for x in bluGrps:
-            order = attrLib.getAttr(x + '.blu_order', verbose=False) or 0
-            orders.append(order)
-        return max(orders)
-
-    @staticmethod
     def createGrp(name="empty_GRP", parent="", pivot_matrix=None, forceRecreate=True):
         """
         create groups and parent them
@@ -295,12 +286,9 @@ class Template(object):
         attributes that start 3 underlines will be displayed in the UI
         """
         attrLib.addString(self.blueprintGrp, 'blu_type', v=self.__class__.__name__, lock=True)
-        attrLib.addInt(self.blueprintGrp, 'blu_order', lock=True)
         attrLib.addBool(self.blueprintGrp, 'blu_verbose', v=self.verbose)
         attrLib.addString(self.blueprintGrp, 'blu_side', v=self.__side)
         attrLib.addString(self.blueprintGrp, 'blu_prefix', v=self.__prefix)
-
-        attrLib.setAttr(self.blueprintGrp + '.blu_order', self.getLastTemplateNumber() + 1)
 
     @property
     def side(self):

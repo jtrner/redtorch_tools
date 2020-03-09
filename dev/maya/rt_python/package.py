@@ -1,7 +1,7 @@
 import os
 
 
-__version__ = '2.13.0'
+__version__ = '2.14.0'
 __author__ = 'Ehsan Hassani Moghaddam'
-__comment__ = 'better quadLeg'
+__comment__ = 'blueprint and rig sections in rigUI'
 os.environ['REDTORCH_TOOLS_VERSION'] = __version__

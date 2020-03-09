@@ -42,7 +42,7 @@ class Root(template.Template):
         # add blueprint attrs
         # this data will be used to initialize the class later
         self.blueprints['base'] = '{}_BLU'.format(name)
-        attrLib.addString(self.blueprintGrp, ln='blu_inputs', v=str(self.blueprints))
+        # attrLib.addString(self.blueprintGrp, ln='blu_inputs', v=str(self.blueprints))
 
         # create input blueprints
         if not mc.objExists(self.blueprints['base']):

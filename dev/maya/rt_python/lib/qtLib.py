@@ -176,32 +176,89 @@ def createVLayout(parent, maxHeight=None, maxWidth=None, margins=4, spacing=4):
     return lay
 
 
-def createCB(label, labelWidthMin=60, labelWidthMax=200, parent=None):
-    lay = createHLayout(parent)
+def createCB(label, labelWidthMin=40, labelWidthMax=200, parent=None):
+    if parent:
+        wid = None
+        lay = createHLayout(parent)
+        lay.layout().setContentsMargins(1, 1, 1, 1)
+        lay.layout().setSpacing(1)
+    else:
+        wid = QtWidgets.QWidget()
+        lay = QtWidgets.QHBoxLayout()
+        wid.setLayout(lay)
     lay.setAlignment(QtCore.Qt.AlignLeft)
     lb = QtWidgets.QLabel(label)
     lb.setMinimumWidth(labelWidthMin)
     lb.setMaximumWidth(labelWidthMin)
     cb = QtWidgets.QComboBox()
-    cb.setMinimumWidth(labelWidthMax)
-    cb.setMaximumWidth(labelWidthMax)
+    cb.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
     lay.addWidget(lb)
     lay.addWidget(cb)
-    return cb
+    return wid, lb, cb
 
 
 def createCheckBox(label, labelWidthMin=40, labelWidthMax=200, parent=None):
-    lay = createHLayout(parent)
+    if parent:
+        wid = None
+        lay = createHLayout(parent)
+        lay.layout().setContentsMargins(1, 1, 1, 1)
+        lay.layout().setSpacing(1)
+    else:
+        wid = QtWidgets.QWidget()
+        lay = QtWidgets.QHBoxLayout()
+        wid.setLayout(lay)
     lay.setAlignment(QtCore.Qt.AlignLeft)
     lb = QtWidgets.QLabel(label)
     lb.setMinimumWidth(labelWidthMin)
     lb.setMaximumWidth(labelWidthMin)
     cb = QtWidgets.QCheckBox()
-    cb.setMinimumWidth(labelWidthMax)
-    cb.setMaximumWidth(labelWidthMax)
+    cb.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
     lay.addWidget(lb)
     lay.addWidget(cb)
-    return cb
+    return wid, lb, cb
+
+
+def createSpinBox(label, labelWidthMin=40, labelWidthMax=200, parent=None):
+    if parent:
+        wid = None
+        lay = createHLayout(parent)
+        lay.layout().setContentsMargins(1, 1, 1, 1)
+        lay.layout().setSpacing(1)
+    else:
+        wid = QtWidgets.QWidget()
+        lay = QtWidgets.QHBoxLayout()
+        wid.setLayout(lay)
+    lay.setAlignment(QtCore.Qt.AlignLeft)
+    lb = QtWidgets.QLabel(label)
+    lb.setMinimumWidth(labelWidthMin)
+    lb.setMaximumWidth(labelWidthMin)
+    cb = QtWidgets.QSpinBox()
+    cb.setMaximum(99999)
+    cb.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+    lay.addWidget(lb)
+    lay.addWidget(cb)
+    return wid, lb, cb
+
+
+def createLineEdit(label, labelWidthMin=40, labelWidthMax=200, parent=None):
+    if parent:
+        wid = None
+        lay = createHLayout(parent)
+        lay.layout().setContentsMargins(1, 1, 1, 1)
+        lay.layout().setSpacing(1)
+    else:
+        wid = QtWidgets.QWidget()
+        lay = QtWidgets.QHBoxLayout()
+        wid.setLayout(lay)
+    lay.setAlignment(QtCore.Qt.AlignLeft)
+    lb = QtWidgets.QLabel(label)
+    lb.setMinimumWidth(labelWidthMin)
+    lb.setMaximumWidth(labelWidthMin)
+    cb = QtWidgets.QLineEdit()
+    cb.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+    lay.addWidget(lb)
+    lay.addWidget(cb)
+    return wid, lb, cb
 
 
 def createSeparator(parent):
@@ -265,6 +322,11 @@ def addItemToTreeWidget(treeWidget, itemName, insert=False):
     return node_item
 
 
+def clearLayout(lay):
+    for i in reversed(range(lay.count())):
+        lay.itemAt(i).widget().setParent(None)
+
+
 def filterTW(tw, le):
     """
     Hides items in a QTreeWidget that don't match the text in the QLineEdit
@@ -307,10 +369,15 @@ def getSelectedItemAsText(tw):
     :return: text of currently selected item
     :rtype: string
     """
+    item = getSelectedItem(tw)
+    if item:
+        return item.text(0)
+
+
+def getSelectedItem(tw):
     items = tw.selectedItems()
-    if not items:
-        return
-    return items[-1].text(0)
+    if items:
+        return items[-1]
 
 
 def getItemInTree(tw, text):

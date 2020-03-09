@@ -37,6 +37,7 @@ import maya.cmds as mc
 from ..lib import qtLib
 from ..lib import control
 from ..lib import fileLib
+from ..lib import attrLib
 from . import rigLib
 from ..general import workspace
 from ..general import utils as generalUtils
@@ -46,6 +47,7 @@ from . import component
 reload(qtLib)
 reload(control)
 reload(fileLib)
+reload(attrLib)
 reload(rigLib)
 reload(workspace)
 reload(generalUtils)
@@ -53,7 +55,7 @@ reload(package)
 reload(component)
 
 
-# rigLib.importComponents()
+# rigLib.importBlueprints()
 
 # CONSTANTS
 ICON_DIR = os.path.abspath(os.path.join(__file__, '../../../../icon'))
@@ -214,29 +216,55 @@ class UI(QtWidgets.QDialog):
         self.addRightClickMenu(self.versions_tw, rmb_data=versionsMenu)
 
         # ======================================================================
+        # blueprint mode vs build mode
+        mode_hl = qtLib.createHLayout(self.builds_lay)
+
+        lb = QtWidgets.QLabel('Mode:')
+        mode_hl.addWidget(lb)
+
+        self.mode_grp = QtWidgets.QButtonGroup(mode_hl)
+
+        self.mode_blu = QtWidgets.QRadioButton("blueprint")
+        self.mode_grp.addButton(self.mode_blu, 1)
+
+        self.mode_rig = QtWidgets.QRadioButton("rig")
+        self.mode_grp.addButton(self.mode_rig, 2)
+
+        mode_hl.addWidget(self.mode_blu)
+        mode_hl.addWidget(self.mode_rig)
+
+        self.mode_grp.buttonClicked.connect(self.modeChanged)
+
+        # ======================================================================
         # blueprint frame
-        blu_gb, blu_frame = qtLib.createGroupBox(self.builds_lay, 'Create Blueprint')
+        self.blu_gb, blu_frame = qtLib.createGroupBox(self.builds_lay, 'Create Blueprint')
         blu_lay = qtLib.createHLayout(blu_frame)
 
-        # Available Components
-        self.availableComponents_tw = DeselectableTreeWidget()
-        blu_lay.layout().addWidget(self.availableComponents_tw)
-        self.availableComponents_tw.setAlternatingRowColors(True)
-        self.availableComponents_tw.setColumnWidth(0, 250)
-        self.availableComponents_tw.setHeaderLabels(['Available Components'])
-        self.availableComponents_tw.itemDoubleClicked.connect(self.addComponent)
+        # Available Blueprints
+        self.availableBlueprints_tw = DeselectableTreeWidget()
+        blu_lay.layout().addWidget(self.availableBlueprints_tw)
+        self.availableBlueprints_tw.setAlternatingRowColors(True)
+        self.availableBlueprints_tw.setColumnWidth(0, 80)
+        self.availableBlueprints_tw.setMaximumWidth(100)
+        self.availableBlueprints_tw.setHeaderLabels(['Available Blueprints'])
+        self.availableBlueprints_tw.itemDoubleClicked.connect(self.addBlueprint)
         for availCmp in AVAILABLE_COMPONENTS:
-            qtLib.addItemToTreeWidget(self.availableComponents_tw, availCmp)
+            qtLib.addItemToTreeWidget(self.availableBlueprints_tw, availCmp)
 
-        # Components in Scene
-        self.components_tw = DeselectableTreeWidget()
-        blu_lay.layout().addWidget(self.components_tw)
-        self.components_tw.setAlternatingRowColors(True)
-        self.components_tw.setColumnWidth(0, 250)
-        self.components_tw.setHeaderLabels(['Components in Scene'])
-        # self.components_tw.itemDoubleClicked.connect(self.runStep)
-        # for availCmp in AVAILABLE_COMPONENTS:
-        #     qtLib.addItemToTreeWidget(self.components_tw, availCmp)
+        # Blueprints in Scene
+        self.blueprints_tw = DeselectableTreeWidget()
+        blu_lay.layout().addWidget(self.blueprints_tw)
+        self.blueprints_tw.setAlternatingRowColors(True)
+        self.blueprints_tw.setColumnWidth(0, 220)
+        self.blueprints_tw.setMinimumWidth(150)
+        self.blueprints_tw.setMaximumWidth(200)
+        self.blueprints_tw.setHeaderLabels(['Blueprints in Scene'])
+        self.blueprints_tw.itemSelectionChanged.connect(self.handleNewComponentSelected)
+
+        # arguments widget
+        self.args_w = qtLib.createVLayout(blu_lay, margins=1, spacing=1)
+        # argW = self.args_w.parentWidget()
+        # argW.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
         # all buttons layout
         comp_buttons_vl = qtLib.createVLayout(blu_frame, margins=1, spacing=4)
@@ -245,7 +273,6 @@ class UI(QtWidgets.QDialog):
         bluRefreshIconPath = os.path.join(ICON_DIR, 'refresh.png')
         bluRefreshIcon = QtGui.QIcon(bluRefreshIconPath)
         self.bluRefresh_btn = QtWidgets.QPushButton(bluRefreshIcon, '')
-        # self.bluRefresh_btn.setFixedSize(100, 100)
         comp_buttons_vl.layout().addWidget(self.bluRefresh_btn)
         self.bluRefresh_btn.clicked.connect(self.bluRefresh)
 
@@ -282,9 +309,20 @@ class UI(QtWidgets.QDialog):
         # blueprintBtnOptions['Export Selected As Blueprint'] = self.exportAsSkeletonFile
         self.addRightClickMenu(self.openBlueprint_btn, rmb_data=blueprintBtnOptions)
 
+        #
+        qtLib.createSeparator(comp_buttons_vl)
+
+        self.duplicateBlueprint_btn = QtWidgets.QPushButton('Duplicate')
+        comp_buttons_vl.layout().addWidget(self.duplicateBlueprint_btn)
+        self.duplicateBlueprint_btn.clicked.connect(self.duplicateBlueprint)
+
+        self.mirrorBlueprint_btn = QtWidgets.QPushButton('Mirror')
+        comp_buttons_vl.layout().addWidget(self.mirrorBlueprint_btn)
+        self.mirrorBlueprint_btn.clicked.connect(self.mirrorBlueprint)
+
         # ======================================================================
         # buildTree frame
-        rig_gb, rig_frame = qtLib.createGroupBox(self.builds_lay, 'Create Rig')
+        self.rig_gb, rig_frame = qtLib.createGroupBox(self.builds_lay, 'Create Rig')
         buildTree_lay = qtLib.createHLayout(rig_frame)
 
         self.buildTree_tw = DeselectableTreeWidget()
@@ -326,6 +364,13 @@ class UI(QtWidgets.QDialog):
         publishBtns_vl.layout().addWidget(self.publish_btn)
         self.publish_btn.clicked.connect(self.publishRig)
 
+        #
+        self.mode_blu.setChecked(True)
+        self.rig_gb.setHidden(True)
+        self.bluRefresh()
+        item = self.blueprints_tw.topLevelItem(0)
+        self.blueprints_tw.setCurrentItem(item)
+
     def populateSettingsTab(self):
         # ======================================================================
         # settings frame
@@ -346,6 +391,142 @@ class UI(QtWidgets.QDialog):
 
     def handleNewVersionSelected(self):
         self.version = qtLib.getSelectedItemAsText(self.versions_tw)
+
+    def handleNewComponentSelected(self):
+        qtLib.clearLayout(self.args_w)
+
+        selectedBlu = qtLib.getSelectedItemAsText(self.blueprints_tw)
+        if not selectedBlu:
+            return
+        bluGrp = selectedBlu.split(' ')[0] + '_blueprint_GRP'
+        mc.select(bluGrp)
+
+        widgets = self.convertAttrsToQtWidgets(bluGrp)
+        for label, widget in widgets.items():
+            self.args_w.addWidget(widget)
+
+    def convertAttrsToQtWidgets(self, node):
+        ignoreAttrs = ['blu_inputs', 'blu_type', 'blu_order']
+
+        attrs = mc.listAttr(node, st='blu_*')
+        attrs = [x for x in attrs if x not in ignoreAttrs]
+        attrsAndTypes = OrderedDict()
+        for attr in attrs:
+            attrType = attrLib.getAttrType(node + '.' + attr)
+            attrsAndTypes[attr] = attrType
+
+        widgets_data = OrderedDict()
+        for attr, attrType in attrsAndTypes.items():
+            attrName = attr.split('blu_')[-1]
+            if attrType == 'bool':
+                parWidget, lb, widget = qtLib.createCheckBox(attrName, labelWidthMin=80)
+                widgets_data[attr] = parWidget
+                #
+                value = mc.getAttr(node + '.' + attr)
+                widget.setChecked(value)
+                #
+                cmd = partial(self.uiSettingTobluAttr, wid=widget, attr=attr)
+                widget.stateChanged.connect(cmd)
+            elif attrType == 'long':
+                parWidget, lb, widget = qtLib.createSpinBox(attrName, labelWidthMin=80)
+                widgets_data[attr] = parWidget
+                #
+                value = mc.getAttr(node + '.' + attr)
+                widget.setValue(value)
+                #
+                cmd = partial(self.uiSettingTobluAttr, wid=widget, attr=attr)
+                widget.valueChanged.connect(cmd)
+            elif attrType == 'enum':
+                parWidget, lb, widget = qtLib.createCB(attrName, labelWidthMin=80)
+                widgets_data[attr] = parWidget
+                #
+                choices = mc.attributeQuery(attr, node=node, listEnum=True)[0].split(':')
+                widget.addItems(choices)
+                value = mc.getAttr(node + '.' + attr)
+                widget.setCurrentIndex(value)
+
+                cmd = partial(self.uiSettingTobluAttr, wid=widget, attr=attr)
+                widget.currentIndexChanged.connect(cmd)
+            else:  # assume it's of type string
+                parWidget, lb, widget = qtLib.createLineEdit(attrName, labelWidthMin=80)
+                widgets_data[attr] = parWidget
+                #
+                value = mc.getAttr(node + '.' + attr)
+                widget.setText(value)
+                #
+                cmd = partial(self.uiSettingTobluAttr, wid=widget, attr=attr)
+                widget.textChanged.connect(cmd)
+
+            # def updateInputVal(self):
+            #     for k, v in self.blueprints.items():
+            #         tokens = v.split('_')
+            #         newName = '_'.join([self.name] + tokens[2:])
+            #         self.blueprints[k] = newName
+            #     attrLib.setAttr(self.blueprintGrp + '.blu_inputs', self.blueprints)
+
+        return widgets_data
+
+    def uiSettingTobluAttr(self, dummy, wid, attr):
+        selectedBlu_item = qtLib.getSelectedItem(self.blueprints_tw)
+        if not selectedBlu_item:
+            return
+        selectedBlu = selectedBlu_item.text(0)
+        node = selectedBlu.split(' ')[0] + '_blueprint_GRP'
+        bluType = mc.getAttr(node + '.blu_type')
+
+        widgetType = wid.__class__.__name__
+        if widgetType == 'QCheckBox':
+            value = wid.isChecked()
+        if widgetType == 'QSpinBox':
+            value = wid.value()
+        if widgetType == 'QLineEdit':
+            value = wid.text()
+        if widgetType == 'QComboBox':
+            value = wid.currentIndex()
+        attrLib.setAttr(node + '.' + attr, value)
+
+        # rename nodes
+        objs = mc.listRelatives(node, ad=True, fullPath=True)
+        objs.append(node)
+        objs.sort(key=lambda obj: obj.count('|'), reverse=True)
+        if attr == 'blu_side':
+            itemName = '{}_{} [{}]'.format(value,
+                                        mc.getAttr(node + '.blu_prefix'),
+                                        bluType)
+            for obj in objs:
+                tokens = obj.split('|')[-1].split('_')
+                newName = '_'.join([value] + tokens[1:])
+                mc.rename(obj, newName)
+        elif attr == 'blu_prefix':
+            itemName = '{}_{} [{}]'.format(mc.getAttr(node + '.blu_side'),
+                                        value,
+                                        bluType)
+            for obj in objs:
+                tokens = obj.split('|')[-1].split('_')
+                newName = '_'.join([tokens[0], value] + tokens[2:])
+                mc.rename(obj, newName)
+
+        #
+        if attr in ['blu_side', 'blu_prefix']:
+            selectedBlu_item.setText(0, itemName)
+
+    def renameBluprint(self, blueprintGrp, search, replace):
+
+        objs = mc.listRelatives(blueprintGrp, ad=True, fullPath=True)
+        objs.sort(key=lambda obj: obj.count('|'))
+        for obj in objs:
+            mc.rename(obj, obj.replace(search, replace, 1))
+
+        mc.rename(blueprintGrp, obj.replace(search, replace))
+
+    def modeChanged(self):
+        selectedModeId = self.mode_grp.checkedId()
+        if selectedModeId == 1:
+            self.rig_gb.setHidden(True)
+            self.blu_gb.setHidden(False)
+        if selectedModeId == 2:
+            self.rig_gb.setHidden(False)
+            self.blu_gb.setHidden(True)
 
     def updateJobs(self):
         self.jobs_tw.clear()
@@ -518,15 +699,18 @@ class UI(QtWidgets.QDialog):
         folderPath = UI.removeInvalidPartsOfPath(folderPath)
         return folderPath
 
-    def addComponent(self):
-        cmp = qtLib.getSelectedItemAsText(self.availableComponents_tw)
+    def addBlueprint(self):
+        cmp = qtLib.getSelectedItemAsText(self.availableBlueprints_tw)
         python_rig_component = globals()['component']
         cmpModule = getattr(python_rig_component, cmp)
         cmpClass = getattr(cmpModule, cmp[0].upper() + cmp[1:])
         cmpInstance = cmpClass()
         self.cmpInstances[cmpInstance.name] = cmpInstance
         qtLib.printMessage(self.info_lb,
-                           'New component of type "{}" was added.'.format(cmp))
+                           'New blueprint of type "{}" was added.'.format(cmp))
+        self.bluRefresh()
+        itemName = '{} [{}]'.format(cmpInstance.name, cmpInstance.__class__.__name__)
+        qtLib.selectItemByText(self.blueprints_tw, itemName)
 
     def openDirectoy(self):
         """
@@ -735,10 +919,19 @@ class UI(QtWidgets.QDialog):
         qtLib.printMessage(self.info_lb, msg, mode='info')
 
     def bluRefresh(self):
+        qtLib.clearLayout(self.args_w)
+        self.blueprints_tw.clear()
+        if not mc.objExists('blueprint_GRP'):
+            return
         bluGrps = mc.listRelatives('blueprint_GRP')
-        for bluGrp in blueprintGrps:
-            blu_name = ''
-        print('todo: add instance properties to rigUI')
+        if not bluGrps:
+            return
+        for bluGrp in sorted(bluGrps):
+            blu_type = mc.getAttr(bluGrp + '.blu_type')
+            blu_side = mc.getAttr(bluGrp + '.blu_side')
+            blu_prefix = mc.getAttr(bluGrp + '.blu_prefix')
+            title = '{}_{} [{}]'.format(blu_side, blu_prefix, blu_type)
+            qtLib.addItemToTreeWidget(self.blueprints_tw, title)
 
     def getAllItems(self, tree):
         items = []
@@ -871,6 +1064,26 @@ class UI(QtWidgets.QDialog):
         answer = qtLib.confirmDialog(self, msg='Export selected as "{}"?'.format(skelFile))
         if answer:
             mc.file(skelFile, force=True, es=True, typ="mayaAscii")
+
+    def duplicateBlueprint(self):
+        selectedBlu = qtLib.getSelectedItemAsText(self.blueprints_tw)
+        if not selectedBlu:
+            return
+        bluGrp = selectedBlu.split(' ')[0] + '_blueprint_GRP'
+        dup = rigLib.duplicateBlueprint(bluGrp)
+        newBluGrp = dup.replace('_blueprint_GRP', '')
+        bluType = mc.getAttr(dup + '.blu_type')
+        newItemName = '{} [{}]'.format(newBluGrp, bluType)
+        self.bluRefresh()
+        qtLib.selectItemByText(self.blueprints_tw, newItemName)
+
+    def mirrorBlueprint(self):
+        selectedBlu = qtLib.getSelectedItemAsText(self.blueprints_tw)
+        if not selectedBlu:
+            return
+        bluGrp = selectedBlu.split(' ')[0] + '_blueprint_GRP'
+        rigLib.mirrorBlueprint(bluGrp)
+        self.bluRefresh()
 
     def importControls(self):
         # get input from UI

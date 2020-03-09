@@ -360,7 +360,7 @@ class UI(QtWidgets.QDialog):
         self.replaceTextureDir_btn = QtWidgets.QPushButton('Replace Textures Directory')
 
         address_2_hl = qtLib.createHLayout(address_vl, maxHeight=30)
-        self.useSelection_cb = qtLib.createCheckBox('Use Selection', labelWidthMin=70,
+        _, _, self.useSelection_cb = qtLib.createCheckBox('Use Selection', labelWidthMin=70,
                                               labelWidthMax=70, parent=address_2_hl)
 
         address_2_hl.layout().addWidget(self.replaceTextureDir_btn)

@@ -261,7 +261,7 @@ class UI(QtWidgets.QDialog):
         newPlayblast_hl.layout().addWidget(self.play_btn)
 
         # resolution
-        self.resolution_box = qtLib.createCB(
+        _, _, self.resolution_box = qtLib.createCB(
             'Res:', labelWidthMin=20, labelWidthMax=100, parent=playblast_vl)
         self.resolution_box.addItems(RESOLUTIONS)
 

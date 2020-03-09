@@ -145,7 +145,7 @@ def reverseShape(self, objs=None, axis='x'):
             mc.warning("Object doesn't have a shape. Skipped!")
 
 
-def blendShapeGeosUnderTwoGroups(originalGroup, editedGroup, deleteHistory=False):
+def blendShapeGeosUnderTwoGroups(originalGroup, editedGroup, deleteHistory=False, space='local'):
     """
     from rt_python.lib import meshLib
     meshLib.blendShapeGeosUnderTwoGroups(originalGroup='model_GRP', editedGroup='model_GRP1', deleteHistory=True)
@@ -162,7 +162,7 @@ def blendShapeGeosUnderTwoGroups(originalGroup, editedGroup, deleteHistory=False
             mismatchOrigs.append(origMesh)
             continue
         editMesh = editMeshList[0]
-        mc.blendShape(editMesh, origMesh, w=(0, 1))
+        mc.blendShape(editMesh, origMesh, w=(0, 1), origin=space)
 
     if deleteHistory:
         mc.delete(origMeshes, ch=True)

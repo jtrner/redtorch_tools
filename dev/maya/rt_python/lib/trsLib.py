@@ -557,8 +557,11 @@ def getDistanceFromPoses(posA=None, posB=None):
 
 
 def mirrorLikeJnt(nodes=None):
+    if not isinstance(nodes, (list, tuple)):
+        nodes = [nodes]
     if not nodes:
         nodes = mc.ls(sl=True)
+    mirroredObjs = []
     for node in nodes:
         jnt = mc.joint(None)
         match(jnt, node)
@@ -572,8 +575,12 @@ def mirrorLikeJnt(nodes=None):
             mc.parent(mir[1], world=True)
         mc.delete(mir[0], jnt)
         mc.rotate(180, 0, 0, mir[1], r=True, fo=True, os=True)
-        mc.rename(mir[1], node.replace('L', 'R', 1))
+        side = node[0]
+        otherSide = 'R' if side == 'L' else 'L'
+        mir = mc.rename(mir[1], node.replace(side, otherSide, 1))
+        mirroredObjs.append(mir)
 
+    return mirroredObjs
 
 def mirror(target, axis="x", type_="pose", copy=False, children=True, **kwargs):
     """

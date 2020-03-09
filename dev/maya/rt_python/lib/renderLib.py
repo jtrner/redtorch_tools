@@ -1043,7 +1043,7 @@ def substanceToMayaSoftware(textureDir):
             mc.connectAttr(bmp + '.outNormal', mat + '.normalCamera')
 
 
-def renderSequence(frames, melCmd='', resolution=[1280, 720], renderer='arnold', sample=3):
+def renderSequence(frames, melCmd=None, resolution=[1280, 720], renderer='arnold', sample=3):
     """
     from rt_python.lib import renderLib
     reload(renderLib)
@@ -1058,7 +1058,8 @@ def renderSequence(frames, melCmd='', resolution=[1280, 720], renderer='arnold',
 
     for f in frames:
         mc.currentTime(f)
-        mm.eval(melCmd)
+        if melCmd:
+            mm.eval(melCmd)
         setRenderSetings(start=f, end=f, resolution=resolution,
                          renderer=renderer, sample=sample)
 
