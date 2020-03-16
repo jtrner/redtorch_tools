@@ -14,10 +14,14 @@ from ...lib import trsLib
 from ...lib import crvLib
 from ...lib import connect
 from ...lib import control
+from ...lib import mathLib
+from ...lib import jntLib
+reload(mathLib)
+reload(jntLib)
 
 
 def run(jnts=None, numCtls=None, guides=None, numJnts=None, addSpaces=False,
-        isSerial=True, side='C', description='rope', upCrvNormal=(1, 0, 0),
+        isSerial=True, side='C', description='rope', upCrvNormal=(0, 1, 0),
         matchOrientation=False):
     """
     rope.run(jnts=guides, numCtls=6, guides=None, numJnts=None, description='aaa')
@@ -46,26 +50,38 @@ def run(jnts=None, numCtls=None, guides=None, numJnts=None, addSpaces=False,
             ctlPoses.append(pos)
         mc.delete(tmpCrv, tmpSoftCrv)
         numJnts = len(jnts)
-    # otherwise control positions and number of output jnts are given
+        crvPointPoses = [mc.xform(x, q=1, ws=1, t=1) for x in jnts]
+
+    # control positions and number of output jnts are given
     elif guides and numJnts:
         ctlPoses = [mc.xform(x, q=1, ws=1, t=1) for x in guides]
-        jnts = []
-        for i in range(numJnts):
-            jnts.append(mc.joint(None, name='{}{}_JNT'.format(name, i))[0])
-    else:
-        mc.error('Either (jnts and numCtls) or (ctlPoses and numJnts) must be given!')
+        crvPointPoses = ctlPoses
+        numCtls = len(guides)
 
-    # create crv, upCrv (will be used to drive softCrv and upVector of output jnts)
-    crv = crvLib.fromPoses(ctlPoses, degree=1, fit=False,name='{}_CRV'.format(name))[0]
+    # control positions and output joints are given
+    elif guides and jnts:
+        ctlPoses = [mc.xform(x, q=1, ws=1, t=1) for x in guides]
+        numJnts = len(jnts)
+        numCtls = len(guides)
+        crvPointPoses = [mc.xform(x, q=1, ws=1, t=1) for x in jnts]
+
+    else:
+        mc.error('Either (jnts and numCtls) or (ctlPoses and numJnts) or (guides and jnts) must be given!')
+
+    crv = crvLib.fromPoses(ctlPoses, degree=1, fit=False, name='{}_CRV'.format(name))[0]
+    upCrv = mc.duplicate(crv, name='{}_up_CRV'.format(name))[0]
     size = mc.arclen(crv) / len(ctlPoses) / 2
-    upCrv = mc.offsetCurve(crv, nr=upCrvNormal, d=size, ch=False)[0]
-    # mc.move(0, size, 0, upCrv + '.cv[*]', r=True)
+    # upCrv = mc.offsetCurve(crv, nr=upCrvNormal, d=size, ch=False)[0]
+    # upCrv = mc.rename(upCrv, '{}_up_CRV'.format(name))
+
+    #
+    mc.rebuildCurve(crv, ch=0, s=numCtls - 1, d=1, kr=0, rpo=1)
+    mc.rebuildCurve(upCrv, ch=0, s=numCtls - 1, d=1, kr=0, rpo=1)
 
     # create softCrv (will be used to drive position of output joints)
-    # softCrv = mc.fitBspline(crv, ch=1, tol=0.01, name='{}Soft_CRV'.format(name))[0]
-    # upSoftCrv = mc.fitBspline(upCrv, ch=1, tol=0.01, name='{}SoftUp_CRV'.format(name))[0]
-    softCrv = mc.rebuildCurve(crv, ch=1, s=numCtls - 1, d=3, kr=0, name='{}Soft_CRV'.format(name))[0]
-    upSoftCrv = mc.rebuildCurve(upCrv, ch=1, s=numCtls - 1, d=3, kr=0, name='{}Soft_CRV'.format(name))[0]
+    softCrv = mc.rebuildCurve(crv, ch=1, s=numCtls - 1, d=3, kr=0, rpo=0, name='{}_soft_CRV'.format(name))[0]
+    upSoftCrv = mc.rebuildCurve(upCrv, ch=1, s=numCtls - 1, d=3, kr=0, rpo=0, name='{}_up_soft_CRV'.format(name))[0]
+    upSoftCrv = mc.rename(upSoftCrv, '{}_up_soft_CRV'.format(name))
 
     # parent curves
     mc.parent(crv, upCrv, softCrv, upSoftCrv, crvGrp)
@@ -73,23 +89,43 @@ def run(jnts=None, numCtls=None, guides=None, numJnts=None, addSpaces=False,
     # create clusters for each cv of crv
     clss = crvLib.clusterize(crv, name=name)
 
-    # drive upCrv with crv clusters
-    for i in range(len(clss)):
-        clsNode = mc.listConnections(clss[i] + '.worldMatrix')[0]
-        setName = mc.listConnections(clsNode + '.message')[0]
-        mc.sets('{}.cv[{}]'.format(upCrv, i), fe=setName)
+    #
+    if not jnts:
+        jnts = jntLib.create_on_curve(curve=softCrv, numOfJoints=numJnts,
+                                      parent=True, description=name)
+        upLoc = mc.createNode('transform')
+        trsLib.match(upLoc, jnts[0])
+        mc.move(0, 100000, 0, upLoc, r=True, ws=True)
+        jntLib.orientUsingAim(jnts=jnts, upAim=upLoc,
+                              aimAxes='x', upAxes='y')
+        mc.delete(upLoc)
 
     # create controls
     baseCtl = control.Control(
         side=side,
         descriptor='{}_base'.format(description),
         shape='square',
-        size=size*2,
+        size=size * 2,
         color='cyan',
         translate=ctlPoses[0])
+    par = baseCtl.name
     ctls = []
     for i in range(len(ctlPoses)):
-        matchRotate = jnts[i] if matchOrientation else ''
+
+        if matchOrientation:
+            # match with guide
+            if guides:
+                matchRotate = guides[i]
+            # match with joint
+            else:
+                if i == 0:
+                    idx = 0
+                else:
+                    idx = (numJnts / numCtls) * i
+                matchRotate = jnts[idx]
+        else:
+            matchRotate = ''
+
         ctl = control.Control(
             side=side,
             descriptor='{}_{:03d}'.format(description, i + 1),
@@ -98,21 +134,22 @@ def run(jnts=None, numCtls=None, guides=None, numJnts=None, addSpaces=False,
             parent=baseCtl.name,
             translate=ctlPoses[i],
             matchRotate=matchRotate)
-        mc.parent(clss[i + 1], ctl.name)
+        mc.parent(clss[i], ctl.name)
         ctls.append(ctl.name)
 
-        if i == 0:
-            mc.parent(clss[0], ctl.name)
-            continue
-
-        if i == len(ctlPoses) - 1:
-            mc.parent(clss[-1], ctl.name)
-
-        if addSpaces:
+        # if i == 0:
+        #     mc.parent(clss[0], ctl.name)
+        #     continue
+        #
+        # if i == len(ctlPoses) - 1:
+        #     mc.parent(clss[-1], ctl.name)
+        world = mc.createNode('transform', p=par)
+        trsLib.match(world, ctl.name)
+        if i and addSpaces:
             worldZro = trsLib.duplicate(ctl.zro, name=ctl.zro.replace('ZRO', 'world_ZRO'))
             connect.blendConstraint(
                 worldZro,
-                ctls[i-1],
+                world,
                 ctl.zro,
                 type='parentConstraint',
                 skipRotate=['x', 'y', 'z'],
@@ -121,12 +158,31 @@ def run(jnts=None, numCtls=None, guides=None, numJnts=None, addSpaces=False,
                 mo=True)
             connect.blendConstraint(
                 worldZro,
-                ctls[i-1],
+                world,
                 ctl.zro,
                 type='orientConstraint',
                 blendNode=ctl.name,
                 blendAttr='rotateWithPrevCtl',
                 mo=True)
+
+        par = ctl.name
+
+    # move upCrv points along Y axes of controls
+    # firstCV = '{}.cv[0]'.format(upCrv)
+    # mathLib.moveAlongTransform(firstCV, ctls[0], [0, size, 0])
+    #
+    # lastCV = '{}.cv[{}]'.format(upCrv, len(clss) - 1)
+    # mathLib.moveAlongTransform(lastCV, ctls[-1], [0, size, 0])
+
+    for i in range(len(ctls)):  # other cvs
+        CV = '{}.cv[{}]'.format(upCrv, i)
+        mathLib.moveAlongTransform(CV, ctls[i], [0, size, 0])
+
+    # drive upCrv points with crv clusters
+    for i in range(len(clss)):
+        clsNode = mc.listConnections(clss[i] + '.worldMatrix')[0]
+        setName = mc.listConnections(clsNode + '.message')[0]
+        mc.sets('{}.cv[{}]'.format(upCrv, i), fe=setName)
 
     # outputs
     rslts = []
@@ -140,7 +196,7 @@ def run(jnts=None, numCtls=None, guides=None, numJnts=None, addSpaces=False,
         # if joints should point to their children ie: normal joint chains
         aimUparam = None
         if isSerial and i != numJnts - 1:  # last joint doesn't aim to anything
-            nextJ = jnts[i+1]
+            nextJ = jnts[i + 1]
             pos = mc.xform(nextJ, q=1, ws=1, t=1)
             aimUparam = crvLib.getUParam(pos, softCrv)
         crvLib.attach(node=rslt, curve=softCrv, upCurve=upSoftCrv, upAxis='y',
@@ -155,4 +211,4 @@ def run(jnts=None, numCtls=None, guides=None, numJnts=None, addSpaces=False,
     # hide stuff
     mc.hide(crvGrp, rsltGrp, clss)
 
-    return baseCtl.name, crvGrp, rsltGrp, ctls
+    return baseCtl.name, crvGrp, rsltGrp, ctls, jnts

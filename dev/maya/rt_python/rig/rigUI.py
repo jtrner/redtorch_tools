@@ -283,7 +283,6 @@ class UI(QtWidgets.QDialog):
         # skeleton button
         self.openSkel_btn = QtWidgets.QPushButton('Open Skeleton')
         comp_buttons_vl.layout().addWidget(self.openSkel_btn)
-        self.openSkel_btn.clicked.connect(self.openSkeletonFile)
         self.openSkel_btn.clicked.connect(
             lambda: self.openSkeletonFile(importFile=False, fileName='skeleton'))
 
@@ -822,6 +821,13 @@ class UI(QtWidgets.QDialog):
         if os.path.lexists(jobsDir):
             settings.setValue("mainJobsDir", jobsDir)
 
+        # mode
+        mode = self.mode_blu.isChecked()
+        if mode:
+            settings.setValue("mode", True)
+        else:
+            settings.setValue("mode", False)
+
     def restoreUI(self):
         """
         Restore UI size and position that if was last used
@@ -847,15 +853,16 @@ class UI(QtWidgets.QDialog):
             if recentProj:
                 self.selectUIFromPath(recentProj)
 
-            # mtl config
-            mtlConfig = settings.value("mtlConfig")
-            if mtlConfig:
-                self.mtlConfigBrowse_le.setText(mtlConfig)
-
-            # rig setup file
-            rigSetupFile = settings.value("rigSetupFile")
-            if rigSetupFile:
-                self.rigSetupBrowse_le.setText(rigSetupFile)
+            # mode
+            mode = settings.value("mode")
+            if mode:
+                self.mode_blu.setChecked(True)
+                self.blu_gb.setHidden(False)
+                self.rig_gb.setHidden(True)
+            else:
+                self.mode_rig.setChecked(True)
+                self.blu_gb.setHidden(True)
+                self.rig_gb.setHidden(False)
 
     def mainJobsDirChanged(self):
         jobsDir = self.mainJobsDir_le.text()
@@ -913,6 +920,7 @@ class UI(QtWidgets.QDialog):
         print self.rigBuilderPath
         rigBuild = __import__('rigBuild', fromlist=['dummy'])
         reload(rigBuild)
+        print rigBuild
         self.rigBuild_instance = rigBuild.RigBuild()
         time_elapsed = datetime.now() - start_time
         msg = 'Ready! Codes were loaded in: {}'.format(str(time_elapsed).split('.')[0])

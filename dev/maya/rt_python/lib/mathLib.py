@@ -33,6 +33,7 @@ def barycentricFromPositions(a, b, c, p):
     u = 1.0 - v - w
     return u, v, w
 
+
 def barycentricFromObjs(a=None, b=None, c=None, p=None, useSelection=False):
     if useSelection:
         sels = mc.ls(sl=True)
@@ -117,3 +118,41 @@ def getFootRotation(footJnt, ballJnt):
     mat = matrixFrom3Vec(x, y, z)
     rot = matrixToEuler(mat)
     return rot
+
+
+def getMatrix(node):
+    sels = om2.MSelectionList().add(node)
+    dep = sels.getDependNode(0)
+    dep_fn = om2.MFnDependencyNode(dep)
+    mtx_plug_array = dep_fn.findPlug('worldMatrix', 0)
+    plug_object = mtx_plug_array.elementByLogicalIndex(0).asMObject()
+    matrix = om2.MFnMatrixData(plug_object).matrix()
+    return matrix
+
+
+def matrixFromPose(*position):
+    if len(position) == 1:
+        position = position[0]
+    mat = om2.MMatrix(
+        [[1, 0, 0, 0],
+         [0, 1, 0, 0],
+         [0, 0, 1, 0],
+         [position[0], position[1], position[2], 1]])
+    return mat
+
+
+def moveAlongTransform(node, transform, move=(0, 1, 0)):
+    """
+    moveAlongTransform(
+        node='C_tail_up_CRV.cv[1]',
+        transform='C_tail_001_CTL',
+        move=(0, 10, 0))
+    """
+    mat = getMatrix(transform)
+    invMat = matrixFromPose(mat[12], mat[13], mat[14]).inverse()
+    ofsPos = mc.xform(node, q=True, ws=True, t=True)
+    ofsMat = matrixFromPose(ofsPos)
+    mat2 = matrixFromPose(move)
+    newMat =  mat2 * mat * ofsMat * invMat
+    mc.xform(node, ws=True, t=(newMat[12], newMat[13], newMat[14]))
+

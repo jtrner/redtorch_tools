@@ -71,6 +71,10 @@ def importData(dataPath, ignoreNames=True):
                 if not mc.objExists(j):
                     mc.warning('registry.importSkin() -> joint "{0}" does not exist!'.format(j))
             infs = mc.ls(skinData[2])
+            if not infs:
+                mc.warning('registry.importSkin -> None of influences below exist for "{}", skipped!'.format(node))
+                print skinData[2]
+                continue
             mc.skinCluster(infs, node, tsb=1, rui=0, n=newName)
 
         # assign weights

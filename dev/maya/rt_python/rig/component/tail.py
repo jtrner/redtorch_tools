@@ -11,6 +11,8 @@ from ...lib import strLib
 from ...lib import attrLib
 from ...lib import trsLib
 from ...lib import jntLib
+from ...lib import crvLib
+from ...lib import space
 from ..command import rope
 from . import template
 
@@ -19,7 +21,9 @@ reload(strLib)
 reload(attrLib)
 reload(trsLib)
 reload(jntLib)
+reload(crvLib)
 reload(rope)
+reload(space)
 reload(template)
 
 
@@ -28,12 +32,17 @@ class Tail(template.Template):
     class for creating tail rig for biped characters
     """
 
-    def __init__(self, side="C", prefix="tail", numOfJnts=6, hasMidCtl=True, addSpaces=True, **kwargs):
+    def __init__(self, side="C", prefix="tail", numOfCtls=6, numOfJnts=10,
+                 jntsToRig=None, hasMidCtl=True, addSpaces=True,
+                 autoOrient=True, **kwargs):
         kwargs['side'] = side
         kwargs['prefix'] = prefix
         self.hasMidCtl = hasMidCtl
+        self.numOfCtls = numOfCtls
         self.numOfJnts = numOfJnts
         self.addSpaces = addSpaces
+        self.jntsToRig = jntsToRig
+        self.autoOrient = autoOrient
 
         super(Tail, self).__init__(**kwargs)
 
@@ -42,7 +51,7 @@ class Tail(template.Template):
 
         # create input blueprints
         par = self.blueprintGrp
-        for i in range(self.numOfJnts):
+        for i in range(self.numOfCtls):
             blu = '{}_{:03d}_BLU'.format(self.name, i + 1)
             self.blueprints['{:03d}'.format(i + 1)] = blu
             if not mc.objExists(blu):
@@ -54,31 +63,38 @@ class Tail(template.Template):
 
         # delete extra blueprint joints
         all_blueprints = mc.ls('{}_???_BLU'.format(self.name))
-        if len(all_blueprints) > self.numOfJnts:
-            mc.error('tail.py: numOfJnts value is less than number of found blueprint joints!')
-            # to_del = []
-            # for blu in all_blueprints:
-            #     if blu not in self.blueprints.values():
-            #         to_del.append(blu)
-            # mc.warning('numOfJnts is less than found blueprints: ', to_del)
-            # #mc.delete(to_del)
-        attrLib.addString(self.blueprintGrp, ln='blu_inputs', v=str(self.blueprints))
+        if len(all_blueprints) > self.numOfCtls:
+            mc.error('tail.py: numOfCtls value is less than number of found blueprint joints!')
+        attrLib.addString(self.blueprintGrp, ln='blu_inputs', v=self.blueprints)
 
     def createJoints(self):
         """
         create joints from blueprint poses
         :return:
         """
-        self.joints['chainJnts'] = []
-        par = self.moduleGrp
-        for i in range(self.numOfJnts):
-            jnt = '{}_{:03d}_JNT'.format(self.name, i + 1)
-            mc.joint(par, name=jnt)
-            trsLib.setTRS(jnt, self.blueprintPoses['{:03d}'.format(i + 1)], space='world')
-            par = jnt
-            self.joints['chainJnts'].append(jnt)
 
-        self.orientJnts(self.joints['chainJnts'])
+        # use existing joints
+        if self.jntsToRig:
+            self.joints['chainJnts'] = self.jntsToRig
+
+        # or create joints
+        else:
+            crv = crvLib.fromJnts(jnts=self.blueprints.values(),
+                                  degree=1, fit=False)[0]
+            mc.rebuildCurve(crv, degree=3, spans=2)
+            self.joints['chainJnts'] = []
+            jnts = jntLib.create_on_curve(curve=crv, numOfJoints=self.numOfJnts,
+                                          parent=True)
+            mc.parent(jnts[0], self.moduleGrp)
+            for i in range(self.numOfJnts):
+                jnt = '{}_{:03d}_JNT'.format(self.name, i + 1)
+                jnt = mc.rename(jnts[i], jnt)
+                self.joints['chainJnts'].append(jnt)
+            mc.delete(crv)
+
+        # orient joints
+        if self.autoOrient:
+            self.orientJnts(self.joints['chainJnts'])
 
     def orientJnts(self, jnts):
         upLoc = mc.createNode('transform')
@@ -90,18 +106,15 @@ class Tail(template.Template):
 
     def build(self):
         super(Tail, self).build()
-
-        # tail
-        baseCtl, crvGrp, rsltGrp, ctls = rope.run(
+        self.baseCtl, crvGrp, rsltGrp, ctls, jnts = rope.run(
             jnts=self.joints['chainJnts'],
-            numCtls=self.numOfJnts,
-            guides=None,
+            guides=self.blueprints.values(),
             numJnts=None,
             addSpaces=self.addSpaces,
             description=self.prefix,
             matchOrientation=True)
-        baseCtlGrp = mc.listRelatives(baseCtl, p=1)[0]
-        mc.parent(baseCtlGrp, self.ctlGrp)
+        self.baseCtlZro = mc.listRelatives(self.baseCtl, p=1)[0]
+        mc.parent(self.baseCtlZro, self.ctlGrp)
         mc.parent(crvGrp, rsltGrp, self.originGrp)
 
     def connect(self):
@@ -115,6 +128,14 @@ class Tail(template.Template):
         connect.matrix(hipCtl, self.moduleGrp)
         connect.matrix(hipCtl, self.ctlGrp)
 
+        # fk orient space
+        orientDrivers = self.getOut('tailOrient')
+        space.orient(
+            drivers=orientDrivers,
+            drivens=[self.baseCtlZro],
+            control=self.baseCtl,
+            name=self.name + 'OrientSpace')
+
     def createSettings(self):
         """
         returns the list of attributes that will be displayed in the rigCreator UI
@@ -122,7 +143,10 @@ class Tail(template.Template):
         """
         super(Tail, self).createSettings()
 
+        attrLib.addInt(self.blueprintGrp, 'blu_numOfCtls', v=self.numOfCtls)
         attrLib.addInt(self.blueprintGrp, 'blu_numOfJnts', v=self.numOfJnts)
+        attrLib.addBool(self.blueprintGrp, 'blu_autoOrient', v=self.autoOrient)
+        attrLib.addString(self.blueprintGrp, 'blu_jntsToRig', v=self.jntsToRig or '')
         attrLib.addString(self.blueprintGrp, 'blu_bodyCtl', v='C_root.bodyCtl')
         attrLib.addString(self.blueprintGrp, 'blu_hipCtl', v='C_spine.hipCtl')
         attrLib.addString(self.blueprintGrp, 'blu_globalScale', v='C_root.mainCtl')

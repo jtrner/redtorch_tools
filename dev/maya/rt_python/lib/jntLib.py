@@ -151,7 +151,7 @@ def create_on_vertex(vtx=None):
     return joints
 
 
-def create_on_curve(curve=None, numOfJoints=5, parent=True):
+def create_on_curve(curve=None, numOfJoints=5, parent=True, description='C_base'):
     """
     create specified number of joints on input curve
     """
@@ -174,7 +174,7 @@ def create_on_curve(curve=None, numOfJoints=5, parent=True):
         pos = curveLib.getPointAtParam(curveShape, segSize * i, 'world')
         if not parent:
             mc.select(clear=True)
-        newJoints.append(mc.joint(p=pos))
+        newJoints.append(mc.joint(p=pos, name='{}_{:03d}_JNT'.format(description, i + 1)))
 
     mc.delete(curve)
 

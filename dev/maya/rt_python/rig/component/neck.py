@@ -78,7 +78,7 @@ class Neck(template.Template):
         jnts = jntLib.create_on_curve(curve=crv, numOfJoints=self.numOfJnts, parent=True)
         mc.parent(jnts[0], self.moduleGrp)
         for i in range(self.numOfJnts):
-            jnt = '{}_{:02d}_JNT'.format(self.name, i+1)
+            jnt = '{}_{:02d}_JNT'.format(self.name, i + 1)
             jnt = mc.rename(jnts[i], jnt)
             self.joints['neckJnts'].append(jnt)
 
@@ -89,14 +89,14 @@ class Neck(template.Template):
     def build(self):
         super(Neck, self).build()
 
-        self.baseCtl, crvGrp, rsltGrp, ctls = rope.run(
+        self.baseCtl, crvGrp, rsltGrp, ctls, jnts = rope.run(
             jnts=self.joints['neckJnts'], numCtls=5, guides=None, numJnts=None,
             addSpaces=False, description=self.prefix)
 
         iconSize = trsLib.getDistance(self.joints['neckJnts'][0], self.joints['neckJnts'][-1])
 
         # baseCtl properties
-        crvLib.scaleShape(self.baseCtl, [iconSize * 0.5]*3)
+        crvLib.scaleShape(self.baseCtl, [iconSize * 0.5] * 3)
         self.setOut('baseCtl', self.baseCtl)
 
         # neckStart control properties
@@ -107,7 +107,6 @@ class Neck(template.Template):
         self.setOut('startCtl', self.startCtl)
         neckStartZro = self.name + '_neckStartGrp_ZRO'
         mc.rename(mc.listRelatives(self.startCtl, p=1)[0], neckStartZro)
-
 
         # end control properties
         self.endCtl = mc.rename(ctls[-1], self.name + '_end_CTL')
@@ -149,7 +148,7 @@ class Neck(template.Template):
         attrLib.lockHideAttrs(endTanCtl, attrs=['s', 'v'])
         self.setOut('endTanCtl', endTanCtl)
         endTanZro = mc.rename(mc.listRelatives(endTanCtl, p=1)[0],
-                                  endTanCtl.replace('CTL', 'ZRO'))
+                              endTanCtl.replace('CTL', 'ZRO'))
         mc.parent(endTanZro, self.endCtl)
 
         tanVisAt = attrLib.addEnum(self.endCtl, 'tangentCtlVis', en=['OFF', 'ON'])

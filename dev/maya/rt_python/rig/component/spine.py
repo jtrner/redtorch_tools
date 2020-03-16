@@ -69,15 +69,13 @@ class Spine(template.Template):
         create joints from blueprint poses
         :return:
         """
-        moduleGrp = self.name + '_module_GRP'
-
         blueprints = self.blueprints['start'], self.blueprints['mid'], self.blueprints['end']
         crv = crvLib.fromJnts(jnts=blueprints, degree=1, fit=False)[0]
         mc.rebuildCurve(crv, degree=3, spans=2)
 
         # create spine base joint and move it a bit lower than first spine joint
         # to avoid skin mirroring issues when joints are on top of each other
-        self.joints['baseJnt'] = mc.joint(moduleGrp, n=self.name + '_base_JNT')
+        self.joints['baseJnt'] = mc.joint(self.moduleGrp, n=self.name + '_base_JNT')
         trsLib.setTRS(self.joints['baseJnt'], self.blueprintPoses['start'], space='world')
         mc.move(0, -0.01, 0, self.joints['baseJnt'], ws=True, r=True)
 
@@ -90,13 +88,12 @@ class Spine(template.Template):
             jnt = mc.rename(jnts[i], jnt)
             self.joints['spineJnts'].append(jnt)
 
-
         mc.delete(crv)
 
     def build(self):
         super(Spine, self).build()
 
-        self.baseCtl, crvGrp, rsltGrp, ctls = rope.run(
+        self.baseCtl, crvGrp, rsltGrp, ctls, jnts = rope.run(
             jnts=self.joints['spineJnts'], numCtls=5, guides=None, numJnts=None,
             addSpaces=False, description=self.prefix)
 

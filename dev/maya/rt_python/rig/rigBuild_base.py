@@ -64,9 +64,9 @@ class RigBuild_base(object):
         self.shot = os.getenv('SHOT', '')
         self.user = os.getenv('USER', '')
         self.version = os.getenv('RIG_SCRIPT_VERSION', '')
-
-        # init arguments
-        self.forceReload = kwargs.get('forceReload', False)
+        #
+        # # init arguments
+        # self.forceReload = kwargs.get('forceReload', False)
 
     def pre(self):
         print('pre success')
@@ -183,37 +183,53 @@ class RigBuild_base(object):
         print('connect success')
 
     def importConstraints(self):
-        print('importConstraints success')
+        # import skeletonGeos jointConstraints
+        constrainsPath = '{0}/{1}/{2}/{3}/task/rig/users/{4}/{5}/' \
+                         'data/skeletonGeos_jointConstraints.json'
+        constrainsPath = constrainsPath.format(self.JOBS_DIR, self.job, self.seq,
+                                               self.shot, self.user, self.version)
+        connect.importJointConstraints(dataPath=constrainsPath)
+
+        print('rigBuild_base.importConstraints() success')
 
     def deform(self):
         # import skinClusters
         skincluster_dir = '{0}/{1}/{2}/{3}/task/rig/users/{4}/{5}/data/skincluster'
         skincluster_dir = skincluster_dir.format(self.JOBS_DIR, self.job, self.seq,
                                                  self.shot, self.user, self.version)
-
         skincluster.importData(dataPath=skincluster_dir)
-        print('deform success')
+
+        print('rigBuild_base.deform() success')
 
     def post(self):
         # hide rig
         mc.setAttr('C_main_CTL.rigVis', 0)
 
-        # make rig scalable
-        flcs = mc.ls('*_FLC')
-        [connect.direct('C_main_CTL', x, attrs=['s']) for x in flcs]
+        # todo: add support to skinCluster far from origin fix here
+        mc.setAttr('geometry_GRP.inheritsTransform', 0)
+
+        # # make rig scalable
+        # flcs = mc.ls('*_FLC')
+        # [connect.direct('C_main_CTL', x, attrs=['s']) for x in flcs]
 
         # add skel and muscle visibility setting
-        skelVis = attrLib.addEnum('C_main_CTL', 'skeletonGeoVis', en=('off', 'on'))
-        muscleVis = attrLib.addEnum('C_main_CTL', 'muscleGeoVis', en=('off', 'on'))
-        attrLib.connectAttr(skelVis, 'C_skeleton_GRP.v')
-        attrLib.connectAttr(muscleVis, 'C_muscle_GRP.v')
-        attrLib.connectAttr('C_main_CTL.geoVis', 'C_skin_GRP.v')
-        attrLib.disconnectAttr('geometry_GRP.v')
+        if mc.objExists('C_skeleton_GRP'):
+            skelVis = attrLib.addEnum('C_main_CTL', 'skeletonGeoVis', en=('off', 'on'))
+            attrLib.connectAttr(skelVis, 'C_skeleton_GRP.v')
 
-        mc.setAttr('geometry_GRP.inheritsTransform', 0)
+        if mc.objExists('C_muscle_GRP'):
+            muscleVis = attrLib.addEnum('C_main_CTL', 'muscleGeoVis', en=('off', 'on'))
+            attrLib.connectAttr(muscleVis, 'C_muscle_GRP.v')
+
+        if mc.objExists('C_skin_GRP'):
+            attrLib.connectAttr('C_main_CTL.geoVis', 'C_skin_GRP.v')
+            attrLib.disconnectAttr('geometry_GRP.v')
 
         if mc.objExists('blueprint_GRP'):
             mc.parent('blueprint_GRP', 'setup_GRP')
             mc.hide('blueprint_GRP')
 
-        print('post success')
+        if mc.objExists('skeleton_GRP'):
+            mc.parent('skeleton_GRP', 'setup_GRP')
+
+        print('rigBuild_base.post() success')
