@@ -222,7 +222,8 @@ def IkLegQuad(joints=None,
                    spring=spring_jnts[-1],
                    legLength=legLength,
                    globalScaleAttr=globalScaleAttr,
-                   name=name + '_heel')
+                   name=name + '_heel',
+                   moduleGrp=moduleGrp)
 
     # # workaround for spring IK flipping when first joint's
     # # parent rotates more than 180 away from last joint
@@ -243,7 +244,7 @@ def IkLegQuad(joints=None,
     return ret
 
 
-def setupAutoAnkle(ikCtl, aimTo, heelCtl, static, spring, legLength, globalScaleAttr, name):
+def setupAutoAnkle(ikCtl, aimTo, heelCtl, static, spring, legLength, globalScaleAttr, name, moduleGrp):
     """
     when leg is stright, it's better for heel to match ikSpring
     and when len is not straight, it's better for heel to aim to scapicle
@@ -300,7 +301,7 @@ def setupAutoAnkle(ikCtl, aimTo, heelCtl, static, spring, legLength, globalScale
                      worldUpType="objectrotation",
                      upVector=[1, 0, 0],
                      worldUpVector=[1, 0, 0],
-                     worldUpObject=ikCtl,
+                     worldUpObject=moduleGrp,
                      name=name + "_AMC",
                      mo=True)
 

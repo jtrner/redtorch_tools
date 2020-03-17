@@ -48,7 +48,8 @@ GREEN_PALE = (130, 160, 130)
 PURPLE_PALE = (180, 150, 180)
 ORANGE_PALE = (200, 130, 80)
 
-ICON_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'icon'))
+dirname = __file__.split('maya')[0]
+ICON_DIR = os.path.abspath(os.path.join(dirname, 'icon'))
 SETTINGS_PATH = os.path.join(os.getenv("HOME"), 'testUI.uiconfig')
 
 
@@ -873,14 +874,13 @@ def twFilterField(parent=None, tw=None):
     return filter_le
 
 
-def createBrowseField(parent, label='Path:'):
+def createBrowseField(parent, label='Path:', txt='Browse For Something ...', labelWidth=90):
     address_vl = createHLayout(parent, maxHeight=30)
     lb = QtWidgets.QLabel(label)
-    lb.setMinimumSize(90, 20)
-    lb.setMaximumSize(90, 20)
+    lb.setMinimumSize(labelWidth, 20)
+    lb.setMaximumSize(labelWidth, 20)
     address_vl.layout().addWidget(lb)
     address_le = QtWidgets.QLineEdit()
-    txt = 'Create Materials from texture found here.'
     address_le.setPlaceholderText(txt)
     address_vl.layout().addWidget(address_le)
     dirBrowse_btn = QtWidgets.QPushButton()
@@ -892,6 +892,20 @@ def createBrowseField(parent, label='Path:'):
     return address_le, dirBrowse_btn
 
 
+def getSaveFileName(dialog, le, defaultFolder, txt='Select file', ext='json'):
+    defaultFolder_from_ui = le.text()
+    if defaultFolder_from_ui:
+        defaultFolder = defaultFolder_from_ui
+    f, filter = QtWidgets.QFileDialog.getSaveFileName(dialog,
+                                                      txt,
+                                                      defaultFolder,
+                                                      "{0} Files (*.{0})".format(ext),
+                                                      "",
+                                                      QtWidgets.QFileDialog.Options())
+    if f:
+        le.setText(f)
+
+
 def setOpenFileName(dialog, le, defaultFolder):
     defaultFolder_from_ui = le.text()
     if defaultFolder_from_ui:
@@ -899,7 +913,7 @@ def setOpenFileName(dialog, le, defaultFolder):
     f, filter = QtWidgets.QFileDialog.getOpenFileName(dialog,
                                                       "Select groom json file",
                                                       defaultFolder,
-                                                      "All Files (*);;Text Files (*.txt)",
+                                                      "All Files (*);;Text Files (*.json)",
                                                       "",
                                                       QtWidgets.QFileDialog.Options())
     if f:

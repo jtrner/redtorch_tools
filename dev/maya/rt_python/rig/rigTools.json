@@ -63,16 +63,16 @@
         "icon": ""
     }
 },
-"Joints": {
+"Joint": {
     "OrientUsingAim": {
         "command": "import maya.cmds as mc\nfrom rt_python.lib import jntLib\nreload(jntLib)\nsels=mc.ls(sl=1)\njntLib.orientUsingAim(jnts=sels[:-1] , upAim=sels[-1], aimAxes='x')",
         "icon": "OrientUsingAim"
     }
 },
-"Misc": {
-    "RemoveContainers": {
-        "command": "from rt_python.lib import container\nreload(container)\ncontainer.removeAll()",
-        "icon": "RemoveContainers"
+"Control": {
+    "Control UI": {
+        "command": "from rt_python.lib import controlUI\nreload(controlUI)\ncontrolUI.launch()",
+        "icon": ""
     }
 }
 }

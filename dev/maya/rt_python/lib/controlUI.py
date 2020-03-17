@@ -3,11 +3,11 @@ controlUI.py
 
 Usage:
     reload(controlUI)
-    if 'controlUI_win' in globals():
-        controlUI_win.deleteLater()
-        del globals()['controlUI_win']
-    controlUI_win = controlUI.UI()
-    controlUI_win.show()
+    if 'controlUI_obj' in globals():
+        controlUI_obj.deleteLater()
+        del globals()['controlUI_obj']
+    controlUI_obj = controlUI.UI()
+    controlUI_obj.show()
 
 mayaMainWindowPtr = omui.MQtUtil.mainWindow()
 mayaMainWindow = wrapInstance(long(mayaMainWindowPtr), QWidget)
@@ -26,7 +26,6 @@ from functools import partial
 # Qt modules
 from PySide2 import QtCore, QtWidgets
 
-import maya.OpenMayaUI as omui
 import maya.cmds as mc
 
 from . import display
@@ -92,28 +91,22 @@ CURVE_SHAPES = [
     'sharpSpiral',
 ]
 
-
-def getMayaWindow():
-    for obj in QtWidgets.QApplication.topLevelWidgets():
-        if obj.objectName() == 'MayaWindow':
-            return obj
-    raise RuntimeError('Could not find MayaWindow instance')
+SETTINGS_PATH = os.path.join(os.getenv("HOME"), 'controlUI.uiconfig')
 
 
 class UI(QtWidgets.QDialog):
-    def __init__(self, title='Control UI', parent=getMayaWindow()):
+    def __init__(self, title='Control UI', parent=qtLib.getMayaWindow()):
+        self.closed = False
 
         # last selected object
         self.LAST = None
+        self.controlPath = os.path.join(os.environ['HOMEPATH'], 'Desktop', 'ctls.ma')
 
         # create window
         super(UI, self).__init__(parent=parent)
         self.setWindowTitle(title)
-        # self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
-        # self.setModal(False)
-        self.setMinimumHeight(550)
+        self.setMinimumHeight(520)
         self.setMinimumWidth(300)
-        # self.resize(550, 260)
 
         # main layout
         self.setLayout(QtWidgets.QVBoxLayout())
@@ -123,16 +116,8 @@ class UI(QtWidgets.QDialog):
 
         # ======================================================================
         # color buttons frame
-        col_f = QtWidgets.QFrame()
-        col_f.setFrameStyle(QtWidgets.QFrame.StyledPanel)
-        col_f.setMinimumHeight(200)
-        self.layout().addWidget(col_f)
-
-        col_vb = QtWidgets.QVBoxLayout()
-        col_f.setLayout(col_vb)
-
-        col_lb = QtWidgets.QLabel('Color')
-        col_vb.layout().addWidget(col_lb)
+        col_gb, col_frame = qtLib.createGroupBox(self.layout(), 'Color')
+        col_vb = qtLib.createHLayout(col_frame)
 
         col_lay = QtWidgets.QGridLayout()
         col_vb.layout().addLayout(col_lay)
@@ -141,9 +126,9 @@ class UI(QtWidgets.QDialog):
         col_lay.layout().setAlignment(QtCore.Qt.AlignTop)
 
         # color buttons
-        for i in range(8):
-            for j in range(4):
-                idx = (i * 4) + j
+        for i in range(4):
+            for j in range(8):
+                idx = (i * 8) + j
                 name = MAYA_COLORS[idx]['name']
                 col00_btn = QtWidgets.QPushButton()  # name
                 color = MAYA_COLORS[idx]['color']
@@ -155,43 +140,48 @@ class UI(QtWidgets.QDialog):
 
         # ======================================================================
         # export/import buttons frame
-        expImp_f = QtWidgets.QFrame()
-        expImp_f.setFrameStyle(QtWidgets.QFrame.StyledPanel)
-        self.layout().addWidget(expImp_f)
+        expImp_gb, expImp_frame = qtLib.createGroupBox(self.layout(), 'Export & Import')
+        expImp_vb = qtLib.createHLayout(expImp_frame)
 
-        expImp_vb = QtWidgets.QVBoxLayout()
-        expImp_f.setLayout(expImp_vb)
-
-        expImp_lb = QtWidgets.QLabel('Export & Import')
-        expImp_vb.layout().addWidget(expImp_lb)
-
-        expImp_lay = QtWidgets.QHBoxLayout()
+        expImp_lay = QtWidgets.QVBoxLayout()
         expImp_vb.layout().addLayout(expImp_lay)
         expImp_lay.layout().setContentsMargins(2, 2, 2, 2)
         expImp_lay.layout().setSpacing(5)
         expImp_lay.layout().setAlignment(QtCore.Qt.AlignTop)
 
+        #
+        self.getPathFromRigUI_btn = QtWidgets.QPushButton('Get Path From Current Asset')
+        expImp_lay.addWidget(self.getPathFromRigUI_btn)
+        self.getPathFromRigUI_btn.clicked.connect(self.getPathFromRigUI)
+
+        self.getPathToDesktop_btn = QtWidgets.QPushButton('Get Path to Desktop')
+        expImp_lay.addWidget(self.getPathToDesktop_btn)
+        self.getPathToDesktop_btn.clicked.connect(self.getPathToDesktop)
+
+        self.controlPath_le, self.controlBrowse_bt = qtLib.createBrowseField(
+            expImp_lay,
+            label='Path:',
+            txt='Will save to desktop if empty',
+            labelWidth=50)
+        self.controlBrowse_bt.clicked.connect(lambda: qtLib.getSaveFileName(
+            self, self.controlPath_le, self.controlPath, ext='ma'))
+
         # add export / import buttons
+        expImp_hl = QtWidgets.QHBoxLayout()
+        expImp_lay.layout().addLayout(expImp_hl)
         exp_btn = QtWidgets.QPushButton('Export')
         imp_btn = QtWidgets.QPushButton('Import')
 
-        expImp_lay.layout().addWidget(exp_btn)
-        expImp_lay.layout().addWidget(imp_btn)
+        expImp_hl.layout().addWidget(exp_btn)
+        expImp_hl.layout().addWidget(imp_btn)
 
         exp_btn.clicked.connect(self.exportCtls)
         imp_btn.clicked.connect(self.importCtls)
 
         # ======================================================================
         # replace/mirror buttons frame
-        shape_f = QtWidgets.QFrame()
-        shape_f.setFrameStyle(QtWidgets.QFrame.StyledPanel)
-        self.layout().addWidget(shape_f)
-
-        shape_vb = QtWidgets.QVBoxLayout()
-        shape_f.setLayout(shape_vb)
-
-        shape_lb = QtWidgets.QLabel('Shape & Mirror')
-        shape_vb.layout().addWidget(shape_lb)
+        shape_gb, shape_frame = qtLib.createGroupBox(self.layout(), 'Shape & Mirror')
+        shape_vb = qtLib.createVLayout(shape_frame)
 
         # 
         shp_lay = QtWidgets.QGridLayout()
@@ -249,6 +239,9 @@ class UI(QtWidgets.QDialog):
         self.select_cvs_btn.clicked.connect(self.selectCVs)
         self.select_cvs_btn.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
 
+        # restore UI settings
+        self.restoreUI()
+
     def setColor(self, color):
         sel = mc.ls(sl=True)
         if sel:
@@ -256,15 +249,30 @@ class UI(QtWidgets.QDialog):
             mc.select(clear=True)
         display.setColor(nodes=self.LAST, color=color)
 
+    def getPathFromRigUI(self):
+        jobDir = os.environ['JOBS_DIR']
+        job = os.environ['JOB']
+        seq = os.environ['SEQ']
+        shot = os.environ['SHOT']
+        user = os.environ['USER']
+        version = os.environ['RIG_SCRIPT_VERSION']
+
+        controlPath = os.path.join(
+            jobDir, job, seq, shot, 'task', 'rig', 'users',
+            user, version, 'data', 'ctls.ma')
+        self.controlPath_le.setText(controlPath)
+
+    def getPathToDesktop(self):
+        controlPath = os.path.join(os.environ['HOMEPATH'], 'Desktop', 'ctls.ma')
+        self.controlPath_le.setText(controlPath)
+
     def exportCtls(self):
-        path = mc.internalVar(uad=True)
-        filePath = os.path.join(path, '..', '..', 'Desktop', 'ctls.ma')
-        control.Control.exportCtls(filePath)
+        controlPath = self.controlPath_le.text()
+        control.Control.exportCtls(controlPath)
 
     def importCtls(self):
-        path = mc.internalVar(uad=True)
-        filePath = os.path.join(path, '..', '..', 'Desktop', 'ctls.ma')
-        control.Control.importCtls(filePath)
+        controlPath = self.controlPath_le.text()
+        control.Control.importCtls(controlPath)
 
     def mirrorCtls(self):
         sel = mc.ls(sl=True)
@@ -301,3 +309,45 @@ class UI(QtWidgets.QDialog):
         mc.hilite(sel)
         mc.selectMode(component=True)
         mc.selectType(alc=False, cv=True)
+
+    def closeEvent(self, *args, **kwargs):
+        self.closed = True
+
+        # settings path
+        settings = QtCore.QSettings(SETTINGS_PATH, QtCore.QSettings.IniFormat)
+
+        # window size and position
+        settings.setValue("geometry", self.saveGeometry())
+
+        # main jobs directory
+        controlPath = self.controlPath_le.text()
+        settings.setValue("controlPath", controlPath)
+
+    def restoreUI(self):
+        """
+        Restore UI size and position that if was last used
+        :return: n/a
+        """
+        # self.closed = False
+        if os.path.exists(SETTINGS_PATH):
+            settings = QtCore.QSettings(SETTINGS_PATH, QtCore.QSettings.IniFormat)
+
+            # window size and position
+            self.restoreGeometry(settings.value("geometry"))
+
+            # controlPath
+            controlPath = settings.value("controlPath")
+            if not controlPath:
+                controlPath = os.path.join(os.path.expanduser('~/Desktop'), 'ctls.ma')
+            self.controlPath_le.setText(controlPath)
+
+
+def launch():
+    if 'controlUI_obj' in globals():
+        if not controlUI_obj.closed:
+            controlUI_obj.close()
+        controlUI_obj.deleteLater()
+        del globals()['controlUI_obj']
+    global controlUI_obj
+    controlUI_obj = UI()
+    controlUI_obj.show()
