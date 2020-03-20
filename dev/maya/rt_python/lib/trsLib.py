@@ -293,17 +293,11 @@ def getShapes(node="", fullPath=False):
     if not mc.objExists(node):  # doesn't exist
         mc.error('"{}" does not exist.'.format(node))
 
-    shape_list = []
-    all_shapes = mc.listRelatives(node, children=True, shapes=True, fullPath=True)
+    shape_list = mc.listRelatives(node, children=True, shapes=True, fullPath=True) or []
  
     # make sure node itself is in the list if it's a shape too
     if isShape(node):
-        if not all_shapes: 
-                all_shapes = [node]
-        else:
-            all_shapes.append(node)
-
-    shape_list = all_shapes
+        shape_list.append(node)
 
     if shape_list and (not fullPath):
         shape_list = [x.split('|')[-1] for x in shape_list]

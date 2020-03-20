@@ -20,6 +20,9 @@ from . import common
 from . import attrLib
 from . import display
 
+reload(trsLib)
+reload(attrLib)
+
 
 def fromPoses(poses, degree=1, fit=False, name='newCurve'):
     """
@@ -577,42 +580,112 @@ def haveSameNumberOfCVs(curve1, curve2):
     return numCVs(getShapes(curve1)[1]) == numCVs(getShapes(curve2)[0])
 
 
+def moveCrvShapesToTopChildrenShapes(crv):
+    all_shapes = mc.listRelatives(crv, s=True)
+    crv_shapes = mc.listRelatives(crv, s=True, type='nurbsCurve')
+    non_crv_shapes = list(set(all_shapes) - set(crv_shapes))
+    tmp = mc.createNode('transform')
+    for shape in non_crv_shapes:
+        moved = mc.parent(shape, tmp, s=True)[0]
+        mc.parent(moved, crv, add=True, s=True)
+    mc.delete(tmp)
+
+
 def mirror(crvs=None):
     if not crvs:
         crvs = mc.ls(sl=True)
     else:
         crvs = mc.ls(crvs)
 
-    for obj in crvs:
-        otherObj = findMirror(obj=obj)
+    for crv in crvs:
+        otherObj = findMirror(obj=crv)
         if otherObj:
-            shape = getShapes(obj)[0]
+            shape = getShapes(crv, fullPath=True)[0]
             if not shape:
                 return
             # use transform for joints as they might create extra transform when parenting
-            dup, dupShape = trsLib.duplicateClean(obj)
+            dup = mc.duplicate(crv)[0]
             if mc.nodeType(dup) == 'joint':
                 dup_trs = mc.createNode('transform')
                 trsLib.match(dup_trs, dup)
-                mc.parent(dupShape, dup_trs, add=True, s=True)
+
+                # delete non shape children
+                all_children = mc.listRelatives(dup, fullPath=True)
+                shape_children = getShapes(dup, fullPath=True)
+                [mc.delete(x) for x in all_children if x not in shape_children]
+
+                for shape in shape_children:
+                    mc.parent(shape, dup_trs, add=True, s=True)
                 mc.delete(dup)
                 dup = dup_trs
-            children = trsLib.getAllChildren(node=dup, type="transform")
-            [trsLib.disableLimits(x) for x in children]
-            attrLib.unlock(dup, ['t', 'r', 's'])
-            attrLib.unlock(children, ['t', 'r', 's'])
+
+            #
             grp = mc.createNode('transform', n='curveMirrorTemp')
             mc.parent(dup, grp)
             mc.setAttr(grp + '.sx', -1)
             mc.parent(dup, otherObj)
             mc.makeIdentity(dup, apply=True)
-            otherObjShape = getShapes(otherObj)[0]
-            color = display.getColor(otherObjShape)
-            display.setColor(dupShape, color)
-            mc.delete(otherObjShape)
-            mc.parent(dupShape, otherObj, add=True, s=True)
-            mc.rename(dupShape, otherObj + 'Shape')
+
+            # get old shapes colors and connections
+            otherObjShapes = getShapes(otherObj)
+            color = display.getColor(otherObjShapes[0])
+            visInputs = mc.listConnections(otherObjShapes[0] + '.v', s=True, d=False, plugs=True)
+            drawInputs = mc.listConnections(otherObjShapes[0] + '.overrideDisplayType', s=True, d=False, plugs=True)
+            mc.delete(otherObjShapes)
+
+            dupShapes = getShapes(dup, fullPath=True)
+            for dupShape in dupShapes:
+                mc.parent(dupShape, otherObj, add=True, s=True)
+
+                # set color and connections
+                display.setColor(dupShape, color)
+                if visInputs:
+                    mc.connectAttr(visInputs[0], dupShape + '.v')
+                if drawInputs:
+                    mc.connectAttr(drawInputs[0], dupShape + '.overrideDisplayType')
+
+            # rename shapes
+            ctl_shapes = getShapes(crv, fullPath=True) or []
+            tmpCtl_shapes = getShapes(otherObj, fullPath=True) or []
+            for s, tmpS in zip(ctl_shapes, tmpCtl_shapes):
+                side, name = s.split('|')[-1].split('_', 1)
+                otherSide = getOtherSide(side)
+                mc.rename(tmpS, otherSide + '_' + name)
+
             mc.delete(grp, dup)
+
+            moveCrvShapesToTopChildrenShapes(otherObj)
+
+
+def getDisplaySettings(crv):
+    # get old shapes colors and connections
+    crvShapes = getShapes(crv, fullPath=True)
+    if not crvShapes:
+        return 'noColor', None, None
+    color = display.getColor(crvShapes[0])
+    visInputs = mc.listConnections(crvShapes[0] + '.v', s=True, d=False, plugs=True)
+    drawInputs = mc.listConnections(crvShapes[0] + '.overrideDisplayType', s=True, d=False, plugs=True)
+    return color, visInputs, drawInputs
+
+
+def setDisplaySettings(crv, color='noColor', visInputs=None, drawInputs=None):
+    dupShapes = getShapes(crv, fullPath=True)
+    for dupShape in dupShapes:
+        display.setColor(dupShape, color)
+        if visInputs:
+            mc.connectAttr(visInputs[0], dupShape + '.v')
+        if drawInputs:
+            mc.connectAttr(drawInputs[0], dupShape + '.overrideDisplayType')
+
+
+def getOtherSide(side):
+    prefixes = {'L_': 'R_',
+                'Lf': 'Rt',
+                'L': 'R',
+                'R_': 'L_',
+                'Rt': 'Lf',
+                'R': 'L'}
+    return prefixes[side]
 
 
 def findMirror(obj=None):
@@ -882,16 +955,25 @@ def replaceShape(nodes, shape='cube'):
     """
     if isinstance(nodes, basestring):
         nodes = [nodes]
+
     for node in nodes:
+        good_shape_names = getShapes(node, fullPath=True) or []
+
         newCrv = eval('{}()'.format(shape))
-        newCrvShape = getShapes(newCrv)[0]
-        oldShape = trsLib.getShapes(node)
-        color = display.getColor(oldShape[0])
-        display.setColor(newCrvShape, color)
-        if oldShape:
-            mc.delete(oldShape)
-        mc.parent(newCrvShape, node, shape=True, add=True)
-        mc.rename(newCrvShape, node + 'Shape')
+        newCrvShapes = getShapes(newCrv)
+        oldShapes = trsLib.getShapes(node, fullPath=True)
+        if oldShapes:
+            mc.delete(oldShapes)
+
+        color, visInputs, drawInputs = getDisplaySettings(node)
+        setDisplaySettings(newCrv, color=color, visInputs=visInputs, drawInputs=drawInputs)
+        mc.parent(newCrvShapes, node, shape=True, add=True)
+
+        # rename shapes
+        bad_shape_names = getShapes(node, fullPath=True) or []
+        for bad_shape_name, good_shape_name in zip(bad_shape_names, good_shape_names):
+            mc.rename(bad_shape_name, good_shape_name.split('|')[-1])
+
         mc.delete(newCrv)
 
 
@@ -903,18 +985,24 @@ def copyShape(src=None, dst=None):
         if len(nodes) != 2:
             mc.error("select two curves to copy shapes")
         else:
-            src, dest = nodes[:2]
+            src, dst = nodes[:2]
+
+    good_shape_names = getShapes(dst, fullPath=True) or []
 
     newCrv, newCrvShape = trsLib.duplicateClean(src, name='tempCurve')
-    print '...................', newCrv, newCrvShape
-    oldShape = trsLib.getShapes(dest)
+    oldShape = trsLib.getShapes(dst)
     color = display.getColor(oldShape[0])
     display.setColor(newCrvShape, color)
     if oldShape:
-        print '.aaaaaaaaaaaa', oldShape
         mc.delete(oldShape)
-    mc.parent(newCrvShape, dest, shape=True, add=True)
-    mc.rename(newCrvShape, dest + 'Shape')
+    mc.parent(newCrvShape, dst, shape=True, add=True)
+
+    # rename shapes
+    bad_shape_names = getShapes(dst, fullPath=True) or []
+    for bad_shape_name, good_shape_name in zip(bad_shape_names, good_shape_names):
+        good_name = good_shape_name.split('|')[-1]
+        mc.rename(bad_shape_name, good_name)
+
     mc.delete(newCrv)
 
 
@@ -959,7 +1047,7 @@ def selectNonFirst(nodes=None):
 
 
 def separate(crv, keepOriginal=False):
-    crvShapes = mc.listRelatives(crv, fullPath=True)
+    crvShapes = mc.listRelatives(crv, fullPath=True, type="nurbsCurve")
     name = crv.split('|')[-1]
     for crvS in crvShapes:
         newCrv = mc.createNode('transform', n=name)
@@ -1035,7 +1123,6 @@ def averageAndDelete():
     mc.blendShape(crvs[1:], crvs[0], w=wts)
     mc.delete(loc, crvs[1:])
     mc.delete(crvs[0], constructionHistory=True)
-    print crvs[0]
     mc.select(crvs[0])
 
 
@@ -1052,7 +1139,7 @@ def setLength(crv, length):
 
     origLen = mc.arclen(crv)
     if origLen > length:
-        minV, maxV = mc.getAttr(crv+'.minMaxValue')[0]
+        minV, maxV = mc.getAttr(crv + '.minMaxValue')[0]
         u = (maxV - minV) * length / origLen
         result = mc.detachCurve('{}.u[{}]'.format(crv, u), rpo=True)
         mc.delete(result[0])
@@ -1075,8 +1162,6 @@ def setLength(crv, length):
 
     if sel:
         mc.select(sel)
-
-    # print mc.arclen(crv)
 
 
 def increaseLen(crv, percent=5):

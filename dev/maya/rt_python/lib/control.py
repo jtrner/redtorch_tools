@@ -18,6 +18,10 @@ from . import trsLib
 from . import strLib
 from . import attrLib
 
+reload(crvLib)
+reload(attrLib)
+
+
 COLORS = {'C': 'yellow',
           'L': 'blue',
           'R': 'red'}
@@ -106,28 +110,44 @@ class Control(object):
             control.Control.exportCtls(filePath)
         """
         # get all controls in the scene
-        ctls = mc.ls('*_CTL')
+        ctls = mc.ls('*_CTL', '*_Ctl', '*_ctl', '*_CTRL', '*_Ctrl', '*_ctrl', long=True)
 
         # group all new controls
         grp = mc.createNode('transform', n='control_GRP_temp')
 
         # tmpCtls = []
         for ctl in ctls:
-            if not ctl.endswith('CTL'):
-                continue
+            # if curve shape has incoming connection, break it
+            shapes = crvLib.getShapes(ctl, fullPath=True) or []
+            mc.delete(shapes, ch=True)
+
             # duplicate control
-            tmpCtl = trsLib.duplicateClean(ctl, 'CTL', 'CTL_temp')
-            attrLib.unlock(tmpCtl[0], ['t', 'r', 's'])
-            # tmpCtls.append(tmpCtl)
-            mc.parent(tmpCtl[0], grp)
+            tmpCtl = mc.duplicate(ctl, name=ctl.split('|')[-1] + '_temp')[0]
+
+            # delete non shape children
+            all_children = mc.listRelatives(tmpCtl, fullPath=True) or []
+            crv_shape_children = crvLib.getShapes(tmpCtl, fullPath=True) or []
+            [mc.delete(x) for x in all_children if x not in crv_shape_children]
+
+            # add _temp to end of shape names
+            ctl_shapes = crvLib.getShapes(ctl, fullPath=True) or []
+            tmpCtl_shapes = crvLib.getShapes(tmpCtl, fullPath=True) or []
+            for s, tmpS in zip(ctl_shapes, tmpCtl_shapes):
+                mc.rename(tmpS, s.split('|')[-1] + '_temp')
+
+            #
+            attrLib.unlock(tmpCtl, ['t', 'r', 's'])
+            mc.parent(tmpCtl, grp)
+
             # delete children under duplicated controls
-            children = mc.listRelatives(tmpCtl, ad=True, fullPath=True) or []
+            children = mc.listRelatives(tmpCtl, ad=True, fullPath=True, type="nurbsCurve") or []
             for child in children:
                 if not mc.nodeType(child) == 'nurbsCurve':
                     try:
                         mc.delete(child)
                     except:
                         pass
+
         # export all temp controls
         mc.select(grp)
         mc.file(path, f=True, op="v=0;", typ="mayaAscii", es=True)
@@ -148,19 +168,40 @@ class Control(object):
             mc.warning('Control shape file "{0}" can not be found, skipped!'.format(path))
             return
         mc.file(path, i=True)
-        grp = mc.ls('control_GRP_temp*')[0]
-        newCrvs = mc.listRelatives(grp, c=True, ad=True, type='nurbsCurve')
+        newCrvsShapes = mc.listRelatives('control_GRP_temp', ad=True, type='nurbsCurve', fullPath=True) or []
+        newCrvs = list(set([mc.listRelatives(x, p=True)[0] for x in newCrvsShapes]))
 
-        for crv in newCrvs:
-            oldCrv = crv.replace('_temp', '')
+        for newCrv in newCrvs:
+            # find old crv
+            oldCrv = newCrv.split('|')[-1].replace('_temp', '')
             if not mc.objExists(oldCrv):
                 mc.warning('Control "{0}" does not exist , skipped!'.format(oldCrv))
                 continue
-            mc.nodeCast(oldCrv, crv, sn=True)
-            color = display.getColor(oldCrv)
-            display.setColor(crv, color)
 
-        mc.delete(grp)
+            old_shapes = crvLib.getShapes(oldCrv, fullPath=True) or []
+            new_shapes = crvLib.getShapes(newCrv, fullPath=True) or []
+
+            #
+            # mc.delete(old_shapes, ch=True)
+            [attrLib.disconnectAttr(x + '.create') for x in old_shapes]
+
+            #
+            if old_shapes:
+                displaySettings = crvLib.getDisplaySettings(newCrv)
+
+            #
+            crvLib.copyShape(newCrv, oldCrv)
+
+            #
+            if old_shapes:
+                crvLib.setDisplaySettings(oldCrv, *displaySettings)
+
+            # # delete extra old shapes
+            # old_shapes = crvLib.getShapes(oldCrv, fullPath=True) or []
+            # if len(old_shapes) > len(new_shapes):
+            #     mc.delete(old_shapes[len(new_shapes):])
+
+        mc.delete('control_GRP_temp')
 
         print('Controls imported successfully!')
 

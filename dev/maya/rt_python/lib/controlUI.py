@@ -16,11 +16,6 @@ mayaMainWindow = wrapInstance(long(mayaMainWindowPtr), QWidget)
 import os
 import sys
 
-thisDir = os.path.dirname(__file__)
-path = os.path.abspath(os.path.join(thisDir, '../../../third_party_packages/Qtpy'))
-if path not in sys.path:
-    sys.path.insert(0, path)
-
 from functools import partial
 
 # Qt modules
@@ -32,11 +27,13 @@ from . import display
 from . import control
 from . import crvLib
 from . import qtLib
+from ..general import utils
 
 reload(display)
 reload(control)
 reload(crvLib)
 reload(qtLib)
+reload(utils)
 
 # CONSTANTS
 MAYA_COLORS = {
@@ -242,6 +239,7 @@ class UI(QtWidgets.QDialog):
         # restore UI settings
         self.restoreUI()
 
+    @utils.undoChunk
     def setColor(self, color):
         sel = mc.ls(sl=True)
         if sel:
@@ -274,6 +272,7 @@ class UI(QtWidgets.QDialog):
         controlPath = self.controlPath_le.text()
         control.Control.importCtls(controlPath)
 
+    @utils.undoChunk
     def mirrorCtls(self):
         sel = mc.ls(sl=True)
         if sel:

@@ -59,17 +59,16 @@ def setColor(nodes=None, color='noColor'):
     set objects wireframe color
     """
     if not nodes:
-        nodes = mc.ls(sl=True)
-    if isinstance(nodes, basestring):
+        nodes = mc.ls(sl=True, long=True)
+    if not isinstance(nodes, (list, tuple)):
         nodes = [nodes]
+
     all_shapes = []
     for x in nodes:
-        shapes = trsLib.getShapes(x)
-        if shapes:
-            all_shapes.extend(shapes)
-        else:
-            all_shapes.append(x)
+        shapes = trsLib.getShapes(x, fullPath=True) or []
+        all_shapes.extend(shapes)
     [mc.setAttr(x + ".overrideEnabled", True) for x in all_shapes]
+
     if color:
         [mc.setAttr(x + ".overrideColor", COLORS[color]) for x in all_shapes]
         [mc.setAttr(x + ".overrideRGBColors", 0) for x in all_shapes]
