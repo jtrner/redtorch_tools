@@ -1,0 +1,74 @@
+overal control doesn't move all sub controls on the face
+Face_C_Blink_Lwr_Down_Clamp node has missing connections
+or C_Mouth_LipUpr_Up_Mid_Anm 0 keyframe value is not on 1.0
+
+========================================================================
+========================================================================
+following  MAW departments distribution lists have created
+
+Name: MAW_Assets
+Email: maw_assets@iconcreativestudio.com
+
+Name: MAW_Animation
+Email: maw_animation@iconcreativestudio.com
+
+Name: MAW_Tech_Animation
+Email: maw_tech_animation@iconcreativestudio.com
+
+Name: MAW_Leads
+Email: maw_leads@iconcreativestudio.com
+
+========================================================================
+========================================================================
+Commit Code of Conduct
+What do you put in a commit message?
+Ticket number
+Why you fix something
+What was your Intention
+
+========================================================================
+========================================================================
+I believe supervisor shouldn't be the only one who gives feedback to  (reviews) the artist.
+The review must come from all the key people on all other departments in direct contact
+with the person being reviewed. Usually leads on other departments,
+direct supervisor (could be your show supervisor or CG supervisor),
+production team are good examples of people who can review people.
+
+========================================================================
+========================================================================
+D:/Pipeline/ehsanm/dev/git_repo/rigging_framework/rigging_widgets
+
+========================================================================
+========================================================================
+# reload rigging_framework
+import maya.cmds as mc
+import sys
+import copy
+import os
+import maya.cmds as mc
+mc.file(new=True, f=True)
+
+syscopy = copy.copy(sys.modules)
+removeList = []
+for modKey, mod in syscopy.iteritems():
+    if sys.modules[modKey]:
+        if hasattr(mod, '__file__'):
+            if 'rigging_framework' in sys.modules[modKey].__file__:
+                print sys.modules[modKey].__file__
+                removeList.append(modKey)
+for mod in removeList:
+    sys.modules.pop(mod)
+
+import workflow.rigging_callbacks.controller_utilities as cut
+cut.initialize_rig_controller()
+import rigging_widgets.widget_launchers.launch_widgets as lw
+lw.launch()
+
+========================================================================
+========================================================================
+Bob notes from Ian
+- Set the gimbals to off (You can use the tool in the Icon Tool Panel)
+- Looks like the gimbal vis ctrls connections were broken for the tail.
+- To set up the Auto-Bend, select all four *_IKFKSwitch_Ctrl for the arms and legs. Go to the MAW Build Tools, select Setup Auto-Bend under Post-Build section.
+- Proxy Textures, looks like you set the general colours so that is all that is needed for the proxy textures.
+- Pectorals may be needed...but not a must at this stage

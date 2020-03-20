@@ -1,0 +1,21 @@
+   http://pipedocs.icon.local:8000/resources/tutorial/pipeline_development/#install-git   
+Can you check out the "first time setup" 
+it'll help populate the Git configs
+sure
+Will check that right now, thank you
+Then there's the SSH keys
+   http://pipedocs.icon.local:8000/resources/tutorial/pipeline_development/#generate-ssh-key   
+Some of that page has fallen out of date and I haven't taken the time yet to update it
+So, skip the "Set up your development environment repositories"
+oh... actually - I think I did update it now that I'm looking at it
+the info on DEV_TOOLS should help as well - though that's updated and will no longer ask you which pipeline you want to source, it is instead just a straight >> Dev TaskTool shortcut
+For more reading
+One of my team has compiled a document going over Git Flow:
+   https://docs.google.com/document/d/13GC1eBzolbPbxAdAT4BIq-1xENEE4plOgF2dsnfSvBI/edit?ts=5dd438cb#heading=h.sdpbmy7f3863   
+And this is a really good resource as well:
+   https://www.atlassian.com/git/tutorials/what-is-version-control   
+Specifically:  https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow
+
+
+SSH key: H:\.ssh
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC320H1kdrnNJLH/6VUpmvPE1dQwVCPtpk3bDW4W21gLQCl87oVUyZghniXqBZq8hDp9dTk99M2w79x60lmkei5xQL4BTPz9OaRH4Qb9HYpcTFid9tFeUGTqmH4HqhcrZuxR1H4skz6lmIspY/i7sack8yCEQhoznmVDVrwEfcOWcTDTtoNiDLaV+A5hRsIakzkMJx3D0Z84bLzUvxFLM6Get48o9XJk8lx6llzvQrwRsYR3V2JwfVM8Zk6ZaxYKg2zGP9bFw8YOWjU50BMAOaPOQ/e+j79PSBFvcNTyuoPv2S5VMzw25vtIPmwU2Ucnr2drZtozk3CeA6o+g3OBCG/ ehsanm@iconcreativestudio.com
