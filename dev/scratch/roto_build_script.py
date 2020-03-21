@@ -18,7 +18,6 @@ roto_build_script.post_fix()
 
 """
 import os
-from collections import OrderedDict
 
 import maya.cmds as mc
 
@@ -28,13 +27,19 @@ from rt_python.lib import attrLib
 from rt_python.lib import crvLib
 from rt_python.lib import space
 from rt_python.lib import control
+from rt_python.lib import skincluster
 
 import iRigUtil
 
 reload(iRigUtil)
 reload(renderLib)
+reload(control)
 
 asset_name = 'Roto'
+version = 'v0002'
+user = 'ehsanm'
+userDir = 'Y:/MAW/assets/type/Character/{}/work/rig/Maya/{}'.format(asset_name, user)
+buildDir = '{}/{}_using_framework/{}/build'.format(userDir, asset_name, version)
 
 
 def post_fix():
@@ -45,17 +50,70 @@ def post_fix():
     hideExtraCtls()
     createSpaces()
     importCtlShapes()
+    importSkinclusters()
     iRigUtil.connectGimbalVis()
 
 
+def importSkinclusters():
+    path = os.path.join(buildDir, 'data/skincluster')
+    skincluster.importData(path)
+
+
 def importCtlShapes():
-    version = 'v0002'
-    userDir = 'Y:/MAW/assets/type/Character/{}/work/rig/Maya/ehsanm'.format(asset_name)
-    path = '{}/{}_using_framework/{}/build/data/ctls.ma'.format(userDir, asset_name, version)
+    print buildDir
+    path = os.path.join(buildDir, 'data/ctls.ma')
     control.Control.importCtls(path)
 
 
 def createSpaces():
+    # left back leg pole vector
+    drivers = {'drivers': ['C_spine_a_jnt',
+                           'COG_gimbal_Ctrl',
+                           'C_main_ground_gimbal_Ctrl'],
+               'attrNames': ['hip', 'cog', 'ground'],
+               'dv': 2}
+    space.parent(
+        drivers=drivers,
+        drivens=['L_backLeg_ik_knee_b_gp'],
+        control='L_backLeg_ik_knee_Ctrl',
+        name='follow')
+
+    # right back leg pole vector
+    drivers = {'drivers': ['C_spine_a_jnt',
+                           'COG_gimbal_Ctrl',
+                           'C_main_ground_gimbal_Ctrl'],
+               'attrNames': ['hip', 'cog', 'ground'],
+               'dv': 2}
+    space.parent(
+        drivers=drivers,
+        drivens=['R_backLeg_ik_knee_b_gp'],
+        control='R_backLeg_ik_knee_Ctrl',
+        name='follow')
+
+    # left front leg pole vector
+    drivers = {'drivers': ['C_spine_e_jnt',
+                           'COG_gimbal_Ctrl',
+                           'C_main_ground_gimbal_Ctrl'],
+               'attrNames': ['chest', 'cog', 'ground'],
+               'dv': 2}
+    space.parent(
+        drivers=drivers,
+        drivens=['L_leg_ik_knee_b_gp'],
+        control='L_leg_ik_knee_Ctrl',
+        name='follow')
+
+    # right front leg pole vector
+    drivers = {'drivers': ['C_spine_e_jnt',
+                           'COG_gimbal_Ctrl',
+                           'C_main_ground_gimbal_Ctrl'],
+               'attrNames': ['chest', 'cog', 'ground'],
+               'dv': 2}
+    space.parent(
+        drivers=drivers,
+        drivens=['R_leg_ik_knee_b_gp'],
+        control='R_leg_ik_knee_Ctrl',
+        name='follow')
+
     # left back leg
     drivers = {'drivers': ['C_spine_a_jnt',
                            'COG_gimbal_Ctrl',
@@ -106,7 +164,7 @@ def createSpaces():
 
     # tail orient only
     drivers = {'drivers': ['C_fk_tailBase_a_jnt',
-                           'C_spine_e_jnt',
+                           'C_spine_a_jnt',
                            'COG_gimbal_Ctrl',
                            'C_main_ground_gimbal_Ctrl'],
                'attrNames': ['tailBase', 'hip', 'cog', 'ground'],
@@ -214,8 +272,8 @@ def assignShaders():
 
     ramp, place2d = renderLib.createEyeRamp(name='eye_mtl')
     mc.setAttr(ramp + '.colorEntryList[1].position',  0.12)
-    mc.setAttr(ramp + '.colorEntryList[1].position',  0.19)
-    mc.setAttr(ramp + '.colorEntryList[1].position',  0.21)
+    mc.setAttr(ramp + '.colorEntryList[2].position',  0.19)
+    mc.setAttr(ramp + '.colorEntryList[3].position',  0.21)
     mc.setAttr(place2d + '.translateFrameU',  - 0.2)
     mc.setAttr(place2d + '.translateFrameV',  - 0.2)
 

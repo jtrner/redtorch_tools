@@ -992,7 +992,7 @@ def copyShape(src=None, dst=None):
     good_shape_names = getShapes(dst, fullPath=True) or []
 
     newCrv, newCrvShape = trsLib.duplicateClean(src, name='tempCurve')
-    oldShape = trsLib.getShapes(dst)
+    oldShape = getShapes(dst)
     color = display.getColor(oldShape[0])
     display.setColor(newCrvShape, color)
     if oldShape:
