@@ -1,6 +1,6 @@
 """
 import sys
-path = os.path.join("D:/all_works/scratch")
+path = os.path.join("G:/Rigging/Users/Ehsan/code_share/redtorch_tools/dev/scratch")
 if path in sys.path:
     sys.path.remove(path)
 sys.path.insert(0, path)
@@ -9,13 +9,28 @@ import iRigUtil
 reload(iRigUtil)
 
 
+iRigUtil.toggleGimbals()
+
+iRigUtil.mimic_gimbal_shapes()
+
+iRigUtil.connectGimbalVis()
+
 iRigUtil.createLocForSelected()
 
-iRigUtil.matchToLoc()
+iRigUtil.matchLocToCtls()
+
+iRigUtil.selectCtls()
 
 iRigUtil.deleteTempLocs()
 
-iRigUtil.toggleGimbals()
+iRigUtil.matchToLoc()
+
+iRigUtil.resetSelectedTweakCtls()
+
+iRigUtil.matchSelectedToLoc()
+
+iRigUtil.bake()
+
 
 
 """
@@ -41,7 +56,7 @@ def toolbox():
     toolboxUI.launch()
 
 
-def mimic_all_gimbals():
+def mimic_gimbal_shapes():
     sels = mc.ls(sl=True)
     if sels:
         all_gimbal_vis_attrs = [mc.ls(x + '.gimbal_visibility') for x in sels]

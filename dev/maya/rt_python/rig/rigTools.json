@@ -59,7 +59,7 @@
         "icon": ""
     },
     "ImportSkinCluster": {
-        "command": "from rt_python.lib import skincluster\nreload(skincluster)\nskincluster.importSkinToDesktop()",
+        "command": "from rt_python.lib import skincluster\nreload(skincluster)\nskincluster.importSkinFromDesktop()",
         "icon": ""
     }
 },
