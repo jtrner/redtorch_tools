@@ -7,7 +7,7 @@ import maya.cmds as mc
 from . import strLib
 from . import attrLib
 from . import trsLib
-
+reload(strLib)
 
 def parent(**kwargs):
     constraint(mode='parent', **kwargs)
@@ -43,18 +43,26 @@ def constraint(mode='parent', **kwargs):
 
     # drivers's last argument could determine the default value
     dv = 0
+    attrNames = None
     if isinstance(drivers, dict):
+        driverNodes = drivers['drivers']
         if 'dv' in drivers:
             dv = drivers['dv']
-        drivers = drivers['drivers']
+        if 'attrNames' in drivers:
+            attrNames = drivers['attrNames']
+    else:
+        driverNodes = drivers
 
-    drivers = [x for x in drivers if x]
-    if not drivers:
+    driverNodes = mc.ls(driverNodes)
+    if not driverNodes:
         return
+
+    if not attrNames:
+        attrNames = [strLib.getDescriptor(x) for x in driverNodes]
         
     # create hooks for more stability
     hooks = []
-    for drvr in drivers:
+    for drvr in driverNodes:
         n = strLib.removeSuffix(drivens[0]) + mode.title()
         n += strLib.getDescriptor(drvr).title() + 'Space_HOK'
         hook = mc.createNode('transform', p=drvr, n=n)
@@ -74,12 +82,12 @@ def constraint(mode='parent', **kwargs):
     attr = attrLib.addEnum(
                              control,
                              ln='space'+mode.title(),
-                             en=[strLib.getDescriptor(x) for x in drivers],
+                             en=attrNames,
                              dv=dv
                             )
 
     # connect setting attribute to constraint weights
-    for i, drvr in enumerate(drivers):
+    for i, drvr in enumerate(driverNodes):
         cnd = mc.createNode('condition', n=name + strLib.getDescriptor(drvr).title() + '_CND')
         mc.connectAttr(attr, cnd+'.firstTerm')
         mc.setAttr(cnd+'.secondTerm', i)

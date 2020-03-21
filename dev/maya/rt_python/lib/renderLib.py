@@ -361,6 +361,27 @@ def assignMaterial(nodes=None, mtlType='blinn', name='newMaterial', textureDir=N
     return mat
 
 
+def createEyeRamp(name='eye'):
+    # create texture and connect to shader
+    ramp = mc.shadingNode('ramp', asTexture=True, isColorManaged=True, name=name + '_RMP')
+    mc.setAttr(ramp + '.colorEntryList[0].color', 0, 0, 0, type='double3')
+    mc.setAttr(ramp + '.colorEntryList[0].position', 0.1)
+    mc.setAttr(ramp + '.colorEntryList[1].color', 0, 0.7, 0, type='double3')
+    mc.setAttr(ramp + '.colorEntryList[1].position', 0.2)
+    mc.setAttr(ramp + '.colorEntryList[2].color', 0, 0.2, 0, type='double3')
+    mc.setAttr(ramp + '.colorEntryList[2].position', 0.3)
+    mc.setAttr(ramp + '.colorEntryList[3].color', 0.9, 0.9, 0.9, type='double3')
+    mc.setAttr(ramp + '.colorEntryList[3].position', 0.4)
+    mc.setAttr(ramp + '.type', 4)
+
+    # assign given uvSet to texture file
+    place2d = mc.createNode('place2dTexture', name=name + '_P2D')
+    mc.connectAttr(place2d + '.outUvFilterSize', ramp + '.uvFilterSize')
+    mc.connectAttr(place2d + '.outUV', ramp + '.uvCoord')
+
+    return ramp, place2d
+
+
 def assignRandomShaders(nodes=None, applyToAll=False, colorRange=(0, 1), mtlType='lambert'):
     """
     :usage:

@@ -18,20 +18,22 @@ roto_build_script.post_fix()
 
 """
 import os
-import json
 from collections import OrderedDict
 
 import maya.cmds as mc
 
-from rig_tools.frankenstein.character import spine_simple
-from rig_tools.frankenstein.templates import master
 from rt_python.lib import renderLib
+from rt_python.lib import connect
+from rt_python.lib import attrLib
+from rt_python.lib import crvLib
+from rt_python.lib import space
+from rt_python.lib import control
 
-reload(spine_simple)
-reload(master)
+import iRigUtil
 
-INSTANCES = OrderedDict()
-PACK_GUIDE_JSON = 'D:/test/test.json'
+reload(iRigUtil)
+reload(renderLib)
+
 asset_name = 'Roto'
 
 
@@ -39,6 +41,112 @@ def post_fix():
     import_model()
     assignShaders()
     fixSpine()
+    setupVis()
+    hideExtraCtls()
+    createSpaces()
+    importCtlShapes()
+    iRigUtil.connectGimbalVis()
+
+
+def importCtlShapes():
+    version = 'v0002'
+    userDir = 'Y:/MAW/assets/type/Character/{}/work/rig/Maya/ehsanm'.format(asset_name)
+    path = '{}/{}_using_framework/{}/build/data/ctls.ma'.format(userDir, asset_name, version)
+    control.Control.importCtls(path)
+
+
+def createSpaces():
+    # left back leg
+    drivers = {'drivers': ['C_spine_a_jnt',
+                           'COG_gimbal_Ctrl',
+                           'C_main_ground_gimbal_Ctrl'],
+               'attrNames': ['hip', 'cog', 'ground'],
+               'dv': 2}
+    space.parent(
+        drivers=drivers,
+        drivens=['L_backLeg_ik_ankle_b_gp'],
+        control='L_backLeg_ik_ankle_Ctrl',
+        name='follow')
+
+    # right back leg
+    drivers = {'drivers': ['C_spine_a_jnt',
+                           'COG_gimbal_Ctrl',
+                           'C_main_ground_gimbal_Ctrl'],
+               'attrNames': ['hip', 'cog', 'ground'],
+               'dv': 2}
+    space.parent(
+        drivers=drivers,
+        drivens=['R_backLeg_ik_ankle_b_gp'],
+        control='R_backLeg_ik_ankle_Ctrl',
+        name='follow')
+
+    # left front leg
+    drivers = {'drivers': ['C_spine_e_jnt',
+                           'COG_gimbal_Ctrl',
+                           'C_main_ground_gimbal_Ctrl'],
+               'attrNames': ['chest', 'cog', 'ground'],
+               'dv': 2}
+    space.parent(
+        drivers=drivers,
+        drivens=['L_leg_ik_ankle_b_gp'],
+        control='L_leg_ik_ankle_Ctrl',
+        name='follow')
+
+    # right front leg
+    drivers = {'drivers': ['C_spine_e_jnt',
+                           'COG_gimbal_Ctrl',
+                           'C_main_ground_gimbal_Ctrl'],
+               'attrNames': ['chest', 'cog', 'ground'],
+               'dv': 2}
+    space.parent(
+        drivers=drivers,
+        drivens=['R_leg_ik_ankle_b_gp'],
+        control='R_leg_ik_ankle_Ctrl',
+        name='follow')
+
+    # tail orient only
+    drivers = {'drivers': ['C_fk_tailBase_a_jnt',
+                           'C_spine_e_jnt',
+                           'COG_gimbal_Ctrl',
+                           'C_main_ground_gimbal_Ctrl'],
+               'attrNames': ['tailBase', 'hip', 'cog', 'ground'],
+               'dv': 3}
+    space.orient(
+        drivers=drivers,
+        drivens=['C_tail_root_handle_b_gp'],
+        control='C_tail_settings_Ctrl',
+        name='follow')
+
+
+def hideExtraCtls():
+    ctls = ['C_tail_root_handle_Ctrl']
+    for ctl in ctls:
+        shapes = crvLib.getShapes(ctl)
+        [mc.setAttr(x + '.v', 0) for x in shapes]
+
+
+def setupVis():
+    mainCtl = 'C_main_root_Ctrl'
+    geoGrp = 'Geo_Grp'
+    rigGrp = 'character_deform_gp'
+
+    # geo visibility swtich
+    a = attrLib.addEnum(mainCtl, 'geoVis', en=['off', 'on'], dv=1)
+    mc.connectAttr(a, geoGrp + '.v')
+
+    # rig visibility swtich
+    a = attrLib.addEnum(mainCtl, 'rigVis', en=['off', 'on'], dv=1)
+    mc.connectAttr(a, rigGrp + '.v')
+
+    # geo selectablity swtich
+    a = attrLib.addEnum(mainCtl, 'geoSelectable', en=['off', 'on'])
+    connect.reverse(a, geoGrp + '.overrideEnabled')
+    mc.setAttr(geoGrp + '.overrideDisplayType', 2)
+
+    # rig selectablity swtich
+    a = attrLib.addEnum(mainCtl, 'rigSelectable', en=['off', 'on'])
+    connect.reverse(a, rigGrp + '.overrideEnabled')
+    mc.setAttr(rigGrp + '.overrideDisplayType', 2)
 
 
 def fixSpine():
@@ -55,81 +163,60 @@ def import_model():
     mc.file(os.path.join(model_dir, model_path), i=True)
 
     #
-    mc.parent('Geo_Grp', world=True)
+    if mc.objExists('character'):
+        mc.parent('Geo_Grp', 'character')
+    else:
+        mc.parent('Geo_Grp', world=True)
     mc.delete('Character_Grp')
 
     # fix modeling shit
     mc.setAttr('Model_A_Grp.tx', -20.175)
 
-    # #
-    # mc.hide('character_utilities_gp', 'Model_B_Grp')
+    #
+    mc.hide(mc.ls('character_utilities_gp', 'Model_B_Grp'))
 
     # put fur in a template
     for geo in mc.listRelatives('Model_A_Grp'):
         mc.setAttr(geo + '.overrideEnabled', True)
         mc.setAttr(geo + '.overrideDisplayType', 2)
 
-    # mc.setAttr("fur_groom_volume_Geo.overrideEnabled", True)
-    # mc.setAttr('fur_groom_volume_Geo.overrideDisplayType', 1)
-
 
 def assignShaders():
     #
     renderLib.assignShader('body_Geo',
-                 color=[0.8, 0.45, 0.8],
-                 eccentricity=[0.5],
-                 diffuse=[1],
-                 specularColor=[0.2, 0.2, 0.2],
-                 name='body_proxy_mtl')
+                           color=[0.8, 0.45, 0.8],
+                           eccentricity=[0.5],
+                           diffuse=[1],
+                           specularColor=[0.2, 0.2, 0.2],
+                           name='body_proxy_mtl')
 
     renderLib.assignShader('fur_groom_volume_Geo',
-                 color=[0.8, 0.45, 0.8],
-                 transparency=[0.7, 0.7, 0.7],
-                 diffuse=[1],
-                 specularColor=[0, 0, 0],
-                 name='fur_proxy_mtl')
+                           color=[0.8, 0.45, 0.8],
+                           transparency=[0.25, 0.25, 0.25],
+                           diffuse=[1],
+                           specularColor=[0, 0, 0],
+                           name='fur_proxy_mtl')
 
+    renderLib.assignShader(['horn_L_Geo', 'horn_R_Geo'],
+                           color=[0.88, 0.46, 0.6],
+                           name='horn_proxy_mtl')
 
-def create_packs():
-    INSTANCES['master'] = master.Template_Master()
-    INSTANCES['master'].create_packs()
+    renderLib.assignShader(['teeth_upper_Geo', 'teeth_lower_Geo'],
+                           color=[0.8, 0.8, 0.8],
+                           name='teeth_proxy_mtl')
 
-    INSTANCES['spine'] = spine_simple.Build_Spine_Simple()
-    INSTANCES['spine'].create_pack()
+    eye_mtl = renderLib.assignShader('eye_Geo',
+                                     color=[0.8, 0.8, 0.8],
+                                     diffuse=[1],
+                                     eccentricity=[0.15],
+                                     specularColor=[0.5, 0.5, 0.5],
+                                     name='eye_proxy_mtl')
 
+    ramp, place2d = renderLib.createEyeRamp(name='eye_mtl')
+    mc.setAttr(ramp + '.colorEntryList[1].position',  0.12)
+    mc.setAttr(ramp + '.colorEntryList[1].position',  0.19)
+    mc.setAttr(ramp + '.colorEntryList[1].position',  0.21)
+    mc.setAttr(place2d + '.translateFrameU',  - 0.2)
+    mc.setAttr(place2d + '.translateFrameV',  - 0.2)
 
-def load_pack_guides():
-    with open(PACK_GUIDE_JSON, 'r') as f:
-        packs_data = json.load(f, object_pairs_hook=OrderedDict)
-    if not packs_data:
-        return
-
-    for pack, guides_data in packs_data.items():
-        if not mc.objExists(pack):
-            continue
-        for g, m in guides_data.items():
-            if not mc.objExists(g):
-                continue
-            mc.xform(g, ws=True, m=m)
-
-
-def save_pack_guides():
-    packs_data = OrderedDict()
-    packs = mc.listRelatives('BuildPack_Grp')
-    for pack in packs:
-        packs_data[pack] = OrderedDict()
-        guides = mc.listRelatives(pack, ad=True) or []
-        for g in reversed(guides):
-            m = mc.xform(g, q=True, ws=True, m=True)
-            packs_data[pack][g] = m
-
-    with open(PACK_GUIDE_JSON, 'w') as f:
-        json.dump(packs_data, f, sort_keys=False, indent=4)
-
-
-def create_bits():
-    master = INSTANCES.pop('master')
-    master.create_bits()
-
-    for instance in INSTANCES.values():
-        instance.create_bit()
+    mc.connectAttr(ramp+'.outColor', eye_mtl + '.color')

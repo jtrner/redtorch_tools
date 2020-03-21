@@ -235,8 +235,7 @@ def getSuffix(name=""):
 def removeSuffix(name=""):
     if hasSuffix(name):
         return "_".join(name.split("_")[:-1])
-    else:
-        raise Exception("{}, does not have a valid suffix.".format(name))
+    return name
 
 
 def mergeSuffix(name=""):

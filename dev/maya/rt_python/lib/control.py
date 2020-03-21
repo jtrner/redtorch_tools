@@ -109,6 +109,8 @@ class Control(object):
             filePath = "C:/Users/Ehsan/Desktop/ctls.ma"
             control.Control.exportCtls(filePath)
         """
+        print('from rt_python.lib import control\ncontrol.Control.exportCtls({})'.format(path))
+
         # get all controls in the scene
         ctls = mc.ls('*_CTL', '*_Ctl', '*_ctl', '*_CTRL', '*_Ctrl', '*_ctrl', long=True)
 
@@ -164,6 +166,8 @@ class Control(object):
             filePath = "C:/Users/Ehsan/Desktop/ctls.ma"
             control.Control.importCtls(filePath)
         """
+        print('from rt_python.lib import control\ncontrol.Control.importCtls({})'.format(path))
+
         if not os.path.isfile(path):
             mc.warning('Control shape file "{0}" can not be found, skipped!'.format(path))
             return
