@@ -91,7 +91,7 @@ class Neck(template.Template):
 
         self.baseCtl, crvGrp, rsltGrp, ctls, jnts = rope.run(
             jnts=self.joints['neckJnts'], numCtls=5, guides=None, numJnts=None,
-            addSpaces=False, description=self.prefix)
+            description=self.prefix)
 
         iconSize = trsLib.getDistance(self.joints['neckJnts'][0], self.joints['neckJnts'][-1])
 

@@ -33,14 +33,12 @@ class Tail(template.Template):
     """
 
     def __init__(self, side="C", prefix="tail", numOfCtls=6, numOfJnts=10,
-                 jntsToRig=None, hasMidCtl=True, addSpaces=True,
-                 autoOrient=True, **kwargs):
+                 jntsToRig=None, hasMidCtl=True, autoOrient=True, **kwargs):
         kwargs['side'] = side
         kwargs['prefix'] = prefix
         self.hasMidCtl = hasMidCtl
         self.numOfCtls = numOfCtls
         self.numOfJnts = numOfJnts
-        self.addSpaces = addSpaces
         self.jntsToRig = jntsToRig
         self.autoOrient = autoOrient
 
@@ -110,7 +108,6 @@ class Tail(template.Template):
             jnts=self.joints['chainJnts'],
             guides=self.blueprints.values(),
             numJnts=None,
-            addSpaces=self.addSpaces,
             description=self.prefix,
             matchOrientation=True)
         self.baseCtlZro = mc.listRelatives(self.baseCtl, p=1)[0]
@@ -130,11 +127,12 @@ class Tail(template.Template):
 
         # fk orient space
         orientDrivers = self.getOut('tailOrient')
-        space.orient(
-            drivers=orientDrivers,
-            drivens=[self.baseCtlZro],
-            control=self.baseCtl,
-            name=self.name + 'OrientSpace')
+        if orientDrivers:
+            space.orient(
+                drivers=orientDrivers,
+                drivens=[self.baseCtlZro],
+                control=self.baseCtl,
+                name=self.name + 'OrientSpace')
 
     def createSettings(self):
         """

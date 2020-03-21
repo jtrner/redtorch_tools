@@ -874,6 +874,8 @@ def attach(node=None, curve=None, upCurve=None, upAxis='y', aimUparam=None):
     mc.connectAttr(dmx + '.outputTranslate', node + '.translate')
     mc.connectAttr(dmx + '.outputRotate', node + '.rotate')
 
+    return pci_1, pci_2
+
 
 def numCVs(curve_shape=None):
     """

@@ -12,7 +12,6 @@ import maya.cmds as mc
 
 from ...lib import trsLib
 from ...lib import crvLib
-from ...lib import connect
 from ...lib import control
 from ...lib import mathLib
 from ...lib import jntLib
@@ -20,9 +19,8 @@ reload(mathLib)
 reload(jntLib)
 
 
-def run(jnts=None, numCtls=None, guides=None, numJnts=None, addSpaces=False,
-        isSerial=True, side='C', description='rope', upCrvNormal=(0, 1, 0),
-        matchOrientation=False):
+def run(jnts=None, numCtls=None, guides=None, numJnts=None,
+        isSerial=True, side='C', description='rope', matchOrientation=False):
     """
     rope.run(jnts=guides, numCtls=6, guides=None, numJnts=None, description='aaa')
 
@@ -50,12 +48,10 @@ def run(jnts=None, numCtls=None, guides=None, numJnts=None, addSpaces=False,
             ctlPoses.append(pos)
         mc.delete(tmpCrv, tmpSoftCrv)
         numJnts = len(jnts)
-        crvPointPoses = [mc.xform(x, q=1, ws=1, t=1) for x in jnts]
 
     # control positions and number of output jnts are given
     elif guides and numJnts:
         ctlPoses = [mc.xform(x, q=1, ws=1, t=1) for x in guides]
-        crvPointPoses = ctlPoses
         numCtls = len(guides)
 
     # control positions and output joints are given
@@ -63,7 +59,6 @@ def run(jnts=None, numCtls=None, guides=None, numJnts=None, addSpaces=False,
         ctlPoses = [mc.xform(x, q=1, ws=1, t=1) for x in guides]
         numJnts = len(jnts)
         numCtls = len(guides)
-        crvPointPoses = [mc.xform(x, q=1, ws=1, t=1) for x in jnts]
 
     else:
         mc.error('Either (jnts and numCtls) or (ctlPoses and numJnts) or (guides and jnts) must be given!')
@@ -110,6 +105,7 @@ def run(jnts=None, numCtls=None, guides=None, numJnts=None, addSpaces=False,
         translate=ctlPoses[0])
     par = baseCtl.name
     ctls = []
+    tweakCtls = []
     for i in range(len(ctlPoses)):
 
         if matchOrientation:
@@ -131,50 +127,27 @@ def run(jnts=None, numCtls=None, guides=None, numJnts=None, addSpaces=False,
             descriptor='{}_{:03d}'.format(description, i + 1),
             shape='cube',
             size=size,
-            parent=baseCtl.name,
+            parent=par,
             translate=ctlPoses[i],
             matchRotate=matchRotate)
-        mc.parent(clss[i], ctl.name)
         ctls.append(ctl.name)
 
-        # if i == 0:
-        #     mc.parent(clss[0], ctl.name)
-        #     continue
-        #
-        # if i == len(ctlPoses) - 1:
-        #     mc.parent(clss[-1], ctl.name)
-        world = mc.createNode('transform', p=par)
-        trsLib.match(world, ctl.name)
-        if i and addSpaces:
-            worldZro = trsLib.duplicate(ctl.zro, name=ctl.zro.replace('ZRO', 'world_ZRO'))
-            connect.blendConstraint(
-                worldZro,
-                world,
-                ctl.zro,
-                type='parentConstraint',
-                skipRotate=['x', 'y', 'z'],
-                blendNode=ctl.name,
-                blendAttr='moveWithPrevCtl',
-                mo=True)
-            connect.blendConstraint(
-                worldZro,
-                world,
-                ctl.zro,
-                type='orientConstraint',
-                blendNode=ctl.name,
-                blendAttr='rotateWithPrevCtl',
-                mo=True)
+        tweakCtl = control.Control(
+            side=side,
+            descriptor='{}_{:03d}_tweak'.format(description, i + 1),
+            shape='sphere',
+            color='greenDark',
+            size=size * 0.2,
+            parent=ctl.name,
+            translate=ctlPoses[i],
+            matchRotate=matchRotate)
+        tweakCtls.append(tweakCtl.name)
+        mc.parent(clss[i], tweakCtl.name)
 
         par = ctl.name
 
-    # move upCrv points along Y axes of controls
-    # firstCV = '{}.cv[0]'.format(upCrv)
-    # mathLib.moveAlongTransform(firstCV, ctls[0], [0, size, 0])
-    #
-    # lastCV = '{}.cv[{}]'.format(upCrv, len(clss) - 1)
-    # mathLib.moveAlongTransform(lastCV, ctls[-1], [0, size, 0])
-
-    for i in range(len(ctls)):  # other cvs
+    # other cvs
+    for i in range(len(ctls)):
         CV = '{}.cv[{}]'.format(upCrv, i)
         mathLib.moveAlongTransform(CV, ctls[i], [0, size, 0])
 
