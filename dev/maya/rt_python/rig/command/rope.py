@@ -67,30 +67,33 @@ def run(jnts=None, numCtls=None, guides=None, numJnts=None, addTweaks=False,
     else:
         mc.error('Either (jnts and numCtls) or (ctlPoses and numJnts) or (guides and jnts) must be given!')
 
-    crv = crvLib.fromPoses(ctlPoses, degree=1, fit=False, name='{}_CRV'.format(name))[0]
+    crv = crvLib.fromPoses(ctlPoses, degree=3, fit=False, name='{}_CRV'.format(name))[0]
     upCrv = mc.duplicate(crv, name='{}_up_CRV'.format(name))[0]
     size = mc.arclen(crv) / len(ctlPoses) / 2
     # upCrv = mc.offsetCurve(crv, nr=upCrvNormal, d=size, ch=False)[0]
     # upCrv = mc.rename(upCrv, '{}_up_CRV'.format(name))
 
     #
-    mc.rebuildCurve(crv, ch=0, s=numCtls - 1, d=1, kr=0, rpo=1)
-    mc.rebuildCurve(upCrv, ch=0, s=numCtls - 1, d=1, kr=0, rpo=1)
+    # mc.rebuildCurve(crv, ch=0, s=numCtls - 1, d=1, kr=0, rpo=1)
+    # mc.rebuildCurve(upCrv, ch=0, s=numCtls - 1, d=1, kr=0, rpo=1)
 
     # create softCrv (will be used to drive position of output joints)
-    softCrv = mc.rebuildCurve(crv, ch=1, s=numCtls - 1, d=3, kr=0, rpo=0, name='{}_soft_CRV'.format(name))[0]
-    upSoftCrv = mc.rebuildCurve(upCrv, ch=1, s=numCtls - 1, d=3, kr=0, rpo=0, name='{}_up_soft_CRV'.format(name))[0]
-    upSoftCrv = mc.rename(upSoftCrv, '{}_up_soft_CRV'.format(name))
+    # softCrv = mc.rebuildCurve(crv, ch=1, s=numCtls - 1, d=3,
+    #                           kr=0, rpo=0, name='{}_soft_CRV'.format(name))[0]
+    # upSoftCrv = mc.rebuildCurve(upCrv, ch=1, s=numCtls - 1, d=3,
+    #                             kr=0, rpo=0, name='{}_up_soft_CRV'.format(name))[0]
+    # upSoftCrv = mc.rename(upSoftCrv, '{}_up_soft_CRV'.format(name))
 
     # parent curves
-    mc.parent(crv, upCrv, softCrv, upSoftCrv, crvGrp)
+    # mc.parent(crv, upCrv, softCrv, upSoftCrv, crvGrp)
+    mc.parent(crv, upCrv, crvGrp)
 
     # create clusters for each cv of crv
     clss = crvLib.clusterize(crv, name=name)
 
     #
     if not jnts:
-        jnts = jntLib.create_on_curve(curve=softCrv, numOfJoints=numJnts,
+        jnts = jntLib.create_on_curve(curve=crv, numOfJoints=numJnts,
                                       parent=True, description=name)
         upLoc = mc.createNode('transform')
         trsLib.match(upLoc, jnts[0])
@@ -178,8 +181,8 @@ def run(jnts=None, numCtls=None, guides=None, numJnts=None, addTweaks=False,
         if isSerial and i != numJnts - 1:  # last joint doesn't aim to anything
             nextJ = jnts[i + 1]
             pos = mc.xform(nextJ, q=1, ws=1, t=1)
-            aimUparam = crvLib.getUParam(pos, softCrv)
-        crvLib.attach(node=rslt, curve=softCrv, upCurve=upSoftCrv, upAxis='y',
+            aimUparam = crvLib.getUParam(pos, crv)
+        crvLib.attach(node=rslt, curve=crv, upCurve=upCrv, upAxis='y',
                       aimUparam=aimUparam)
         rslts.append(rslt)
 

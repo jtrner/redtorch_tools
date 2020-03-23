@@ -1239,3 +1239,75 @@ def decreaseLen(crv, percent=5):
     [crvLib.decreaseLen(crv=x, percent=5) for x in mc.ls(sl=True)]
     """
     increaseLen(crv, percent=-percent)
+
+
+def keepLen(crv):
+    #
+    crv_s = getShapes(crv)[0]
+    spans = mc.getAttr(crv_s + '.spans')
+
+    #
+    new_crv = mc.duplicate(crv)[0]
+    new_crv_s = getShapes(new_crv)[0]
+    stretch = attrLib.addFloat(new_crv, 'stretch', min=0, max=1)
+    slide = attrLib.addFloat(new_crv, 'slide', min=0, max=1)
+    spans = attrLib.addInt(new_crv, 'spans', dv=spans)
+
+    #
+    arc = mc.arclen(crv, ch=True, n='arc')
+    orig_len = mc.getAttr(arc + '.arcLength')
+
+    #
+    stretch_ratio_mdn = mc.createNode('multiplyDivide', n='stretch_ratio_mdn')
+    mc.setAttr(stretch_ratio_mdn + '.operation', 2)
+    mc.setAttr(stretch_ratio_mdn + '.input1X', orig_len)
+    mc.connectAttr(arc + '.arcLength', stretch_ratio_mdn + '.input2X')
+
+    #
+    stretch_blend_bta = mc.createNode('blendTwoAttr', n='stretch_blend_bta')
+    mc.connectAttr(stretch, stretch_blend_bta + '.attributesBlender')
+    mc.connectAttr(stretch_ratio_mdn + '.outputX', stretch_blend_bta + '.input[0]')
+    mc.setAttr(stretch_blend_bta + '.input[1]', 1)
+
+    #
+    crv01 = mc.createNode('rebuildCurve')
+    mc.setAttr(crv01 + '.keepRange', 0)
+    mc.connectAttr(crv_s + '.worldSpace[0]', crv01 + '.inputCurve')
+
+    # start = slide * (1.0 - stretch_ratio_mdn)
+    one_minus_ratio_pma = mc.createNode('plusMinusAverage', n='one_minus_ratio_pma')
+    mc.setAttr(one_minus_ratio_pma + '.operation', 2)
+    mc.setAttr(one_minus_ratio_pma + '.input1D[0]', 1)
+    mc.connectAttr(stretch_blend_bta + '.output', one_minus_ratio_pma + '.input1D[1]')
+
+    start_mdn = mc.createNode('multiplyDivide', n='start_mdn')
+    mc.connectAttr(slide, start_mdn + '.input1X')
+    mc.connectAttr(one_minus_ratio_pma + '.output1D', start_mdn + '.input2X')
+
+    # end = 1.0 - ((1.0 - slide) * reverse_stretch_ratio)
+    one_minus_slide_pma = mc.createNode('plusMinusAverage', n='one_minus_slide_pma')
+    mc.setAttr(one_minus_slide_pma + '.operation', 2)
+    mc.setAttr(one_minus_slide_pma + '.input1D[0]', 1)
+    mc.connectAttr(slide, one_minus_slide_pma + '.input1D[1]')
+
+    rev_slide_mult_rev_ratio_mdn = mc.createNode('multiplyDivide', n='rev_slide_mult_rev_ratio_mdn')
+    mc.connectAttr(one_minus_slide_pma + '.output1D', rev_slide_mult_rev_ratio_mdn + '.input1X')
+    mc.connectAttr(one_minus_ratio_pma + '.output1D', rev_slide_mult_rev_ratio_mdn + '.input2X')
+
+    end_pma = mc.createNode('plusMinusAverage', n='end_pma')
+    mc.setAttr(end_pma + '.operation', 2)
+    mc.setAttr(end_pma + '.input1D[0]', 1)
+    mc.connectAttr(rev_slide_mult_rev_ratio_mdn + '.outputX', end_pma + '.input1D[1]')
+
+    #
+    detach = mc.createNode('detachCurve')
+    mc.connectAttr(crv01 + '.outputCurve', detach + '.inputCurve')
+    mc.connectAttr(start_mdn + '.outputX', detach + '.parameter[0]')
+    mc.connectAttr(end_pma + '.output1D', detach + '.parameter[1]')
+
+    #
+    rebuild_2 = mc.createNode('rebuildCurve')
+    mc.setAttr(rebuild_2 + '.keepRange', 0)
+    mc.connectAttr(detach + '.outputCurve[1]', rebuild_2 + '.inputCurve')
+    mc.connectAttr(rebuild_2 + '.outputCurve', new_crv_s + '.create')
+    mc.connectAttr(spans, rebuild_2 + '.spans')
