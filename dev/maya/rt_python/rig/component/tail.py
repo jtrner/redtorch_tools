@@ -104,12 +104,14 @@ class Tail(template.Template):
 
     def build(self):
         super(Tail, self).build()
-        self.baseCtl, crvGrp, rsltGrp, ctls, jnts = rope.run(
+        self.baseCtl, crvGrp, rsltGrp, ctls, tweakCtls, jnts = rope.run(
             jnts=self.joints['chainJnts'],
             guides=self.blueprints.values(),
             numJnts=None,
             description=self.prefix,
-            matchOrientation=True)
+            matchOrientation=True,
+            addTweaks=True,
+            fkMode=True)
         self.baseCtlZro = mc.listRelatives(self.baseCtl, p=1)[0]
         mc.parent(self.baseCtlZro, self.ctlGrp)
         mc.parent(crvGrp, rsltGrp, self.originGrp)

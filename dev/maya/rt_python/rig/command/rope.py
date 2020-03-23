@@ -19,11 +19,15 @@ reload(mathLib)
 reload(jntLib)
 
 
-def run(jnts=None, numCtls=None, guides=None, numJnts=None,
-        isSerial=True, side='C', description='rope', matchOrientation=False):
+def run(jnts=None, numCtls=None, guides=None, numJnts=None, addTweaks=False,
+        isSerial=True, side='C', description='rope', matchOrientation=False,
+        fkMode=False):
     """
     rope.run(jnts=guides, numCtls=6, guides=None, numJnts=None, description='aaa')
 
+    :param addTweaks: adds sub controls to each control
+    :param matchOrientation: matches orientation of controls to either guides or joints
+    :param fkMode: parents controls under each other to create fk behavior
     :param isSerial: if True joints point to their children
     """
 
@@ -131,20 +135,23 @@ def run(jnts=None, numCtls=None, guides=None, numJnts=None,
             translate=ctlPoses[i],
             matchRotate=matchRotate)
         ctls.append(ctl.name)
+        mc.parent(clss[i], ctl.name)
 
-        tweakCtl = control.Control(
-            side=side,
-            descriptor='{}_{:03d}_tweak'.format(description, i + 1),
-            shape='sphere',
-            color='greenDark',
-            size=size * 0.2,
-            parent=ctl.name,
-            translate=ctlPoses[i],
-            matchRotate=matchRotate)
-        tweakCtls.append(tweakCtl.name)
-        mc.parent(clss[i], tweakCtl.name)
+        if addTweaks:
+            tweakCtl = control.Control(
+                side=side,
+                descriptor='{}_{:03d}_tweak'.format(description, i + 1),
+                shape='sphere',
+                color='greenDark',
+                size=size * 0.2,
+                parent=ctl.name,
+                translate=ctlPoses[i],
+                matchRotate=matchRotate)
+            tweakCtls.append(tweakCtl.name)
+            mc.parent(clss[i], tweakCtl.name)
 
-        par = ctl.name
+        if fkMode:
+            par = ctl.name
 
     # other cvs
     for i in range(len(ctls)):
@@ -184,4 +191,4 @@ def run(jnts=None, numCtls=None, guides=None, numJnts=None,
     # hide stuff
     mc.hide(crvGrp, rsltGrp, clss)
 
-    return baseCtl.name, crvGrp, rsltGrp, ctls, jnts
+    return baseCtl.name, crvGrp, rsltGrp, ctls, tweakCtls, jnts

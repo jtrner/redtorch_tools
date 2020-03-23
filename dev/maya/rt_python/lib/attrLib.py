@@ -50,7 +50,7 @@ def disconnectAttr(attr, ignoreMissingAttrs=False):
 def lockHideAttrs(node, attrs, lock=True, hide=True):
     attrs = flattenAttrs(attrs)
     for a in attrs:
-        mc.setAttr(node + '.' + a, lock=lock, k=not (hide), ch=not (hide))
+        mc.setAttr(node + '.' + a, lock=lock, k=not hide, ch=not hide)
 
 
 def unlock(nodes, attrs):

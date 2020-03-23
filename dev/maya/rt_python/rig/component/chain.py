@@ -133,6 +133,6 @@ class Chain(template.Template):
         super(Chain, self).createSettings()
 
         attrLib.addString(self.blueprintGrp, 'blu_globalScale', v='C_root.mainCtl')
-
+        attrLib.addInt(self.blueprintGrp, 'blu_numOfJnts', v=self.numOfJnts)
         attrLib.addString(self.blueprintGrp, 'blu_spacePoint', v={'drivers': [], 'dv': 0})
         attrLib.addString(self.blueprintGrp, 'blu_spaceOrient', v={'drivers': [], 'dv': 0})

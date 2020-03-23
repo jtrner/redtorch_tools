@@ -89,7 +89,7 @@ class Neck(template.Template):
     def build(self):
         super(Neck, self).build()
 
-        self.baseCtl, crvGrp, rsltGrp, ctls, jnts = rope.run(
+        self.baseCtl, crvGrp, rsltGrp, ctls, tweakCtls, jnts = rope.run(
             jnts=self.joints['neckJnts'], numCtls=5, guides=None, numJnts=None,
             description=self.prefix)
 
@@ -179,9 +179,8 @@ class Neck(template.Template):
 
         # outliner clean up
         mc.parent(crvGrp, rsltGrp, self.originGrp)
-        ctlParent = self.getOut('ctlParent')
         startCtlZro = mc.listRelatives(self.baseCtl, p=1)[0]
-        mc.parent(startCtlZro, ctlParent)
+        mc.parent(startCtlZro, self.ctlGrp)
 
     def connect(self):
         """
@@ -193,6 +192,8 @@ class Neck(template.Template):
         ctlParent = self.getOut('ctlParent')
         connect.matrix(ctlParent, self.moduleGrp)
         connect.matrix(ctlParent, self.ctlGrp)
+        startCtlZro = mc.listRelatives(self.baseCtl, p=1)[0]
+        mc.parent(startCtlZro, ctlParent)
 
         # head orient space
         orientDrivers = self.getOut('headOrient')

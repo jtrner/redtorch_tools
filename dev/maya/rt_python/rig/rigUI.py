@@ -319,6 +319,10 @@ class UI(QtWidgets.QDialog):
         comp_buttons_vl.layout().addWidget(self.mirrorBlueprint_btn)
         self.mirrorBlueprint_btn.clicked.connect(self.mirrorBlueprint)
 
+        self.buildSelected_btn = QtWidgets.QPushButton('Build Selected')
+        comp_buttons_vl.layout().addWidget(self.buildSelected_btn)
+        self.buildSelected_btn.clicked.connect(self.buildSelectedBlueprint)
+
         # ======================================================================
         # buildTree frame
         self.rig_gb, rig_frame = qtLib.createGroupBox(self.builds_lay, 'Create Rig')
@@ -391,6 +395,23 @@ class UI(QtWidgets.QDialog):
     def handleNewVersionSelected(self):
         self.version = qtLib.getSelectedItemAsText(self.versions_tw)
 
+    def getAttrsAndValuesForSelectedBluGrp(self):
+
+        selectedBlu = qtLib.getSelectedItemAsText(self.blueprints_tw)
+        if not selectedBlu:
+            return
+        bluGrp = selectedBlu.split(' ')[0] + '_blueprint_GRP'
+
+        ignoreAttrs = ['blu_inputs', 'blu_type']
+
+        attrs = mc.listAttr(bluGrp, st='blu_*')
+        attrs = [a for a in attrs if a not in ignoreAttrs]
+        attrsAndValues = OrderedDict()
+        for attr in attrs:
+            classArgName = attr.replace('blu_', '')
+            attrsAndValues[classArgName] = mc.getAttr(bluGrp + '.' + attr)
+        return attrsAndValues
+
     def handleNewComponentSelected(self):
         qtLib.clearLayout(self.args_w)
 
@@ -405,7 +426,7 @@ class UI(QtWidgets.QDialog):
             self.args_w.addWidget(widget)
 
     def convertAttrsToQtWidgets(self, node):
-        ignoreAttrs = ['blu_inputs', 'blu_type', 'blu_order']
+        ignoreAttrs = ['blu_inputs', 'blu_type']
 
         attrs = mc.listAttr(node, st='blu_*')
         attrs = [x for x in attrs if x not in ignoreAttrs]
@@ -710,6 +731,17 @@ class UI(QtWidgets.QDialog):
         self.bluRefresh()
         itemName = '{} [{}]'.format(cmpInstance.name, cmpInstance.__class__.__name__)
         qtLib.selectItemByText(self.blueprints_tw, itemName)
+
+    def buildSelectedBlueprint(self):
+        selectedBlu = qtLib.getSelectedItemAsText(self.blueprints_tw)
+        className = selectedBlu.split('[')[-1][:-1]
+        componentName = className[0].lower() + className[1:]
+        python_rig_component = globals()['component']
+        cmpModule = getattr(python_rig_component, componentName)
+        cmpClass = getattr(cmpModule, className)
+        attrsAndValues = self.getAttrsAndValuesForSelectedBluGrp()
+        cmpInstance = cmpClass(**attrsAndValues)
+        cmpInstance.build()
 
     def openDirectoy(self):
         """

@@ -603,21 +603,28 @@ def mirror(crvs=None):
             shape = getShapes(crv, fullPath=True)[0]
             if not shape:
                 return
-            # use transform for joints as they might create extra transform when parenting
+
+            #
             dup = mc.duplicate(crv)[0]
+
+            # delete non shape children
+            all_children = mc.listRelatives(dup, fullPath=True)
+            shape_children = getShapes(dup, fullPath=True)
+            [mc.delete(x) for x in all_children if x not in shape_children]
+
+            # use transform for joints as they might create extra transform when parenting
             if mc.nodeType(dup) == 'joint':
                 dup_trs = mc.createNode('transform')
                 trsLib.match(dup_trs, dup)
-
-                # delete non shape children
-                all_children = mc.listRelatives(dup, fullPath=True)
-                shape_children = getShapes(dup, fullPath=True)
-                [mc.delete(x) for x in all_children if x not in shape_children]
 
                 for shape in shape_children:
                     mc.parent(shape, dup_trs, add=True, s=True)
                 mc.delete(dup)
                 dup = dup_trs
+                attrLib.lockHideAttrs(dup, attrs=['t', 'r', 's', 'jo'], lock=False, hide=False)
+
+            else:
+                attrLib.lockHideAttrs(dup, attrs=['t', 'r', 's'], lock=False, hide=False)
 
             #
             grp = mc.createNode('transform', n='curveMirrorTemp')
@@ -875,6 +882,54 @@ def attach(node=None, curve=None, upCurve=None, upAxis='y', aimUparam=None):
     mc.connectAttr(dmx + '.outputRotate', node + '.rotate')
 
     return pci_1, pci_2
+
+
+def attachUsingPath(node=None, curve=None, upCurve=None, frontAxis='x', upAxis='y', name=None):
+    if not name:
+        name = node + '_attach_to_path'
+
+    up_trs = mc.createNode('transform', n=name + '_up_TRS')
+
+    # get curves
+    crvS = getShapes(curve)[0]
+    upCrvS = getShapes(upCurve)[0]
+
+    # get closest u param
+    pos = mc.xform(node, q=1, ws=1, t=1)
+    u = getUParam(pos, crvS)
+
+    # drive node using first motionPath
+    mop_1 = mc.createNode('motionPath', n=name + '_MOP')
+    mc.connectAttr(crvS + '.worldSpace', mop_1 + '.geometryPath')
+    mc.setAttr(mop_1 + '.uValue', u)
+    mc.setAttr(mop_1 + '.follow', 1)
+    mc.setAttr(mop_1 + '.fractionMode', 0)
+    mc.setAttr(mop_1 + '.worldUpType', 1)
+    mc.setAttr(mop_1 + '.frontAxis', 'xyz'.index(frontAxis))
+    mc.setAttr(mop_1 + '.upAxis', 'xyz'.index(upAxis))
+    mc.connectAttr(up_trs + '.worldMatrix[0]', mop_1 + '.worldUpMatrix')
+    for x in 'xyz':
+        attrLib.connectAttr(
+            '{}.allCoordinates.{}Coordinate'.format(mop_1, x),
+            '{}.t{}'.format(node, x))
+        attrLib.connectAttr(
+            '{}.r{}'.format(mop_1, x),
+            '{}.r{}'.format(node, x))
+
+    # drive upVec node using second motionPath
+    mop_2 = mc.createNode('motionPath', n=name + '_up_MOP')
+    mc.connectAttr(upCrvS + '.worldSpace', mop_2 + '.geometryPath')
+    mc.setAttr(mop_2 + '.fractionMode', 0)
+    for x in 'xyz':
+        attrLib.connectAttr(
+            '{}.allCoordinates.{}Coordinate'.format(mop_2, x),
+            '{}.t{}'.format(up_trs, x))
+
+    # connect two path nodes
+    mc.connectAttr(mop_1 + '.uValue', mop_2 + '.uValue')
+    # mc.connectAttr(mop_1 + '.fractionMode', mop_2 + '.fractionMode')
+
+    return mop_1, mop_2, up_trs
 
 
 def numCVs(curve_shape=None):

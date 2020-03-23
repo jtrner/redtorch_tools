@@ -239,6 +239,8 @@ class UI(QtWidgets.QDialog):
         # restore UI settings
         self.restoreUI()
 
+        self.select_btn.setFocus()
+
     @utils.undoChunk
     def setColor(self, color):
         sel = mc.ls(sl=True)

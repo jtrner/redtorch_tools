@@ -93,7 +93,7 @@ class Spine(template.Template):
     def build(self):
         super(Spine, self).build()
 
-        self.baseCtl, crvGrp, rsltGrp, ctls, jnts = rope.run(
+        self.baseCtl, crvGrp, rsltGrp, ctls, tweakCtls, jnts = rope.run(
             jnts=self.joints['spineJnts'], numCtls=5, guides=None, numJnts=None,
             description=self.prefix)
 
