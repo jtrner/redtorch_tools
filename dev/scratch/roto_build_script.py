@@ -18,6 +18,7 @@ roto_build_script.post_fix()
 
 """
 import os
+import json
 
 import maya.cmds as mc
 
@@ -36,22 +37,50 @@ reload(renderLib)
 reload(control)
 
 asset_name = 'Roto'
-version = 'v0002'
+version = 'v0004'
 user = 'ehsanm'
 userDir = 'Y:/MAW/assets/type/Character/{}/work/rig/Maya/{}'.format(asset_name, user)
 buildDir = '{}/{}_using_framework/{}/build'.format(userDir, asset_name, version)
 
 
 def post_fix():
+    importTail()
     import_model()
     assignShaders()
     fixSpine()
     setupVis()
-    hideExtraCtls()
+    # hideExtraCtls()
     createSpaces()
-    importCtlShapes()
     importSkinclusters()
+    fixCtlPositions()
+    matchCtlNamesToFrank()
+    importCtlShapes()
     iRigUtil.connectGimbalVis()
+
+
+def importTail():
+    tail_file = os.path.join(buildDir, 'data/tail.ma')
+    mc.file(tail_file, i=True)
+
+
+def fixCtlPositions():
+    mc.setAttr('C_eye_aim_handle_a_gp.translateZ', 30)
+
+
+def matchCtlNamesToFrank():
+    ctl_map_json = os.path.join(buildDir, 'data/frame_to_frank_control_map.json')
+    with open(ctl_map_json, 'r') as f:
+        ctl_map_data = json.load(f)
+
+    for oldName, newName in ctl_map_data.items():
+        # rename gimbal
+        children = mc.listRelatives(oldName) or []
+        for child in children:
+            if 'gimbal' in child:
+                gimbal_new_name = newName.replace('Ctrl', 'Gimbal_Ctrl')
+                mc.rename(child, gimbal_new_name)
+        # rename ctl
+        mc.rename(oldName, newName)
 
 
 def importSkinclusters():
@@ -171,8 +200,8 @@ def createSpaces():
                'dv': 3}
     space.orient(
         drivers=drivers,
-        drivens=['C_tail_root_handle_b_gp'],
-        control='C_tail_settings_Ctrl',
+        drivens=['C_tail_base_ZRO'],
+        control='C_tail_base_CTL',
         name='follow')
 
 

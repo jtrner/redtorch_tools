@@ -177,7 +177,7 @@ class UI(QtWidgets.QDialog):
 
         # ======================================================================
         # replace/mirror buttons frame
-        shape_gb, shape_frame = qtLib.createGroupBox(self.layout(), 'Shape & Mirror')
+        shape_gb, shape_frame = qtLib.createGroupBox(self.layout(), 'Shape / Mirror')
         shape_vb = qtLib.createVLayout(shape_frame)
 
         # 
@@ -207,10 +207,16 @@ class UI(QtWidgets.QDialog):
             shp_btn.clicked.connect(partial(self.replace, name))
 
         # mirror button frame
-        shape_lay = QtWidgets.QHBoxLayout()
+        shape_lay = QtWidgets.QVBoxLayout()
         shape_vb.layout().addLayout(shape_lay)
 
         # add shape / mirror buttons
+        qtLib.createSeparator(shape_lay)
+
+        copy_btn = QtWidgets.QPushButton('Copy')
+        shape_lay.layout().addWidget(copy_btn)
+        copy_btn.clicked.connect(self.copyCtl)
+
         mir_btn = QtWidgets.QPushButton('Mirror')
         shape_lay.layout().addWidget(mir_btn)
         mir_btn.clicked.connect(self.mirrorCtls)
@@ -285,6 +291,11 @@ class UI(QtWidgets.QDialog):
         crvLib.mirror(crvs=self.LAST)
         if sel:
             mc.select(sel)
+
+    @utils.undoChunk
+    def copyCtl(self):
+        sel = mc.ls(sl=True)
+        crvLib.copyShape(src=sel[0], dst=sel[1])
 
     def replace(self, shapeName):
         sel = mc.ls(sl=True)

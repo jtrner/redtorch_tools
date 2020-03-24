@@ -1,0 +1,42 @@
+{
+  "C_main_ground_Ctrl": "Ground_Ctrl",
+  "C_main_root_Ctrl": "Root_Ctrl",
+  "C_spine_ik_lower_torso_Ctrl": "C_Spine_Hips_Ctrl",
+  "C_spine_ik_upper_torso_Ctrl": "C_Spine_Chest_Ctrl",
+  "C_spine_ik_c_Ctrl": "C_Spine_Ik_01_Ctrl",
+  "C_neck_fk_b_Ctrl": "C_Neck_01_Ctrl",
+  "C_neck_fk_head_Ctrl": "C_Head_Ctrl",
+  "C_eye_aim_handle_Ctrl": "C_Eye_Aim_Ctrl",
+  "C_fk_tailBase_a_Ctrl": "C_Tail_Main_Ctrl",
+  "C_tail_a_Ctrl": "C_Tail_Fk_01_Ctrl",
+  "C_tail_b_Ctrl": "C_Tail_Fk_02_Ctrl",
+  "C_tail_c_Ctrl": "C_Tail_Fk_03_Ctrl",
+  "C_tail_d_Ctrl": "C_Tail_Fk_04_Ctrl",
+  "C_tail_e_Ctrl": "C_Tail_Fk_05_Ctrl",
+  "C_tail_a_a_Ctrl": "C_Tail_Tweak_01_Ctrl",
+  "C_tail_a_b_Ctrl": "C_Tail_Tweak_02_Ctrl",
+  "C_tail_a_c_Ctrl": "C_Tail_Tweak_03_Ctrl",
+  "C_tail_a_d_Ctrl": "C_Tail_Tweak_04_Ctrl",
+  "C_tail_a_e_Ctrl": "C_Tail_Tweak_05_Ctrl",
+  "C_tail_a_f_Ctrl": "C_Tail_Tweak_06_Ctrl",
+  "C_tail_a_g_Ctrl": "C_Tail_Tweak_07_Ctrl",
+  "C_tail_a_h_Ctrl": "C_Tail_Tweak_08_Ctrl",
+  "C_tail_a_i_Ctrl": "C_Tail_Tweak_09_Ctrl",
+
+  "L_leg_hip_base_Ctrl": "L_Clavicle_Ctrl",
+  "L_leg_ik_ankle_Ctrl": "L_Arm_Wrist_Ik_Ctrl",
+  "L_leg_ik_knee_Ctrl": "L_Arm_PoleVector_Ctrl",
+
+  "L_leg_fk_a_Ctrl": "L_Arm_Shoulder_Fk_Ctrl",
+  "L_leg_fk_b_Ctrl": "L_Arm_Elbow_Fk_Ctrl",
+  "L_leg_fk_c_Ctrl": "L_Arm_Wrist_Fk_Ctrl",
+  "L_leg_fk_d_Ctrl": "L_Arm_Palm_Fk_Ctrl",
+
+  "L_backLeg_ik_ankle_Ctrl": "L_Leg_Ankle_Ik_Ctrl",
+  "L_backLeg_ik_knee_Ctrl": "L_Leg_PoleVector_Ctrl",
+
+  "L_backLeg_fk_a_Ctrl": "L_Leg_Hip_Fk_Ctrl",
+  "L_backLeg_fk_b_Ctrl": "L_Leg_Knee_Fk_Ctrl",
+  "L_backLeg_fk_c_Ctrl": "L_Foot_Ankle_Fk_Ctrl",
+  "L_backLeg_fk_d_Ctrl": "L_Foot_Ball_Fk_Ctrl"
+}
