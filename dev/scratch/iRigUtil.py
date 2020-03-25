@@ -47,6 +47,7 @@ sys.path.insert(0, path)
 
 from rt_python.lib import trsLib
 from rt_python.lib import fileLib
+from rt_python.lib import attrLib
 
 reload(trsLib)
 
@@ -57,32 +58,132 @@ def toolbox():
     toolboxUI.launch()
 
 
-def exportSdk(data_dir):
-    node = 'Lwr_In_Blink_ControlDriver'
-    Lwr_In_Blink_ControlDriver = getSdkValues(node)
-    fileLib.saveJson(os.path.join(data_dir, 'Lwr_In_Blink_ControlDriver.json'),
-                     Lwr_In_Blink_ControlDriver)
+def importSdk(sdkDataPath):
+    """
+    for ctlDrvr in mc.ls('*_ControlDriver'):
+        sdkDataDir = 'Y:/MAW/assets/type/Character/Fungus/work/rig/Maya/ehsanm/Fungus_stuff'
+        sdkDataPath = os.path.join(sdkDataDir, ctlDrvr + '.json')
+        iRigUtil.importSdk(sdkDataPath)
+    """
+    sdkData = fileLib.loadJson(sdkDataPath)
+    setSdkValues(sdkData)
+    print('Sdk was successfully imported from "{}"'.format(sdkDataPath))
+
+
+def setSdkValues(sdkData):
+    for animCrv, data in sdkData.items():
+        skdInfo = sdkData[animCrv]
+
+        dstAttr = skdInfo['dstAttr']
+        floatChange = skdInfo['floatChange']
+        values = skdInfo['values']
+        outWeights = skdInfo['outWeights']
+        outAngles = skdInfo['outAngles']
+        inWeights = skdInfo['inWeights']
+        inAngles = skdInfo['inAngles']
+
+        # if animCurve exist, get its output
+        if mc.objExists(animCrv):
+            attrs = mc.listConnections('%s.output' % animCrv, plugs=True) or []
+            if not attrs:
+                continue
+            dstAttr = attrs[0]
+
+        # if animCurve doesn't exist in scene, create and connect it
+        else:
+            animCrv = mc.createNode('animCurveUA', name=animCrv)
+
+            # do we need unitConversion node?
+            conversionFactor = skdInfo['conversionFactor']
+            if conversionFactor:
+                uc = mc.createNode('unitConversion')
+                mc.connectAttr(animCrv + '.output', uc + '.input')
+                mc.setAttr(uc + '.conversionFactor', conversionFactor)
+                attrLib.connectAttr(uc + '.output', dstAttr)
+                dstAttr = uc + '.input'
+            else:
+                attrLib.connectAttr(animCrv + '.output', dstAttr)
+
+        # if aniCurve output node doesn't exist, skip this animCurve
+        dstNode, dstAttrName = dstAttr.split('.')
+        if not mc.attributeQuery(dstAttrName, n=dstNode, exists=True):
+            continue
+
+        # set times, values, tangents
+        for i in range(len(skdInfo['floatChange'])):
+            try:
+                mc.keyframe(
+                    dstNode, at=dstAttrName, e=True, index=(i, i), timeChange=floatChange[i],
+                    floatChange=floatChange[i], valueChange=values[i])
+            except:
+                mc.setKeyframe(dstNode, at=dstAttrName,
+                               time=(floatChange[i], floatChange[i]),
+                               float=(floatChange[i], floatChange[i]),
+                               value=values[i])
+            mc.keyTangent(dstAttr, e=True, index=(i, i), outWeight=outWeights[i],
+                          outAngle=outAngles[i], inWeight=inWeights[i], inAngle=inAngles[i])
+
+
+def exportSdk(node, sdkDataDir):
+    """
+    for ctlDrvr in mc.ls('*_ControlDriver'):
+        sdkDataDir = 'Y:/MAW/assets/type/Character/Fungus/work/rig/Maya/ehsanm/Fungus_stuff'
+        iRigUtil.exportSdk(ctlDrvr, sdkDataDir)
+    """
+    sdkData = getSdkValues(node)
+    fileLib.saveJson(os.path.join(sdkDataDir, node + '.json'), sdkData)
+    print('exportSdk for "{}" was successful!'.format(node))
 
 
 def getSdkValues(node):
-    animCrvs = mc.listConnections(node, s=False, d=True, type='animCurveUA')
+    animCrvs = mc.listConnections(node, s=False, d=True, type='animCurveUA') or []
 
     sdkData = {}  # dictionary containing one object's sdk
 
     for animCrv in animCrvs:
-        attr = mc.listConnections('%s.output' % animCrv, plugs=True)[0]
-        times = mc.keyframe(attr, q=True, timeChange=True)
-        values = mc.keyframe(attr, q=True, valueChange=True)
-        outWeights = mc.keyTangent(attr, q=True, outWeight=True)
-        outAngles = mc.keyTangent(attr, q=True, outAngle=True)
-        inWeights = mc.keyTangent(attr, q=True, inWeight=True)
-        inAngles = mc.keyTangent(attr, q=True, inAngle=True)
-        sdkData[animCrv] = {'times': times,
-                                   'values': values,
-                                   'outWeights': outWeights,
-                                   'outAngles': outAngles,
-                                   'inWeights': inWeights,
-                                   'inAngles': inAngles}
+        # srcAttr
+        srcAttrs = mc.listConnections(animCrv + '.input', plugs=True) or []
+        if srcAttrs:
+            srcAttr = srcAttrs[0]
+
+        else:  # animCurve doesn't have an input, skip it
+            continue
+
+        # dstAttr
+        dstAttrs = mc.listConnections(animCrv + '.output', plugs=True) or []
+        conversionFactor = None
+        if dstAttrs:
+            dstAttr = dstAttrs[0]
+            dstNode, dstAttrName = dstAttr.split('.')
+
+            # if output is unitConversion, use unitConversion's output
+            if mc.nodeType(dstNode) == 'unitConversion':
+                conversionFactor = mc.getAttr(dstNode + '.conversionFactor')
+                dstAttrs = mc.listConnections(dstNode + '.output', plugs=True) or []
+                if dstAttrs:
+                    dstAttr = dstAttrs[0]
+
+        else:  # animCurve doesn't have an output, skip it
+            continue
+
+        # get key values
+        floatChange = mc.keyframe(dstAttr, q=True, floatChange=True)
+        values = mc.keyframe(dstAttr, q=True, valueChange=True)
+        outWeights = mc.keyTangent(dstAttr, q=True, outWeight=True)
+        outAngles = mc.keyTangent(dstAttr, q=True, outAngle=True)
+        inWeights = mc.keyTangent(dstAttr, q=True, inWeight=True)
+        inAngles = mc.keyTangent(dstAttr, q=True, inAngle=True)
+
+        #
+        sdkData[animCrv] = {'floatChange': floatChange,
+                            'values': values,
+                            'outWeights': outWeights,
+                            'outAngles': outAngles,
+                            'inWeights': inWeights,
+                            'inAngles': inAngles,
+                            'srcAttr': srcAttr,
+                            'dstAttr': dstAttr,
+                            'conversionFactor': conversionFactor}
 
     return sdkData
 
@@ -263,17 +364,17 @@ def getTransformDifference(trigCon):
     # mmx = mc.createNode('multMatrix')
     # imx = mc.createNode('inverseMatrix')
     # dmx = mc.createNode('decomposeMatrix')
-    # 
+    #
     # mc.connectAttr(fromNode + '.worldMatrix[0]', imx + '.inputMatrix')
     # mc.connectAttr(toNode + '.worldMatrix[0]', mmx + '.matrixIn[0]')
     # mc.connectAttr(imx + '.outputMatrix', mmx + '.matrixIn[1]')
     # mc.connectAttr(mmx + '.matrixSum', dmx + '.inputMatrix')
-    # 
+    #
     # attrs = ['otx', 'oty', 'otz', 'orx', 'ory', 'orz', 'osx', 'osy', 'osz']
     # deltaTransformValues = [round(mc.getAttr(dmx + '.' + x), 3) for x in attrs]
-    # 
+    #
     # mc.delete(mmx, imx, dmx)
-    # 
+    #
     # return deltaTransformValues
     attrVals = []
     driveLoc = mc.spaceLocator(n='driveX')
