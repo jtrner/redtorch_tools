@@ -60,7 +60,10 @@ def removeUnknownPlugins():
     if not plugins:
         return
     for p in plugins:
-        mc.unknownPlugin(p, r=True)
+        try:
+            mc.unknownPlugin(p, r=True)
+        except:
+            pass
     print 'Plugins removed:', plugins
 
 

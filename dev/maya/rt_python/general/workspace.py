@@ -28,6 +28,7 @@ from ..lib import optimize
 from ..lib import attrLib
 from ..lib import fileLib
 reload(fileLib)
+reload(optimize)
 
 JOB_DIR = os.path.join('D:', os.path.sep, 'all_works', '01_projects')
 PROJECT_ALL_DIRS = ('asset', 'in', 'out')
