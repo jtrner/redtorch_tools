@@ -61,7 +61,14 @@ def post_fix():
 def importTail():
     tail_file = os.path.join(buildDir, 'data/tail.ma')
     mc.file(tail_file, i=True)
-
+    mc.createNode('transform', n='C_tail', p='character_control_gp')
+    mc.parent('C_tail_origin_GRP',
+              'C_tail_control_GRP',
+              'C_tail')
+    mc.scaleConstraint('C_spine_e_jnt', 'C_tail_control_GRP')
+    mc.setAttr('C_tail_origin_GRP.inheritsTransform', 0)
+    mc.parent('C_tail_001_JNT', 'C_fk_tailBase_bind_b_jnt')
+    mc.delete('C_tail_module_GRP')
 
 def fixCtlPositions():
     mc.setAttr('C_eye_aim_handle_a_gp.translateZ', 30)
@@ -105,7 +112,7 @@ def createSpaces():
         drivers=drivers,
         drivens=['L_backLeg_ik_knee_b_gp'],
         control='L_backLeg_ik_knee_Ctrl',
-        name='follow')
+        name='L_backLeg_ik_knee_follow')
 
     # right back leg pole vector
     drivers = {'drivers': ['C_spine_a_jnt',
@@ -117,7 +124,7 @@ def createSpaces():
         drivers=drivers,
         drivens=['R_backLeg_ik_knee_b_gp'],
         control='R_backLeg_ik_knee_Ctrl',
-        name='follow')
+        name='R_backLeg_ik_knee_follow')
 
     # left front leg pole vector
     drivers = {'drivers': ['C_spine_e_jnt',
@@ -129,7 +136,7 @@ def createSpaces():
         drivers=drivers,
         drivens=['L_leg_ik_knee_b_gp'],
         control='L_leg_ik_knee_Ctrl',
-        name='follow')
+        name='L_leg_ik_knee_follow')
 
     # right front leg pole vector
     drivers = {'drivers': ['C_spine_e_jnt',
@@ -141,7 +148,7 @@ def createSpaces():
         drivers=drivers,
         drivens=['R_leg_ik_knee_b_gp'],
         control='R_leg_ik_knee_Ctrl',
-        name='follow')
+        name='R_leg_ik_knee_follow')
 
     # left back leg
     drivers = {'drivers': ['C_spine_a_jnt',
@@ -153,7 +160,7 @@ def createSpaces():
         drivers=drivers,
         drivens=['L_backLeg_ik_ankle_b_gp'],
         control='L_backLeg_ik_ankle_Ctrl',
-        name='follow')
+        name='L_backLeg_ik_ankle_follow')
 
     # right back leg
     drivers = {'drivers': ['C_spine_a_jnt',
@@ -165,7 +172,7 @@ def createSpaces():
         drivers=drivers,
         drivens=['R_backLeg_ik_ankle_b_gp'],
         control='R_backLeg_ik_ankle_Ctrl',
-        name='follow')
+        name='R_backLeg_ik_ankle_follow')
 
     # left front leg
     drivers = {'drivers': ['C_spine_e_jnt',
@@ -177,7 +184,7 @@ def createSpaces():
         drivers=drivers,
         drivens=['L_leg_ik_ankle_b_gp'],
         control='L_leg_ik_ankle_Ctrl',
-        name='follow')
+        name='L_leg_ik_ankle_follow')
 
     # right front leg
     drivers = {'drivers': ['C_spine_e_jnt',
@@ -189,10 +196,11 @@ def createSpaces():
         drivers=drivers,
         drivens=['R_leg_ik_ankle_b_gp'],
         control='R_leg_ik_ankle_Ctrl',
-        name='follow')
+        name='R_leg_ik_ankle_follow')
 
     # tail orient only
-    drivers = {'drivers': ['C_fk_tailBase_a_jnt',
+    mc.pointConstraint('C_fk_tailBase_b_jnt', 'C_tail_base_ZRO', mo=True)
+    drivers = {'drivers': ['C_fk_tailBase_b_jnt',
                            'C_spine_a_jnt',
                            'COG_gimbal_Ctrl',
                            'C_main_ground_gimbal_Ctrl'],
@@ -202,7 +210,7 @@ def createSpaces():
         drivers=drivers,
         drivens=['C_tail_base_ZRO'],
         control='C_tail_base_CTL',
-        name='follow')
+        name='C_tail_base_follow')
 
 
 def hideExtraCtls():
@@ -234,6 +242,11 @@ def setupVis():
     a = attrLib.addEnum(mainCtl, 'rigSelectable', en=['off', 'on'])
     connect.reverse(a, rigGrp + '.overrideEnabled')
     mc.setAttr(rigGrp + '.overrideDisplayType', 2)
+
+    #
+    nodes = mc.listRelatives('character_deform_gp', ad=True, type='transform')
+    for node in nodes:
+        mc.setAttr(node + '.overrideEnabled', 0)
 
 
 def fixSpine():
