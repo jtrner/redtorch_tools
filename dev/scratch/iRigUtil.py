@@ -39,7 +39,6 @@ import os
 
 import maya.cmds as mc
 
-
 # import redtorch_tools
 path = os.path.join("D:/all_works/redtorch_tools/dev/")
 if path in sys.path:
@@ -47,6 +46,8 @@ if path in sys.path:
 sys.path.insert(0, path)
 
 from rt_python.lib import trsLib
+from rt_python.lib import fileLib
+
 reload(trsLib)
 
 
@@ -54,6 +55,36 @@ def toolbox():
     from redtorch_maya.python.toolbox import toolboxUI
     reload(toolboxUI)
     toolboxUI.launch()
+
+
+def exportSdk(data_dir):
+    node = 'Lwr_In_Blink_ControlDriver'
+    Lwr_In_Blink_ControlDriver = getSdkValues(node)
+    fileLib.saveJson(os.path.join(data_dir, 'Lwr_In_Blink_ControlDriver.json'),
+                     Lwr_In_Blink_ControlDriver)
+
+
+def getSdkValues(node):
+    animCrvs = mc.listConnections(node, s=False, d=True, type='animCurveUA')
+
+    sdkData = {}  # dictionary containing one object's sdk
+
+    for animCrv in animCrvs:
+        attr = mc.listConnections('%s.output' % animCrv, plugs=True)[0]
+        times = mc.keyframe(attr, q=True, timeChange=True)
+        values = mc.keyframe(attr, q=True, valueChange=True)
+        outWeights = mc.keyTangent(attr, q=True, outWeight=True)
+        outAngles = mc.keyTangent(attr, q=True, outAngle=True)
+        inWeights = mc.keyTangent(attr, q=True, inWeight=True)
+        inAngles = mc.keyTangent(attr, q=True, inAngle=True)
+        sdkData[animCrv] = {'times': times,
+                                   'values': values,
+                                   'outWeights': outWeights,
+                                   'outAngles': outAngles,
+                                   'inWeights': inWeights,
+                                   'inAngles': inAngles}
+
+    return sdkData
 
 
 def mimic_gimbal_shapes():
@@ -81,7 +112,7 @@ def mimic_shape(target, source, scale_by=0.9):
     from rt_python.lib import crvLib
 
     crvLib.copyShape(src=source, dst=target)
-    target_cvs = mc.ls(target+'.cv[*]', flatten=True)
+    target_cvs = mc.ls(target + '.cv[*]', flatten=True)
     mc.scale(scale_by, scale_by, scale_by, target_cvs, componentSpace=True)
 
 
@@ -171,7 +202,7 @@ def getNonZeroCtls():
 def createLocForSelected():
     deleteTempLocs()
     for ctl in mc.ls(sl=True):
-        loc = mc.spaceLocator(n=ctl+'_temp_LOC')[0]
+        loc = mc.spaceLocator(n=ctl + '_temp_LOC')[0]
         trsLib.match(loc, ctl)
 
 
@@ -473,10 +504,10 @@ def bake():
                                     oldVal = round(my_key[indexReq], 3)
                                     newVal = oldVal + this_value
                                     mc.keyframe(animCurve, option='over', index=(indexReq, indexReq), absolute=1,
-                                                  valueChange=newVal)
+                                                valueChange=newVal)
                                     if match == False:
                                         mc.keyTangent(animCurve, index=(indexReq, indexReq),
-                                                        inTangentType='linear', outTangentType='linear')
+                                                      inTangentType='linear', outTangentType='linear')
                                 if mc.objExists(animCurve) == False:
                                     freshAnimCurve = mc.createNode('animCurveUA', n=animCurve)
                                     mc.connectAttr(faceDriver + '.' + this_driver, freshAnimCurve + '.input')
@@ -498,9 +529,9 @@ def bake():
                                     mc.setKeyframe(new_inputBlend, f=0, v=0)
                                     mc.setKeyframe(new_inputBlend, f=myIndex, v=this_value)
                                     mc.keyTangent(freshAnimCurve, index=(0, 0), inTangentType='linear',
-                                                    outTangentType='linear')
+                                                  outTangentType='linear')
                                     mc.keyTangent(freshAnimCurve, index=(1, 1), inTangentType='linear',
-                                                    outTangentType='linear')
+                                                  outTangentType='linear')
                             if connector == None:
                                 channel = this_attr.replace('.', '')
                                 if 'trans' in this_attr:
@@ -509,8 +540,8 @@ def bake():
                                     channel = channel.replace('rotate', 'rot')
                                 cur = 3.0 + spec_val
                                 freshAnimCurve = mc.createNode('animCurveUA',
-                                                                 n=this_driver + '_to_' + this_control.replace(
-                                                                     'Ctrl', channel) + '_Anm')
+                                                               n=this_driver + '_to_' + this_control.replace(
+                                                                   'Ctrl', channel) + '_Anm')
                                 mc.connectAttr(faceDriver + '.' + this_driver, freshAnimCurve + '.input')
                                 myIndex = round(mc.getAttr(faceDriver + '.' + this_driver), 3)
                                 if myIndex == 0.0:
@@ -522,24 +553,24 @@ def bake():
                                         pass
                                 mc.setAttr(driven_null, l=0, k=1)
                                 freshBlend = mc.createNode('blendWeighted',
-                                                             n=this_control.replace('Ctrl', channel) + '_Blend')
+                                                           n=this_control.replace('Ctrl', channel) + '_Blend')
                                 mc.setAttr(freshBlend + '.current', cur)
                                 init = '0'
                                 mc.connectAttr(freshAnimCurve + '.output', freshBlend + '.input[' + init + ']')
                                 if 'scale' in this_attr:
                                     mc.disconnectAttr(freshAnimCurve + '.output',
-                                                        freshBlend + '.input[' + init + ']')
+                                                      freshBlend + '.input[' + init + ']')
                                     mc.setAttr(freshBlend + '.input[' + init + ']', 1)
                                     init = '1'
                                     mc.connectAttr(freshAnimCurve + '.output',
-                                                     freshBlend + '.input[' + init + ']')
+                                                   freshBlend + '.input[' + init + ']')
                                 mc.connectAttr(freshBlend + '.output', driven_null)
                                 mc.setKeyframe(freshBlend + '.input[' + init + ']', f=0, v=0)
                                 mc.setKeyframe(freshBlend + '.input[' + init + ']', f=myIndex, v=this_value)
                                 mc.keyTangent(freshAnimCurve, index=(0, 0), inTangentType='linear',
-                                                outTangentType='linear')
+                                              outTangentType='linear')
                                 mc.keyTangent(freshAnimCurve, index=(1, 1), inTangentType='linear',
-                                                outTangentType='linear')
+                                              outTangentType='linear')
                                 mc.setAttr(driven_null, l=1)
                         if not mc.getAttr(this_control + this_attr, settable=True):  # AUTO-1453
                             print "OH NO!", this_control + this_attr, "is not settable. Cannot set it to", spec_val

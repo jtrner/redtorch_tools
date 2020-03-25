@@ -29,6 +29,7 @@ from rt_python.lib import crvLib
 from rt_python.lib import space
 from rt_python.lib import control
 from rt_python.lib import skincluster
+from rt_python.rig.command import pv
 
 import iRigUtil
 
@@ -37,7 +38,7 @@ reload(renderLib)
 reload(control)
 
 asset_name = 'Roto'
-version = 'v0004'
+version = 'v0005'
 user = 'ehsanm'
 userDir = 'Y:/MAW/assets/type/Character/{}/work/rig/Maya/{}'.format(asset_name, user)
 buildDir = '{}/{}_using_framework/{}/build'.format(userDir, asset_name, version)
@@ -48,6 +49,7 @@ def post_fix():
     import_model()
     assignShaders()
     fixSpine()
+    fixPoleVectorPositions()
     setupVis()
     # hideExtraCtls()
     createSpaces()
@@ -56,6 +58,16 @@ def post_fix():
     matchCtlNamesToFrank()
     importCtlShapes()
     iRigUtil.connectGimbalVis()
+
+
+def fixPoleVectorPositions():
+    for limb in 'leg', 'backLeg':
+        for side in 'LR':
+            jnts = ['{}_{}_b_jnt'.format(side, limb),
+                    '{}_{}_c_jnt'.format(side, limb),
+                    '{}_{}_d_jnt'.format(side, limb)]
+            pvPos = pv.Pv(jnts=jnts, distance=1.0)
+            mc.xform('{}_{}_ik_knee_a_gp'.format(side, limb), ws=True, t=pvPos)
 
 
 def importTail():
@@ -212,6 +224,9 @@ def createSpaces():
         control='C_tail_base_CTL',
         name='C_tail_base_follow')
 
+    #
+    mc.parentConstraint('COG_gimbal_Ctrl', 'character_settings_a_gp', mo=True)
+
 
 def hideExtraCtls():
     ctls = ['C_tail_root_handle_Ctrl']
@@ -221,9 +236,13 @@ def hideExtraCtls():
 
 
 def setupVis():
-    mainCtl = 'C_main_root_Ctrl'
+    mainCtl = 'character_settings_Ctrl'
     geoGrp = 'Geo_Grp'
     rigGrp = 'character_deform_gp'
+
+    #
+    mc.deleteAttr(mainCtl, attribute='utility_geometry_vis')
+    mc.deleteAttr(mainCtl, attribute='geometry_vis')
 
     # geo visibility swtich
     a = attrLib.addEnum(mainCtl, 'geoVis', en=['off', 'on'], dv=1)
@@ -275,10 +294,10 @@ def import_model():
     #
     mc.hide(mc.ls('character_utilities_gp', 'Model_B_Grp'))
 
-    # put fur in a template
-    for geo in mc.listRelatives('Model_A_Grp'):
-        mc.setAttr(geo + '.overrideEnabled', True)
-        mc.setAttr(geo + '.overrideDisplayType', 2)
+    # # put fur in a template
+    # for geo in mc.listRelatives('Model_A_Grp'):
+    #     mc.setAttr(geo + '.overrideEnabled', True)
+    #     mc.setAttr(geo + '.overrideDisplayType', 2)
 
 
 def assignShaders():
@@ -290,12 +309,15 @@ def assignShaders():
                            specularColor=[0.2, 0.2, 0.2],
                            name='body_proxy_mtl')
 
-    renderLib.assignShader('fur_groom_volume_Geo',
+    #
+    furOpacityAt = attrLib.addFloat('character_settings_Ctrl', 'furOpacity', min=0, max=1, dv=0.8)
+    furMtl = renderLib.assignShader('fur_groom_volume_Geo',
                            color=[0.8, 0.45, 0.8],
                            transparency=[0.25, 0.25, 0.25],
                            diffuse=[1],
                            specularColor=[0, 0, 0],
                            name='fur_proxy_mtl')
+    [mc.connectAttr(furOpacityAt, furMtl + '.transparency' + x) for x in 'RGB']
 
     renderLib.assignShader(['horn_L_Geo', 'horn_R_Geo'],
                            color=[0.88, 0.46, 0.6],
@@ -305,6 +327,7 @@ def assignShaders():
                            color=[0.8, 0.8, 0.8],
                            name='teeth_proxy_mtl')
 
+    #
     eye_mtl = renderLib.assignShader('eye_Geo',
                                      color=[0.8, 0.8, 0.8],
                                      diffuse=[1],

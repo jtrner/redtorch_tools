@@ -72,3 +72,6 @@ Bob notes from Ian
 - To set up the Auto-Bend, select all four *_IKFKSwitch_Ctrl for the arms and legs. Go to the MAW Build Tools, select Setup Auto-Bend under Post-Build section.
 - Proxy Textures, looks like you set the general colours so that is all that is needed for the proxy textures.
 - Pectorals may be needed...but not a must at this stage
+
+========================================================================
+added horns - added fur opacity attribute on character_settings_Ctrl
