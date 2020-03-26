@@ -49,7 +49,8 @@ import os
 import maya.cmds as mc
 
 # import redtorch_tools
-redtorch_tools_dir = 'D:/all_works/redtorch_tools/dev'
+# redtorch_tools_dir = 'D:/all_works/redtorch_tools/dev'
+redtorch_tools_dir = 'G:/Rigging/Users/Ehsan/code_share/redtorch_tools/dev'
 paths = [redtorch_tools_dir, os.path.join(redtorch_tools_dir, 'maya')]
 for path in paths:
     if path in sys.path:
@@ -86,6 +87,7 @@ def setSdkValues(sdkData):
         skdInfo = sdkData[animCrv]
 
         dstAttr = skdInfo['dstAttr']
+        srcAttr = skdInfo['srcAttr']
         floatChange = skdInfo['floatChange']
         values = skdInfo['values']
         outWeights = skdInfo['outWeights']
@@ -115,6 +117,9 @@ def setSdkValues(sdkData):
             else:
                 attrLib.connectAttr(animCrv + '.output', dstAttr)
 
+        # makes sure animCurve.input has incoming connection
+        attrLib.connectAttr(srcAttr, animCrv + '.input')
+
         # if aniCurve output node doesn't exist, skip this animCurve
         dstNode, dstAttrName = dstAttr.split('.')
         if not mc.attributeQuery(dstAttrName, n=dstNode, exists=True):
@@ -127,10 +132,10 @@ def setSdkValues(sdkData):
                     dstNode, at=dstAttrName, e=True, index=(i, i), timeChange=floatChange[i],
                     floatChange=floatChange[i], valueChange=values[i])
             except:
-                mc.setKeyframe(dstNode, at=dstAttrName,
-                               time=(floatChange[i], floatChange[i]),
-                               float=(floatChange[i], floatChange[i]),
-                               value=values[i])
+                mc.setKeyframe(
+                    dstNode, at=dstAttrName, time=(floatChange[i], floatChange[i]),
+                    float=(floatChange[i], floatChange[i]), value=values[i])
+
             mc.keyTangent(dstAttr, e=True, index=(i, i), outWeight=outWeights[i],
                           outAngle=outAngles[i], inWeight=inWeights[i], inAngle=inAngles[i])
 
