@@ -70,6 +70,8 @@ def run(jnts=None, numCtls=None, guides=None, numJnts=None, addTweaks=False,
     crv = crvLib.fromPoses(ctlPoses, degree=3, fit=False, name='{}_CRV'.format(name))[0]
     upCrv = mc.duplicate(crv, name='{}_up_CRV'.format(name))[0]
     size = mc.arclen(crv) / len(ctlPoses) / 2
+
+    # todo: rebuild curves to 0-1 for path animation
     # upCrv = mc.offsetCurve(crv, nr=upCrvNormal, d=size, ch=False)[0]
     # upCrv = mc.rename(upCrv, '{}_up_CRV'.format(name))
 

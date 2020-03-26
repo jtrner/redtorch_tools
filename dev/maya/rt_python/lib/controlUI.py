@@ -102,7 +102,7 @@ class UI(QtWidgets.QDialog):
         # create window
         super(UI, self).__init__(parent=parent)
         self.setWindowTitle(title)
-        self.setMinimumHeight(520)
+        self.setMinimumHeight(570)
         self.setMinimumWidth(300)
 
         # main layout
@@ -177,7 +177,7 @@ class UI(QtWidgets.QDialog):
 
         # ======================================================================
         # replace/mirror buttons frame
-        shape_gb, shape_frame = qtLib.createGroupBox(self.layout(), 'Shape / Mirror')
+        shape_gb, shape_frame = qtLib.createGroupBox(self.layout(), 'Shapes')
         shape_vb = qtLib.createVLayout(shape_frame)
 
         # 
@@ -213,11 +213,11 @@ class UI(QtWidgets.QDialog):
         # add shape / mirror buttons
         qtLib.createSeparator(shape_lay)
 
-        copy_btn = QtWidgets.QPushButton('Copy')
+        copy_btn = QtWidgets.QPushButton('Copy (select source, then target)')
         shape_lay.layout().addWidget(copy_btn)
         copy_btn.clicked.connect(self.copyCtl)
 
-        mir_btn = QtWidgets.QPushButton('Mirror')
+        mir_btn = QtWidgets.QPushButton('Mirror (uses latest selection if nothing selected)')
         shape_lay.layout().addWidget(mir_btn)
         mir_btn.clicked.connect(self.mirrorCtls)
 
@@ -256,20 +256,30 @@ class UI(QtWidgets.QDialog):
         display.setColor(nodes=self.LAST, color=color)
 
     def getPathFromRigUI(self):
-        jobDir = os.environ['JOBS_DIR']
-        job = os.environ['JOB']
-        seq = os.environ['SEQ']
-        shot = os.environ['SHOT']
-        user = os.environ['USER']
-        version = os.environ['RIG_SCRIPT_VERSION']
+        jobDir = os.getenv('JOBS_DIR')
+        job = os.getenv('JOB')
+        seq = os.getenv('SEQ')
+        shot = os.getenv('SHOT')
+        user = os.getenv('USER')
+        version = os.getenv('RIG_SCRIPT_VERSION')
+
+        if not all([jobDir, job, seq, shot, user, version]):
+            self.getPathToDesktop()
+            return
 
         controlPath = os.path.join(
             jobDir, job, seq, shot, 'task', 'rig', 'users',
             user, version, 'data', 'ctls.ma')
+
         self.controlPath_le.setText(controlPath)
 
     def getPathToDesktop(self):
-        controlPath = os.path.join(os.environ['HOMEPATH'], 'Desktop', 'ctls.ma')
+        home = os.getenv('HOMEPATH', os.getenv('Home'))
+        controlDir = os.path.join(home, 'Desktop')
+        if sys.platform == 'win32' and not os.path.lexists(controlDir):
+            controlDir = os.path.join(home, 'OneDrive', 'Desktop')
+
+        controlPath = os.path.join(controlDir, 'ctls.ma')
         self.controlPath_le.setText(controlPath)
 
     def exportCtls(self):

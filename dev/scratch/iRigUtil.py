@@ -9,6 +9,15 @@ import iRigUtil
 reload(iRigUtil)
 
 
+for ctlDrvr in mc.ls('*_ControlDriver'):
+    sdkDataDir = 'Y:/MAW/assets/type/Character/Fungus/work/rig/Maya/ehsanm/Fungus_stuff'
+    sdkDataPath = os.path.join(sdkDataDir, ctlDrvr + '.json')
+    iRigUtil.importSdk(sdkDataPath)
+
+for ctlDrvr in mc.ls('*_ControlDriver'):
+    sdkDataDir = 'Y:/MAW/assets/type/Character/Fungus/work/rig/Maya/ehsanm/Fungus_stuff'
+    iRigUtil.exportSdk(ctlDrvr, sdkDataDir)
+
 iRigUtil.toggleGimbals()
 
 iRigUtil.mimic_gimbal_shapes()
@@ -40,21 +49,23 @@ import os
 import maya.cmds as mc
 
 # import redtorch_tools
-path = os.path.join("D:/all_works/redtorch_tools/dev/")
-if path in sys.path:
-    sys.path.remove(path)
-sys.path.insert(0, path)
+redtorch_tools_dir = 'D:/all_works/redtorch_tools/dev'
+paths = [redtorch_tools_dir, os.path.join(redtorch_tools_dir, 'maya')]
+for path in paths:
+    if path in sys.path:
+        sys.path.remove(path)
+    sys.path.insert(0, path)
 
 from rt_python.lib import trsLib
 from rt_python.lib import fileLib
 from rt_python.lib import attrLib
+from rt_python.toolbox import toolboxUI
 
+reload(toolboxUI)
 reload(trsLib)
 
 
 def toolbox():
-    from redtorch_maya.python.toolbox import toolboxUI
-    reload(toolboxUI)
     toolboxUI.launch()
 
 
@@ -186,6 +197,15 @@ def getSdkValues(node):
                             'conversionFactor': conversionFactor}
 
     return sdkData
+
+
+def mirrorFaceCtlPos():
+    ctls = mc.ls('Face_L_*_Tweak_Ctrl')
+    for ctl in ctls:
+        offset = ctl + '_Offset_Grp'
+        otherside = offset.replace('Face_L', 'Face_R')
+        pos = mc.xform(offset, q=True, ws=True, t=True)
+        mc.xform(otherside, ws=True, t=(-pos[0], pos[1], pos[2]))
 
 
 def mimic_gimbal_shapes():
