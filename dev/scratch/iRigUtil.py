@@ -49,8 +49,8 @@ import os
 import maya.cmds as mc
 
 # import redtorch_tools
-redtorch_tools_dir = 'D:/all_works/redtorch_tools/dev'
-# redtorch_tools_dir = 'G:/Rigging/Users/Ehsan/code_share/redtorch_tools/dev'
+# redtorch_tools_dir = 'D:/all_works/redtorch_tools/dev'
+redtorch_tools_dir = 'G:/Rigging/Users/Ehsan/code_share/redtorch_tools/dev'
 paths = [redtorch_tools_dir, os.path.join(redtorch_tools_dir, 'maya')]
 for path in paths:
     if path in sys.path:
@@ -64,6 +64,7 @@ from rt_python.toolbox import toolboxUI
 
 reload(toolboxUI)
 reload(trsLib)
+reload(attrLib)
 
 
 def toolbox():
@@ -94,42 +95,38 @@ def setSdkValues(sdkData):
         outAngles = skdInfo['outAngles']
         inWeights = skdInfo['inWeights']
         inAngles = skdInfo['inAngles']
+        animCrvType = skdInfo['animCrvType']
 
         # create animCurve
         if mc.objExists(animCrv):
             mc.delete(animCrv)
-        mc.createNode('animCurveUA', name=animCrv)
-
-        # find blendNode and final driven node
-        blendNode, blendAttrName = dstAttr.replace('.')  # 'Face_L_Nose_Nasolabial_01_Tweak_transY_Blend', 'input[13]'
-        tokens = blendNode.split('_')  # ['Face', 'L', 'Nose', 'Nasolabial', '01', 'Tweak', 'transY', 'Blend']
-        drivenNode = '_'.join(tokens[:-2]) + '_Ctrl_Drv_Grp'  # Face_L_Mouth_Lip_Corner_Tweak_Ctrl_Drv_Grp
-        drivenAttrAlias = tokens[:-2]  # 'transY'
-        drivenAttrName = drivenAttrAlias.replace('trans', 'translate').replace('rot', 'rotate')
-        drivenPlug = drivenNode + '.' + drivenAttrName
-        if not mc.objExists(blendNode):
-            mc.createNode('blendWeight', n=blendNode)
-        attrLib.connectAttr(animCrv + '.output', dstAttr)
-        attrLib.connectAttr(blendNode + '.output', drivenPlug)
+        mc.createNode(animCrvType, name=animCrv)
 
         # makes sure animCurve.input has incoming connection
         attrLib.connectAttr(srcAttr, animCrv + '.input')
 
-        # if aniCurve output node doesn't exist, skip this animCurve
-        dstNode, dstAttrName = dstAttr.split('.')
-        if not mc.attributeQuery(dstAttrName, n=dstNode, exists=True):
-            continue
+        # find blendNode and final driven node
+        blendNode, blendAttrName = dstAttr.split('.')  # 'Face_L_Nose_Nasolabial_01_Tweak_transY_Blend', 'input[13]'
+        tokens = blendNode.split('_')  # ['Face', 'L', 'Nose', 'Nasolabial', '01', 'Tweak', 'transY', 'Blend']
+        drivenNode = '_'.join(tokens[:-2]) + '_Ctrl_Drv_Grp'  # Face_L_Mouth_Lip_Corner_Tweak_Ctrl_Drv_Grp
+        drivenAttrAlias = tokens[-2]  # 'transY'
+        drivenAttrName = drivenAttrAlias.replace('trans', 'translate').replace('rot', 'rotate')
+        drivenPlug = drivenNode + '.' + drivenAttrName
+        if not mc.objExists(blendNode):
+            mc.createNode('blendWeighted', n=blendNode)
+            mc.setAttr(blendNode + '.input[0]', 0)  # just to force update the node
+            # scale's default value is 1
+            if drivenAttrName in ['scaleX', 'scaleY', 'scaleZ', 'sx', 'sy', 'sz']:
+                mc.setAttr(blendNode + '.input[0]', 1)
+        attrLib.connectAttr(animCrv + '.output', dstAttr)
+        attrLib.connectAttr(blendNode + '.output', drivenPlug)
 
         # set times, values, tangents
+        dstNode, dstAttrName = dstAttr.split('.')
         for i in range(len(skdInfo['floatChange'])):
-            try:
-                mc.keyframe(
-                    dstNode, at=dstAttrName, e=True, index=(i, i), timeChange=floatChange[i],
-                    floatChange=floatChange[i], valueChange=values[i])
-            except:
-                mc.setKeyframe(
-                    dstNode, at=dstAttrName, time=(floatChange[i], floatChange[i]),
-                    float=(floatChange[i], floatChange[i]), value=values[i])
+            mc.setKeyframe(
+                dstNode, at=dstAttrName, time=(floatChange[i], floatChange[i]),
+                float=(floatChange[i], floatChange[i]), value=values[i])
 
             mc.keyTangent(dstAttr, e=True, index=(i, i), outWeight=outWeights[i],
                           outAngle=outAngles[i], inWeight=inWeights[i], inAngle=inAngles[i])
@@ -184,6 +181,7 @@ def getSdkValues(node):
         outAngles = mc.keyTangent(dstAttr, q=True, outAngle=True)
         inWeights = mc.keyTangent(dstAttr, q=True, inWeight=True)
         inAngles = mc.keyTangent(dstAttr, q=True, inAngle=True)
+        animCrvType = mc.nodeType(animCrv)
 
         #
         sdkData[animCrv] = {'floatChange': floatChange,
@@ -194,6 +192,7 @@ def getSdkValues(node):
                             'inAngles': inAngles,
                             'srcAttr': srcAttr,
                             'dstAttr': dstAttr,
+                            'animCrvType': animCrvType,
                             'conversionFactor': conversionFactor}
 
     return sdkData

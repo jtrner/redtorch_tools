@@ -134,7 +134,8 @@ def connectAttr(attr1, attr2):
         mc.setAttr(attr2, lock=False)
 
     # is attr1 already connected to attr2?
-    curConnection = mc.listConnections(attr2, s=True, d=False, plugs=True)
+    curConnection = mc.listConnections(attr2, s=True, d=False,
+                                       plugs=True, skipConversionNodes=True)
     if curConnection:
         if curConnection[0] == attr1:
             return
