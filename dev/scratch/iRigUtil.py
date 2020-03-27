@@ -95,27 +95,25 @@ def setSdkValues(sdkData):
         inWeights = skdInfo['inWeights']
         inAngles = skdInfo['inAngles']
 
-        # if animCurve exist, get its output
+        # create animCurve
         if mc.objExists(animCrv):
-            attrs = mc.listConnections('%s.output' % animCrv, plugs=True) or []
-            if not attrs:
-                continue
-            dstAttr = attrs[0]
+            mc.delete(animCrv)
+        mc.createNode('animCurveUA', name=animCrv)
 
-        # if animCurve doesn't exist in scene, create and connect it
+        # do we need unitConversion node?
+        conversionFactor = skdInfo['conversionFactor']
+        if conversionFactor:
+            uc = mc.createNode('unitConversion')
+            mc.connectAttr(animCrv + '.output', uc + '.input')
+            mc.setAttr(uc + '.conversionFactor', conversionFactor)
+            attrLib.connectAttr(uc + '.output', dstAttr)
+            dstAttr = uc + '.input'
         else:
-            animCrv = mc.createNode('animCurveUA', name=animCrv)
+            attrLib.connectAttr(animCrv + '.output', dstAttr)
 
-            # do we need unitConversion node?
-            conversionFactor = skdInfo['conversionFactor']
-            if conversionFactor:
-                uc = mc.createNode('unitConversion')
-                mc.connectAttr(animCrv + '.output', uc + '.input')
-                mc.setAttr(uc + '.conversionFactor', conversionFactor)
-                attrLib.connectAttr(uc + '.output', dstAttr)
-                dstAttr = uc + '.input'
-            else:
-                attrLib.connectAttr(animCrv + '.output', dstAttr)
+        # todo: should find blendNode and output of blendnode
+        # blendNode: Face_R_Eye_OuterLid_Lwr_02_Tweak_rotZ_Blend
+        # outputNode: Face_R_Eye_OuterLid_Lwr_02_Tweak_Ctrl_Drv_Grp.rotateZ
 
         # makes sure animCurve.input has incoming connection
         attrLib.connectAttr(srcAttr, animCrv + '.input')
