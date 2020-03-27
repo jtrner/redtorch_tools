@@ -49,8 +49,8 @@ import os
 import maya.cmds as mc
 
 # import redtorch_tools
-# redtorch_tools_dir = 'D:/all_works/redtorch_tools/dev'
-redtorch_tools_dir = 'G:/Rigging/Users/Ehsan/code_share/redtorch_tools/dev'
+redtorch_tools_dir = 'D:/all_works/redtorch_tools/dev'
+# redtorch_tools_dir = 'G:/Rigging/Users/Ehsan/code_share/redtorch_tools/dev'
 paths = [redtorch_tools_dir, os.path.join(redtorch_tools_dir, 'maya')]
 for path in paths:
     if path in sys.path:
@@ -100,20 +100,17 @@ def setSdkValues(sdkData):
             mc.delete(animCrv)
         mc.createNode('animCurveUA', name=animCrv)
 
-        # do we need unitConversion node?
-        conversionFactor = skdInfo['conversionFactor']
-        if conversionFactor:
-            uc = mc.createNode('unitConversion')
-            mc.connectAttr(animCrv + '.output', uc + '.input')
-            mc.setAttr(uc + '.conversionFactor', conversionFactor)
-            attrLib.connectAttr(uc + '.output', dstAttr)
-            dstAttr = uc + '.input'
-        else:
-            attrLib.connectAttr(animCrv + '.output', dstAttr)
-
-        # todo: should find blendNode and output of blendnode
-        # blendNode: Face_R_Eye_OuterLid_Lwr_02_Tweak_rotZ_Blend
-        # outputNode: Face_R_Eye_OuterLid_Lwr_02_Tweak_Ctrl_Drv_Grp.rotateZ
+        # find blendNode and final driven node
+        blendNode, blendAttrName = dstAttr.replace('.')  # 'Face_L_Nose_Nasolabial_01_Tweak_transY_Blend', 'input[13]'
+        tokens = blendNode.split('_')  # ['Face', 'L', 'Nose', 'Nasolabial', '01', 'Tweak', 'transY', 'Blend']
+        drivenNode = '_'.join(tokens[:-2]) + '_Ctrl_Drv_Grp'  # Face_L_Mouth_Lip_Corner_Tweak_Ctrl_Drv_Grp
+        drivenAttrAlias = tokens[:-2]  # 'transY'
+        drivenAttrName = drivenAttrAlias.replace('trans', 'translate').replace('rot', 'rotate')
+        drivenPlug = drivenNode + '.' + drivenAttrName
+        if not mc.objExists(blendNode):
+            mc.createNode('blendWeight', n=blendNode)
+        attrLib.connectAttr(animCrv + '.output', dstAttr)
+        attrLib.connectAttr(blendNode + '.output', drivenPlug)
 
         # makes sure animCurve.input has incoming connection
         attrLib.connectAttr(srcAttr, animCrv + '.input')
@@ -773,3 +770,48 @@ def fixGimbalVis():
     # Return User Selection
     mc.select(userSel, replace=True)
     print('End of Gimbal Hook Up Script.')
+
+
+def mirrorMovementOn():
+    #mirror functionality of TOTS face panel controls for use during setup
+    attrs = [".translateX", ".translateY", ".translateZ", ".rotateX", ".rotateY", ".rotateZ"]
+
+    faceLeftCtrls = ['Face_L_Mouth_LipLwr_Ctrl', 'Face_L_Mouth_Corner_Ctrl', 'Face_L_Mouth_CornerPinch_Ctrl',
+                     'Face_L_Mouth_LipUpr_Ctrl', 'Face_L_Cheek_Ctrl', 'Face_L_Squint_Ctrl', 'Face_L_Nostril_Ctrl',
+                     'Face_L_Eye_Lid_Lwr_Out_Ctrl', 'Face_L_Eye_Lid_Lwr_In_Ctrl', 'Face_L_Eye_Lid_Lwr_Mid_Ctrl',
+                     'Face_L_Eye_Lid_Upr_Mid_Ctrl', 'Face_L_Eye_Lid_Upr_In_Ctrl', 'Face_L_Eye_Lid_Upr_Out_Ctrl',
+                     'Face_L_Brow_In_Ctrl', 'Face_L_Brow_Mid_Ctrl', 'Face_L_Brow_Out_Ctrl']
+
+    for c in faceLeftCtrls:
+        if mc.objExists(c):
+            rightCtrl = c.replace("_L_", "_R_")
+            for a in attrs:
+                if mc.getAttr(c+a, lock=True) == False:
+                    incoming = mc.listConnections(rightCtrl+a, destination=False, source=True)
+                    if incoming:
+                        if incoming[0] != c:
+                            mc.connectAttr(c+a, rightCtrl+a, force=True)
+                    else:
+                        mc.connectAttr(c+a, rightCtrl+a, force=True)
+
+
+def mirrorMovementOff():
+    #break mirror functionality of TOTS face panel controls for use during setup
+
+    attrs = [".translateX", ".translateY", ".translateZ", ".rotateX", ".rotateY", ".rotateZ"]
+
+    faceLeftCtrls = ['Face_L_Mouth_LipLwr_Ctrl', 'Face_L_Mouth_Corner_Ctrl', 'Face_L_Mouth_CornerPinch_Ctrl',
+                     'Face_L_Mouth_LipUpr_Ctrl', 'Face_L_Cheek_Ctrl', 'Face_L_Squint_Ctrl', 'Face_L_Nostril_Ctrl',
+                     'Face_L_Eye_Lid_Lwr_Out_Ctrl', 'Face_L_Eye_Lid_Lwr_In_Ctrl', 'Face_L_Eye_Lid_Lwr_Mid_Ctrl',
+                     'Face_L_Eye_Lid_Upr_Mid_Ctrl', 'Face_L_Eye_Lid_Upr_In_Ctrl', 'Face_L_Eye_Lid_Upr_Out_Ctrl',
+                     'Face_L_Brow_In_Ctrl', 'Face_L_Brow_Mid_Ctrl', 'Face_L_Brow_Out_Ctrl']
+
+    for c in faceLeftCtrls:
+        if mc.objExists(c):
+            rightCtrl = c.replace("_L_", "_R_")
+            for a in attrs:
+                if mc.getAttr(c+a, lock=True) == False:
+                    incoming = mc.listConnections(rightCtrl+a, destination=False, source=True)
+                    if incoming:
+                        if incoming[0] == c:
+                            mc.disconnectAttr(c+a, rightCtrl+a)
