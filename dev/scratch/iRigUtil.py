@@ -64,6 +64,7 @@ from rt_python.toolbox import toolboxUI
 
 reload(toolboxUI)
 reload(trsLib)
+reload(attrLib)
 
 
 def toolbox():
@@ -94,47 +95,38 @@ def setSdkValues(sdkData):
         outAngles = skdInfo['outAngles']
         inWeights = skdInfo['inWeights']
         inAngles = skdInfo['inAngles']
+        animCrvType = skdInfo['animCrvType']
 
-        # if animCurve exist, get its output
+        # create animCurve
         if mc.objExists(animCrv):
-            attrs = mc.listConnections('%s.output' % animCrv, plugs=True) or []
-            if not attrs:
-                continue
-            dstAttr = attrs[0]
-
-        # if animCurve doesn't exist in scene, create and connect it
-        else:
-            animCrv = mc.createNode('animCurveUA', name=animCrv)
-
-            # do we need unitConversion node?
-            conversionFactor = skdInfo['conversionFactor']
-            if conversionFactor:
-                uc = mc.createNode('unitConversion')
-                mc.connectAttr(animCrv + '.output', uc + '.input')
-                mc.setAttr(uc + '.conversionFactor', conversionFactor)
-                attrLib.connectAttr(uc + '.output', dstAttr)
-                dstAttr = uc + '.input'
-            else:
-                attrLib.connectAttr(animCrv + '.output', dstAttr)
+            mc.delete(animCrv)
+        mc.createNode(animCrvType, name=animCrv)
 
         # makes sure animCurve.input has incoming connection
         attrLib.connectAttr(srcAttr, animCrv + '.input')
 
-        # if aniCurve output node doesn't exist, skip this animCurve
-        dstNode, dstAttrName = dstAttr.split('.')
-        if not mc.attributeQuery(dstAttrName, n=dstNode, exists=True):
-            continue
+        # find blendNode and final driven node
+        blendNode, blendAttrName = dstAttr.split('.')  # 'Face_L_Nose_Nasolabial_01_Tweak_transY_Blend', 'input[13]'
+        tokens = blendNode.split('_')  # ['Face', 'L', 'Nose', 'Nasolabial', '01', 'Tweak', 'transY', 'Blend']
+        drivenNode = '_'.join(tokens[:-2]) + '_Ctrl_Drv_Grp'  # Face_L_Mouth_Lip_Corner_Tweak_Ctrl_Drv_Grp
+        drivenAttrAlias = tokens[-2]  # 'transY'
+        drivenAttrName = drivenAttrAlias.replace('trans', 'translate').replace('rot', 'rotate')
+        drivenPlug = drivenNode + '.' + drivenAttrName
+        if not mc.objExists(blendNode):
+            mc.createNode('blendWeighted', n=blendNode)
+            mc.setAttr(blendNode + '.input[0]', 0)  # just to force update the node
+            # scale's default value is 1
+            if drivenAttrName in ['scaleX', 'scaleY', 'scaleZ', 'sx', 'sy', 'sz']:
+                mc.setAttr(blendNode + '.input[0]', 1)
+        attrLib.connectAttr(animCrv + '.output', dstAttr)
+        attrLib.connectAttr(blendNode + '.output', drivenPlug)
 
         # set times, values, tangents
+        dstNode, dstAttrName = dstAttr.split('.')
         for i in range(len(skdInfo['floatChange'])):
-            try:
-                mc.keyframe(
-                    dstNode, at=dstAttrName, e=True, index=(i, i), timeChange=floatChange[i],
-                    floatChange=floatChange[i], valueChange=values[i])
-            except:
-                mc.setKeyframe(
-                    dstNode, at=dstAttrName, time=(floatChange[i], floatChange[i]),
-                    float=(floatChange[i], floatChange[i]), value=values[i])
+            mc.setKeyframe(
+                dstNode, at=dstAttrName, time=(floatChange[i], floatChange[i]),
+                float=(floatChange[i], floatChange[i]), value=values[i])
 
             mc.keyTangent(dstAttr, e=True, index=(i, i), outWeight=outWeights[i],
                           outAngle=outAngles[i], inWeight=inWeights[i], inAngle=inAngles[i])
@@ -189,6 +181,7 @@ def getSdkValues(node):
         outAngles = mc.keyTangent(dstAttr, q=True, outAngle=True)
         inWeights = mc.keyTangent(dstAttr, q=True, inWeight=True)
         inAngles = mc.keyTangent(dstAttr, q=True, inAngle=True)
+        animCrvType = mc.nodeType(animCrv)
 
         #
         sdkData[animCrv] = {'floatChange': floatChange,
@@ -199,6 +192,7 @@ def getSdkValues(node):
                             'inAngles': inAngles,
                             'srcAttr': srcAttr,
                             'dstAttr': dstAttr,
+                            'animCrvType': animCrvType,
                             'conversionFactor': conversionFactor}
 
     return sdkData
@@ -775,3 +769,48 @@ def fixGimbalVis():
     # Return User Selection
     mc.select(userSel, replace=True)
     print('End of Gimbal Hook Up Script.')
+
+
+def mirrorMovementOn():
+    #mirror functionality of TOTS face panel controls for use during setup
+    attrs = [".translateX", ".translateY", ".translateZ", ".rotateX", ".rotateY", ".rotateZ"]
+
+    faceLeftCtrls = ['Face_L_Mouth_LipLwr_Ctrl', 'Face_L_Mouth_Corner_Ctrl', 'Face_L_Mouth_CornerPinch_Ctrl',
+                     'Face_L_Mouth_LipUpr_Ctrl', 'Face_L_Cheek_Ctrl', 'Face_L_Squint_Ctrl', 'Face_L_Nostril_Ctrl',
+                     'Face_L_Eye_Lid_Lwr_Out_Ctrl', 'Face_L_Eye_Lid_Lwr_In_Ctrl', 'Face_L_Eye_Lid_Lwr_Mid_Ctrl',
+                     'Face_L_Eye_Lid_Upr_Mid_Ctrl', 'Face_L_Eye_Lid_Upr_In_Ctrl', 'Face_L_Eye_Lid_Upr_Out_Ctrl',
+                     'Face_L_Brow_In_Ctrl', 'Face_L_Brow_Mid_Ctrl', 'Face_L_Brow_Out_Ctrl']
+
+    for c in faceLeftCtrls:
+        if mc.objExists(c):
+            rightCtrl = c.replace("_L_", "_R_")
+            for a in attrs:
+                if mc.getAttr(c+a, lock=True) == False:
+                    incoming = mc.listConnections(rightCtrl+a, destination=False, source=True)
+                    if incoming:
+                        if incoming[0] != c:
+                            mc.connectAttr(c+a, rightCtrl+a, force=True)
+                    else:
+                        mc.connectAttr(c+a, rightCtrl+a, force=True)
+
+
+def mirrorMovementOff():
+    #break mirror functionality of TOTS face panel controls for use during setup
+
+    attrs = [".translateX", ".translateY", ".translateZ", ".rotateX", ".rotateY", ".rotateZ"]
+
+    faceLeftCtrls = ['Face_L_Mouth_LipLwr_Ctrl', 'Face_L_Mouth_Corner_Ctrl', 'Face_L_Mouth_CornerPinch_Ctrl',
+                     'Face_L_Mouth_LipUpr_Ctrl', 'Face_L_Cheek_Ctrl', 'Face_L_Squint_Ctrl', 'Face_L_Nostril_Ctrl',
+                     'Face_L_Eye_Lid_Lwr_Out_Ctrl', 'Face_L_Eye_Lid_Lwr_In_Ctrl', 'Face_L_Eye_Lid_Lwr_Mid_Ctrl',
+                     'Face_L_Eye_Lid_Upr_Mid_Ctrl', 'Face_L_Eye_Lid_Upr_In_Ctrl', 'Face_L_Eye_Lid_Upr_Out_Ctrl',
+                     'Face_L_Brow_In_Ctrl', 'Face_L_Brow_Mid_Ctrl', 'Face_L_Brow_Out_Ctrl']
+
+    for c in faceLeftCtrls:
+        if mc.objExists(c):
+            rightCtrl = c.replace("_L_", "_R_")
+            for a in attrs:
+                if mc.getAttr(c+a, lock=True) == False:
+                    incoming = mc.listConnections(rightCtrl+a, destination=False, source=True)
+                    if incoming:
+                        if incoming[0] == c:
+                            mc.disconnectAttr(c+a, rightCtrl+a)

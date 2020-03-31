@@ -29,7 +29,7 @@ def removeAll():
         try:
             ns = mc.referenceQuery(ref, namespace=True)
         except Exception as e:
-            mc.warning(e)
+            print(e)
             mc.lockNode(ref, lock=False)
             mc.delete(ref)
         if ns:
