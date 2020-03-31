@@ -1383,3 +1383,34 @@ def importDeformerWgts(path, newNode=None):
             inputTarget = newNode + '.' + inputTarget.split('.', 1)[-1]
         for i in range(len(wgts)):
             mc.setAttr('{}[{}]'.format(inputTarget, i), wgts[i])
+
+
+def softSelection():
+    """
+    elements,weights = softSelection() 
+    """
+    #Grab the soft selection
+    selection = om.MSelectionList()
+    softSelection = om.MRichSelection()
+    om.MGlobal.getRichSelection(softSelection)
+    softSelection.getSelection(selection)
+   
+    dagPath = om.MDagPath()
+    component = om.MObject()
+   
+    # Filter Defeats the purpose of the else statement
+    iter = om.MItSelectionList( selection, om.MFn.kMeshVertComponent )
+    elements, weights = [], []
+    while not iter.isDone():
+        iter.getDagPath( dagPath, component )
+        dagPath.pop() #Grab the parent of the shape node
+        node = dagPath.fullPathName()
+        fnComp = om.MFnSingleIndexedComponent(component)   
+        getWeight = lambda i: fnComp.weight(i).influence() if fnComp.hasWeights() else 1.0
+       
+        for i in range(fnComp.elementCount()):
+            elements.append('%s.vtx[%i]' % (node, fnComp.element(i)))
+            weights.append(getWeight(i)) 
+        iter.next()
+       
+    return elements, weights
