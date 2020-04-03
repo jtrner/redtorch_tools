@@ -81,6 +81,8 @@ def importTail():
     mc.setAttr('C_tail_origin_GRP.inheritsTransform', 0)
     mc.parent('C_tail_001_JNT', 'C_fk_tailBase_bind_b_jnt')
     mc.delete('C_tail_module_GRP')
+    mc.rename('C_Tail_Root_Ctrl', '??C_Tail_Root_Ctrl')
+
 
 def fixCtlPositions():
     mc.setAttr('C_eye_aim_handle_a_gp.translateZ', 30)

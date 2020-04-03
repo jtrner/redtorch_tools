@@ -813,6 +813,16 @@ def getAllMaterials():
     return validMats
 
 
+def getSG(node):
+    future_history = mc.listHistory(node, future=True)
+    SG = None
+    for node in future_history:
+        if mc.nodeType(node) == 'shadingEngine':
+            SG = node
+            break
+    return SG
+
+
 def getAllSGs():
     return mc.ls(type='shadingEngine')
 
@@ -970,6 +980,17 @@ def applyMtl(mat, geos):
         mc.connectAttr(attr, sg + '.dagSetMembers', nextAvailable=True, f=True)
 
     return sg
+
+
+def assignSG(node, sg):
+    shapes = mc.listRelatives(node, s=True, ni=True, f=True)
+    if not shapes:
+        return
+    attr = shapes[0] + '.instObjGroups'
+    oldSGs = mc.listConnections(attr, type='shadingEngine', s=False, d=True, plugs=True)
+    if oldSGs:
+        attrLib.disconnectAttr(oldSGs[0])
+    mc.connectAttr(attr, sg + '.dagSetMembers', nextAvailable=True, f=True)
 
 
 def substanceToMayaSoftware(textureDir):

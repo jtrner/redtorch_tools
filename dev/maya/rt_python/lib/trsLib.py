@@ -32,7 +32,7 @@ def averagePos(poses=None):
         x += pos[0]
         y += pos[1]
         z += pos[2]
-    return x/len(poses), y/len(poses), z/len(poses)
+    return x / len(poses), y / len(poses), z / len(poses)
 
 
 def getPoseBetween(objA=None, objB=None, bias=0.5, useSelection=False):
@@ -119,13 +119,13 @@ def getAllParents(node="", type="", includeSelf=True, fullPath=False):
     :return: 
           string[]    list of object's children
     """
-    node = mc.ls(node, long=True)[0] 
-    all_parents = [] 
+    node = mc.ls(node, long=True)[0]
+    all_parents = []
     for i in range(node.count('|')):
         par = node.rsplit('|', i)[0]
         all_parents.append(par)
     all_parents.reverse()
-    
+
     if not includeSelf:
         if all_parents:
             all_parents.remove(node)
@@ -135,7 +135,7 @@ def getAllParents(node="", type="", includeSelf=True, fullPath=False):
 
     if not fullPath:
         all_parents = [x.split('|')[-1] for x in all_parents]
-    
+
     return all_parents
 
 
@@ -149,7 +149,7 @@ def getAllChildren(node="", type="", includeSelf=True, fullPath=False):
     :return: 
           string[]    list of object's children
     """
-    node = mc.ls(node, long=True)[0] 
+    node = mc.ls(node, long=True)[0]
     all_children = mc.listRelatives(node, ad=True, fullPath=fullPath)
     if includeSelf:
         if all_children:
@@ -259,7 +259,6 @@ def match(node=None, all="", matchTranslate="", matchRotateWith="", matchScale="
         mc.delete(mc.scaleConstraint(matchScale, node))
 
 
-
 def setTranslation(node=None, translation=None, space="world"):
     """
     :return: None
@@ -294,7 +293,7 @@ def getShapes(node="", fullPath=False):
         mc.error('"{}" does not exist.'.format(node))
 
     shape_list = mc.listRelatives(node, children=True, shapes=True, fullPath=True) or []
- 
+
     # make sure node itself is in the list if it's a shape too
     if isShape(node):
         shape_list.append(node)
@@ -361,15 +360,15 @@ def getHierarchyByType(node="", type="transform", include_self=True, noIntermedi
 
 def getParent(node, fullPath=False):
     parentList = mc.listRelatives(node, parent=True, fullPath=fullPath)
-    
+
     if not parentList:  # no parent found
         return
-    
+
     if fullPath:  # parent's full path without first '|'
         par = parentList[0][1:]
     else:
         par = parentList[0]
-    
+
     return par
 
 
@@ -389,35 +388,34 @@ def getChild(node, fullPath=False):
     return first found child
     """
     parentList = mc.listRelatives(node, children=True, fullPath=fullPath)
-    
+
     if not parentList:  # no parent found
         return
-    
+
     if fullPath:  # parent's full path without first '|'
         par = parentList[0][1:]
     else:
         par = parentList[0]
-    
+
     return par
 
 
 def resetTRS(node):
-    
     for x in ['tx', 'ty', 'tz', 'rx', 'ry', 'rz']:
         try:
-            mc.setAttr(node+'.'+x, 0)
+            mc.setAttr(node + '.' + x, 0)
         except:
             pass
 
     for x in ['sx', 'sy', 'sz']:
         try:
-            mc.setAttr(node+'.'+x, 1)
+            mc.setAttr(node + '.' + x, 1)
         except:
             pass
 
 
 def resetUserAttrs(node):
-    attrs = mc.listAttr(node, keyable=True, userDefined=True, unlocked=True,)
+    attrs = mc.listAttr(node, keyable=True, userDefined=True, unlocked=True, )
     if not attrs:
         return
     for attr in attrs:
@@ -575,6 +573,7 @@ def mirrorLikeJnt(nodes=None):
         mirroredObjs.append(mir)
 
     return mirroredObjs
+
 
 def mirror(target, axis="x", type_="pose", copy=False, children=True, **kwargs):
     """
@@ -751,9 +750,9 @@ def duplicateClean(node, search='', replace='', name=''):
     if shapes:  # don't delete found shapes
         shape = shapes[0]
     else:  # return None for shape if shape not found
-        shape = None 
+        shape = None
 
-    # return
+        # return
     return dup, shape
 
 
@@ -767,7 +766,7 @@ def removeOrigShapes(node):
     children = mc.listRelatives(node, ad=True, shapes=True)
     if not children:
         return
-    toDeleteShape =[x for x in children if mc.getAttr('%s.intermediateObject' % x)]
+    toDeleteShape = [x for x in children if mc.getAttr('%s.intermediateObject' % x)]
     if toDeleteShape:
         mc.delete(toDeleteShape)
 
@@ -797,7 +796,7 @@ def duplicate(node, search='', replace='', hierarchy=False, **kwargs):
     if not hierarchy:
         output = mc.duplicate(node, parentOnly=1, returnRootsOnly=1, n=n, **kwargs)
         return output
-    
+
     # hierarchy True
     objs = mc.duplicate(node, renameChildren=1, n=n, **kwargs)
 
@@ -814,7 +813,7 @@ def duplicate(node, search='', replace='', hierarchy=False, **kwargs):
         n = orig.replace(search, replace, 1)
         n = mc.rename(new, n)
         output.append(n)
-    
+
     return output
 
 
@@ -828,11 +827,11 @@ def getTRS(node, space='object'):
     :type return: list
     """
     if space == 'object':
-        return [mc.getAttr(node+'.'+at)[0] for at in ('t', 'r', 's')]
+        return [mc.getAttr(node + '.' + at)[0] for at in ('t', 'r', 's')]
     elif space == 'world':
         tmp_node = mc.createNode('transform')
         match(tmp_node, node)
-        trs = [mc.getAttr(tmp_node+'.'+at)[0] for at in ('t', 'r', 's')]
+        trs = [mc.getAttr(tmp_node + '.' + at)[0] for at in ('t', 'r', 's')]
         mc.delete(tmp_node)
         return trs
 
@@ -850,14 +849,14 @@ def setTRS(node, trs, space='object'):
         for i, at in enumerate(['t', 'r', 's']):
             for j, ax in enumerate(['x', 'y', 'z']):
                 try:
-                    mc.setAttr(node+'.'+at+ax, trs[i][j])
+                    mc.setAttr(node + '.' + at + ax, trs[i][j])
                 except:
                     continue
     elif space == 'world':
         tmp_node = mc.createNode('transform')
         for i, at in enumerate(['t', 'r', 's']):
             for j, ax in enumerate(['x', 'y', 'z']):
-                mc.setAttr(tmp_node+'.'+at+ax, trs[i][j])
+                mc.setAttr(tmp_node + '.' + at + ax, trs[i][j])
         match(node, tmp_node)
         mc.delete(tmp_node)
 
@@ -877,12 +876,12 @@ def insert(nodes=None, mode='parent', name='offsetGrp', search=None, replace=Non
         nodes = mc.ls(sl=True)
     if isinstance(nodes, basestring):
         nodes = [nodes]
-    
+
     ofsGrps = []
     for node in nodes:
         if search and replace:
             name = node.replace(search, replace, 1)
-            if  name == node:
+            if name == node:
                 name = strLib.mergeSuffix(node) + '_GRP'
             if mc.objExists(name):
                 mc.warning('object already exists: {}'.format(name))
@@ -890,24 +889,24 @@ def insert(nodes=None, mode='parent', name='offsetGrp', search=None, replace=Non
         ofs = mc.group(em=True, name=name)
         mc.delete(mc.parentConstraint(node, ofs))
 
-        if mode=='parent':
+        if mode == 'parent':
             currentParent = getParent(node)
             mc.parent(node, ofs)
             if currentParent:
                 mc.parent(ofs, currentParent)
-        
-        elif mode=='child':
+
+        elif mode == 'child':
             mc.parent(ofs, node)
-        
-        elif mode=='allChilds':
+
+        elif mode == 'allChilds':
             oldChildren = mc.listRelatives(node, f=True)
             ofs = mc.parent(ofs, node)[0]
             if oldChildren:
-                mc.parent(oldChildren, ofs)    
+                mc.parent(oldChildren, ofs)
 
         ofsGrps.append(ofs)
 
-    mc.select(ofsGrps)    
+    mc.select(ofsGrps)
     return ofsGrps
 
 
@@ -918,16 +917,16 @@ def attachToMesh(node, mesh):
     transform.attachToMesh(node, mesh)
     """
     surfShape = getShapes(mesh)[0]
-    folWorldPos = mc.xform(node, q=True, t=True, ws=True )
+    folWorldPos = mc.xform(node, q=True, t=True, ws=True)
     pOnSurf = mc.createNode('closestPointOnMesh')
 
-    mc.connectAttr(surfShape+'.worldMatrix[0]', pOnSurf+'.inputMatrix')
-    mc.connectAttr(surfShape+'.worldMesh[0]', pOnSurf+'.inMesh')
+    mc.connectAttr(surfShape + '.worldMatrix[0]', pOnSurf + '.inputMatrix')
+    mc.connectAttr(surfShape + '.worldMesh[0]', pOnSurf + '.inMesh')
 
-    mc.setAttr(pOnSurf+'.inPosition', *folWorldPos)
+    mc.setAttr(pOnSurf + '.inPosition', *folWorldPos)
 
-    uPos = mc.getAttr(pOnSurf+'.result.parameterU')
-    vPos = mc.getAttr(pOnSurf+'.result.parameterV')
+    uPos = mc.getAttr(pOnSurf + '.result.parameterU')
+    vPos = mc.getAttr(pOnSurf + '.result.parameterV')
 
     cns = mc.pointOnPolyConstraint(mesh, node)[0]
 

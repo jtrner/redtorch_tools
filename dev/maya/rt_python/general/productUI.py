@@ -123,7 +123,7 @@ class UI(QtWidgets.QDialog):
         lb.setMinimumWidth(180)
 
         self.newJob_le = QtWidgets.QLineEdit()
-        self.newJob_le.setPlaceholderText('for_sale, for_fun, etc')
+        self.newJob_le.setPlaceholderText('project name')
         newJob_hl = qtLib.createHLayout(job_vl)
         newJob_hl.layout().addWidget(self.newJob_le)
 
@@ -140,7 +140,7 @@ class UI(QtWidgets.QDialog):
         newSeq_hl = qtLib.createHLayout(seq_vl)
 
         self.newSeq_le = QtWidgets.QLineEdit()
-        self.newSeq_le.setPlaceholderText('asset, chimpAnim, etc')
+        self.newSeq_le.setPlaceholderText('sequence name (or assets folder)')
         newSeq_hl.layout().addWidget(self.newSeq_le)
         self.seqs_tw = qtLib.createTreeWidget(seq_vl)
 
@@ -154,7 +154,7 @@ class UI(QtWidgets.QDialog):
         newShot_hl = qtLib.createHLayout(shot_vl)
 
         self.newShot_le = QtWidgets.QLineEdit()
-        self.newShot_le.setPlaceholderText('chimpanzee, runCycle, etc')
+        self.newShot_le.setPlaceholderText('shot name or asset name')
         newShot_hl.layout().addWidget(self.newShot_le)
         self.shots_tw = qtLib.createTreeWidget(shot_vl)
 

@@ -61,14 +61,105 @@ from rt_python.lib import trsLib
 from rt_python.lib import fileLib
 from rt_python.lib import attrLib
 from rt_python.toolbox import toolboxUI
+from rt_python.lib import deformer
+from rt_python.lib import renderLib
 
 reload(toolboxUI)
 reload(trsLib)
 reload(attrLib)
+reload(renderLib)
+reload(deformer)
 
 
 def toolbox():
     toolboxUI.launch()
+
+
+def rigFootSquash(geos, driverNode, name='L_foot'):
+    lattice_grp = mc.createNode(
+        'transform',
+        n=name + '_Lattice_Grp',
+        p='Utility_Grp')
+
+    lattice_ofs = mc.createNode(
+        'transform',
+        n=name + '_Lattice_Offset_Grp',
+        p=lattice_grp)
+
+    ffd_node, lattice, lattice_base = deformer.createFFD(
+        geos,
+        name=name,
+        divisions=(2, 3, 2),
+        local=False,
+        outsideLattice=2,
+        outsideFalloffDist=5.0,
+        objectCentered=True)
+
+    mc.delete(mc.parentConstraint(lattice, lattice_ofs))
+    mc.delete(mc.scaleConstraint(lattice, lattice_ofs))
+    mc.parent(lattice, lattice_base, lattice_ofs)
+    mc.parentConstraint(driverNode, lattice_grp, mo=True)
+    mc.scaleConstraint(driverNode, lattice_grp, mo=True)
+
+    adl = mc.createNode('addDoubleLinear', name=name + '_Lattice_scale_adl')
+    bulge_plug = attrLib.addFloat(driverNode, 'footBulge')
+    mc.setAttr(adl + '.input2', 1)
+    mc.connectAttr(bulge_plug, adl + '.input1')
+    [mc.connectAttr(adl + '.output', lattice + '.scale' + x) for x in 'XYZ']
+
+    return ffd_node, lattice, lattice_base
+
+
+def removePinky():
+    pinky_stuff = mc.ls('*_Pinky*', type='transform')
+    ring_stuff = mc.ls('*_Ring*', type='transform')
+
+    # # transfer skin
+    # deformer.replaceInfluence()
+
+    #
+    mc.delete(pinky_stuff)
+
+    #
+    for ring_node in ring_stuff:
+        new_name = ring_node.replace('_Ring_', '_Pinky_')
+        mc.rename(ring_node, new_name)
+
+
+def findNonZroCtls():
+    ctls = mc.ls('*_Ctrl')
+    non_zro_ctls = []
+    for ctl in ctls:
+        trs = trsLib.getTRS(ctl)
+        trs_flatten = trs[0] + trs[1] + trs[2]
+        default_vals = [0, 0, 0, 0, 0, 0, 1, 1, 1]
+        for val, default_val in zip(trs_flatten, default_vals):
+            if not almostEquals(val, default_val):
+                non_zro_ctls.append(ctl)
+                break
+    return non_zro_ctls
+
+
+def almostEquals(a, b, epsilon=0.001):
+    if a - b < epsilon and b - a < epsilon:
+        return True
+
+
+def transferSkinAndShaderToReferenceGeos():
+    """
+    assuming the skinned geo was imported,
+    This applies the same skinCluster and material to the newly referenced model
+    :return:
+    """
+    for ref_geo in mc.ls('*:*_Geo'):
+        geo = ref_geo.split(':')[-1]
+        if not mc.objExists(geo):
+            print('Could not find imported version of "{}"'.format(ref_geo))
+            continue
+        deformer.copySkin(src=geo, targets=ref_geo, useSelection=False)
+        sg = renderLib.getSG(node=geo)
+        if sg:
+            renderLib.assignSG(ref_geo, sg)
 
 
 def importSdk(sdkDataPath):
@@ -198,13 +289,29 @@ def getSdkValues(node):
     return sdkData
 
 
+def selectDrvGrps():
+    DrvGrps = [x + '_Drv_Grp' for x in mc.ls(sl=True)]
+    mc.select(mc.ls(DrvGrps))
+
+
 def mirrorFaceCtlPos():
     ctls = mc.ls('Face_L_*_Tweak_Ctrl')
     for ctl in ctls:
         offset = ctl + '_Offset_Grp'
+
         otherside = offset.replace('Face_L', 'Face_R')
+        if not mc.objExists(otherside):
+            continue
         pos = mc.xform(offset, q=True, ws=True, t=True)
         mc.xform(otherside, ws=True, t=(-pos[0], pos[1], pos[2]))
+        cns = mc.parentConstraint(otherside, q=True)
+
+        # update parent constraint maintain offset values
+        if not cns:
+            continue
+        drvrs = mc.parentConstraint(cns, q=True, tl=True)
+        for drvr in drvrs:
+            mc.parentConstraint(drvr, cns, e=True, maintainOffset=True)
 
 
 def mimic_gimbal_shapes():
@@ -487,7 +594,7 @@ def bake():
     driveAttrsDict = getDriverValues()
 
     # find driven controls
-    controlShapes = mc.listRelatives('Face_Ctrl_Grp', ad=1, type='nurbsCurve')
+    controlShapes = mc.listRelatives('Face_Tweaks_Grp', ad=1, type='nurbsCurve')
     controls = [mc.listRelatives(x, p=1)[0] for x in controlShapes]
     controls = list(set(controls))
 
@@ -772,7 +879,7 @@ def fixGimbalVis():
 
 
 def mirrorMovementOn():
-    #mirror functionality of TOTS face panel controls for use during setup
+    # mirror functionality of TOTS face panel controls for use during setup
     attrs = [".translateX", ".translateY", ".translateZ", ".rotateX", ".rotateY", ".rotateZ"]
 
     faceLeftCtrls = ['Face_L_Mouth_LipLwr_Ctrl', 'Face_L_Mouth_Corner_Ctrl', 'Face_L_Mouth_CornerPinch_Ctrl',
@@ -785,17 +892,17 @@ def mirrorMovementOn():
         if mc.objExists(c):
             rightCtrl = c.replace("_L_", "_R_")
             for a in attrs:
-                if mc.getAttr(c+a, lock=True) == False:
-                    incoming = mc.listConnections(rightCtrl+a, destination=False, source=True)
+                if mc.getAttr(c + a, lock=True) == False:
+                    incoming = mc.listConnections(rightCtrl + a, destination=False, source=True)
                     if incoming:
                         if incoming[0] != c:
-                            mc.connectAttr(c+a, rightCtrl+a, force=True)
+                            mc.connectAttr(c + a, rightCtrl + a, force=True)
                     else:
-                        mc.connectAttr(c+a, rightCtrl+a, force=True)
+                        mc.connectAttr(c + a, rightCtrl + a, force=True)
 
 
 def mirrorMovementOff():
-    #break mirror functionality of TOTS face panel controls for use during setup
+    # break mirror functionality of TOTS face panel controls for use during setup
 
     attrs = [".translateX", ".translateY", ".translateZ", ".rotateX", ".rotateY", ".rotateZ"]
 
@@ -809,8 +916,8 @@ def mirrorMovementOff():
         if mc.objExists(c):
             rightCtrl = c.replace("_L_", "_R_")
             for a in attrs:
-                if mc.getAttr(c+a, lock=True) == False:
-                    incoming = mc.listConnections(rightCtrl+a, destination=False, source=True)
+                if mc.getAttr(c + a, lock=True) == False:
+                    incoming = mc.listConnections(rightCtrl + a, destination=False, source=True)
                     if incoming:
                         if incoming[0] == c:
-                            mc.disconnectAttr(c+a, rightCtrl+a)
+                            mc.disconnectAttr(c + a, rightCtrl + a)

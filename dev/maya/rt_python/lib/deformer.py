@@ -883,6 +883,33 @@ def localSkin(skins, world):
             mc.connectAttr('{}.matrixSum'.format(jointsDict[src]), destPlug, f=1)
 
 
+def createFFD(geos, name, divisions=(2, 3, 2),
+              trs=((0, 0, 0), (0, 0, 0), (1, 1, 1)),
+              base_trs=((0, 0, 0), (0, 0, 0), (1, 1, 1)),
+              local=False,
+              outsideLattice=0,
+              outsideFalloffDist=1.0,
+              objectCentered=True):
+    # create ffd
+    mc.select(geos)
+    ffd_node, lattice, ffdBase = mc.lattice(divisions=divisions, objectCentered=objectCentered)
+    ffd_node = mc.rename(ffd_node, name + '_LatticeNode')
+    lattice = mc.rename(lattice, name + '_Lattice')
+    ffdBase = mc.rename(ffdBase, name + '_LatticeBase')
+
+    # set transform values
+    if not objectCentered:
+        trsLib.setTRS(lattice, trs, space='world')
+        trsLib.setTRS(ffdBase, base_trs, space='world')
+
+    # set ffd settings
+    mc.setAttr(ffd_node + '.local', local)
+    mc.setAttr(ffd_node + '.outsideLattice', outsideLattice)
+    mc.setAttr(ffd_node + '.outsideFalloffDist', outsideFalloffDist)
+
+    return ffd_node, lattice, ffdBase
+
+
 def exportFFD(ffd, path):
     """
     import python.lib.deformer as deformer
