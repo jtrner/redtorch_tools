@@ -251,13 +251,13 @@ class UI(QtWidgets.QDialog):
 
         # playblast and play buttons
         iconPath = os.path.join(ICON_DIR, 'playblast.png')
-        self.blast_btn = qtLib.createIconBtn(
-            btnName='blast', btnSize=20, iconPath=iconPath)
+        self.blast_btn = qtLib.createButton(
+            name='blast', btnSize=20, iconPath=iconPath)
         newPlayblast_hl.layout().addWidget(self.blast_btn)
 
         iconPath = os.path.join(ICON_DIR, 'play.png')
-        self.play_btn = qtLib.createIconBtn(
-            btnName='play', btnSize=20, iconPath=iconPath)
+        self.play_btn = qtLib.createButton(
+            name='play', btnSize=20, iconPath=iconPath)
         newPlayblast_hl.layout().addWidget(self.play_btn)
 
         # resolution

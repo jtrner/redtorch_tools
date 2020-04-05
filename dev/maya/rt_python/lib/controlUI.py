@@ -365,11 +365,11 @@ class UI(QtWidgets.QDialog):
 
 
 def launch():
+    global controlUI_obj
     if 'controlUI_obj' in globals():
         if not controlUI_obj.closed:
             controlUI_obj.close()
         controlUI_obj.deleteLater()
         del globals()['controlUI_obj']
-    global controlUI_obj
     controlUI_obj = UI()
     controlUI_obj.show()

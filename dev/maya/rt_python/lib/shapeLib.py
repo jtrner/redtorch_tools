@@ -324,7 +324,7 @@ def exportShapes(nodes=None, outputDir=None):
 
 
 @timing
-def importShapes(inputDir, targets=None, name='new_morph', doBlendShape=False, doMorph=False):
+def importShapes(inputDir, neutral='neutral', targets=None, name='new_morph', doBlendShape=False, doMorph=False):
     """
     import all obj files from given directory
     """
@@ -344,21 +344,21 @@ def importShapes(inputDir, targets=None, name='new_morph', doBlendShape=False, d
         tgts.append(tgt)
         mc.hide(tgt)
 
-    # fix neutral's normals
-    if mc.objExists('neutral'):
-        mc.polyNormalPerVertex('neutral', ufn=True)
-        mc.polySoftEdge('neutral', a=180, ch=False)
-        mc.delete('neutral', ch=True)
-        mc.select('neutral')
-        mc.showHidden('neutral')
+    # # fix neutral's normals
+    # if mc.objExists(neutral):
+    #     mc.polyNormalPerVertex(neutral, ufn=True)
+    #     mc.polySoftEdge(neutral, a=180, ch=False)
+    #     mc.delete(neutral, ch=True)
+    #     mc.select(neutral)
+    #     mc.showHidden(neutral)
 
     # remove netural from targets
-    if 'neutral' in tgts:
-        tgts.remove('neutral')
+    if neutral in tgts:
+        tgts.remove(neutral)
 
     # add blendshape
     if doBlendShape:
-        createBls('neutral', tgts, name)
+        createBls(neutral, tgts, name)
 
     # add morph
     if doMorph:

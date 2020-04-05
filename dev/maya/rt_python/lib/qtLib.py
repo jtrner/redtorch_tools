@@ -406,27 +406,31 @@ def selectItemByText(tw, text):
             tw.clearSelection()
 
 
-def createButton(lay, name, command, icon=None):
+def createButton(lay=None, name='newButton', command=None, iconPath=None, btnSize=None):
     # button
-    btnName = name.replace('_btn.py', '')
     btn = QtWidgets.QPushButton('')
-    lay.addWidget(btn)
-    btn.clicked.connect(command)
 
-    # icon
-    if icon:
-        iconDir = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                               '../../../icon'))
-        iconPath = os.path.join(iconDir, icon + '.png')
-        if os.path.lexists(iconPath):
-            icon = QtGui.QIcon(iconPath)
-            btn.setIcon(icon)
-            btn.setToolTip(btnName)
-            btn.setMinimumSize(36, 36)
-            btn.setMaximumSize(36, 36)
-            btn.setIconSize(QtCore.QSize(32, 32))
-            return
-    btn.setText(btnName)
+    if lay:
+        lay.addWidget(btn)
+
+    if command:
+        btn.clicked.connect(command)
+
+    # iconPath
+    if iconPath and os.path.lexists(iconPath):
+        icon = QtGui.QIcon(iconPath)
+        btn.setIcon(icon)
+        btn.setToolTip(name)
+        if btnSize:
+            btn.setMinimumSize(btnSize, btnSize)
+            btn.setMaximumSize(btnSize, btnSize)
+            btn.setIconSize(QtCore.QSize(btnSize, btnSize))
+        else:
+            btn.setFixedWidth(btn.sizeHint().width())
+    else:
+        btn.setText(name)
+
+    return btn
 
 
 def printMessage(infoLE, message, mode='info'):
@@ -843,26 +847,9 @@ def btnsFromJson(layout, config, btnSize=None):
                                                        '../../../icon'))
                 iconPath = os.path.join(iconDir, iconName+'.png')
 
-            btn = createIconBtn(btnName=btnName, iconPath=iconPath, btnSize=btnSize)
+            btn = createButton(name=btnName, iconPath=iconPath, btnSize=btnSize)
             flowLayout.addWidget(btn)
             btn.clicked.connect(functools.partial(command, commandString))
-
-
-def createIconBtn(btnName, iconPath, btnSize=None):
-    btn = QtWidgets.QPushButton('')
-    if os.path.lexists(iconPath):
-        icon = QtGui.QIcon(iconPath)
-        btn.setIcon(icon)
-        btn.setToolTip(btnName)
-        if btnSize:
-            btn.setMinimumSize(btnSize, btnSize)
-            btn.setMaximumSize(btnSize, btnSize)
-            btn.setIconSize(QtCore.QSize(btnSize, btnSize))
-        else:
-            btn.setFixedWidth(btn.sizeHint().width())
-    else:
-        btn.setText(btnName)
-    return btn
 
 
 def twFilterField(parent=None, tw=None):

@@ -61,6 +61,10 @@
     "ImportSkinCluster": {
         "command": "from rt_python.lib import skincluster\nreload(skincluster)\nskincluster.importSkinFromDesktop()",
         "icon": ""
+    },
+    "Shape UI": {
+        "command": "from rt_python.lib import shapeLibUI\nreload(shapeLibUI)\nshapeLibUI.launch()",
+        "icon": ""
     }
 },
 "Joint": {
