@@ -75,7 +75,50 @@ def toolbox():
     toolboxUI.launch()
 
 
+def connectBrokenAnimCurves(animCrv):
+    drv = animCrv.split('_Face_')[-1].split('_Tweak_')[0]
+    drv = 'Face_' + drv + '_Tweak_Ctrl_Drv_Grp'
+    drv_attr = animCrv.split('_Tweak_')[-1].split('_')[0]
+    drv_attr = drv_attr.replace('trans', 'translate').replace('rot', 'rotate')
+    blendNode = mc.listConnections(drv + '.' + drv_attr, s=True, d=False, skipConversionNodes=True)
+    if blendNode:
+        blend_inputs = mc.listAttr(blendNode[0] + '.input', m=True)
+        mc.connectAttr(animCrv + '.output', '{}.input[{}]'.format(blendNode[0], len(blend_inputs)))
+    else:
+        mc.connectAttr(animCrv + '.output', drv + '.' + drv_attr)
+
+
 def rigFootSquash(geos, driverNode, name='L_foot'):
+    """
+    import maya.cmds as mc
+
+    import sys
+    import os
+    path = os.path.join("G:/Rigging/Users/Ehsan/code_share/redtorch_tools/dev/scratch")
+    if path in sys.path:
+        sys.path.remove(path)
+    sys.path.insert(0, path)
+
+    import iRigUtil
+    reload(iRigUtil)
+
+
+    # select left foot verts and run this
+    iRigUtil.rigFootSquash(
+        geos=mc.ls(sl=True),
+        driverNode='L_Foot_IKFKSwitch_Ctrl',
+        name='L_foot')
+
+
+    # select right foot verts and run this
+    iRigUtil.rigFootSquash(
+        geos=mc.ls(sl=True),
+        driverNode='R_Foot_IKFKSwitch_Ctrl',
+        name='R_foot')
+
+    # move '?_foot_Lattice_Offset_Grp' a bit down and
+    # reduce scaleY so you get a good falloff
+    """
     lattice_grp = mc.createNode(
         'transform',
         n=name + '_Lattice_Grp',
@@ -92,7 +135,6 @@ def rigFootSquash(geos, driverNode, name='L_foot'):
         divisions=(2, 3, 2),
         local=False,
         outsideLattice=2,
-        outsideFalloffDist=5.0,
         objectCentered=True)
 
     mc.delete(mc.parentConstraint(lattice, lattice_ofs))
@@ -102,10 +144,14 @@ def rigFootSquash(geos, driverNode, name='L_foot'):
     mc.scaleConstraint(driverNode, lattice_grp, mo=True)
 
     adl = mc.createNode('addDoubleLinear', name=name + '_Lattice_scale_adl')
-    bulge_plug = attrLib.addFloat(driverNode, 'footBulge')
+    bulge_plug = attrLib.addFloat(driverNode, 'bulge')
+
     mc.setAttr(adl + '.input2', 1)
     mc.connectAttr(bulge_plug, adl + '.input1')
     [mc.connectAttr(adl + '.output', lattice + '.scale' + x) for x in 'XYZ']
+
+    falloff_plug = attrLib.addFloat(driverNode, 'bulge_falloff', dv=1.0)
+    mc.connectAttr(falloff_plug, ffd_node + '.outsideFalloffDist')
 
     return ffd_node, lattice, lattice_base
 
@@ -114,7 +160,7 @@ def removePinky():
     pinky_stuff = mc.ls('*_Pinky*', type='transform')
     ring_stuff = mc.ls('*_Ring*', type='transform')
 
-    # # transfer skin
+    # # transfer skin from pinky to ring or hand? probably doing it manually is better
     # deformer.replaceInfluence()
 
     #
@@ -294,6 +340,16 @@ def selectDrvGrps():
     mc.select(mc.ls(DrvGrps))
 
 
+def mirrorTempLocs():
+    ctls = mc.ls('Face_L_*_Tweak_Ctrl_temp_LOC')
+    for ctl in ctls:
+        otherside = ctl.replace('Face_L', 'Face_R')
+        if not mc.objExists(otherside):
+            continue
+        pos = mc.xform(ctl, q=True, ws=True, t=True)
+        mc.xform(otherside, ws=True, t=(-pos[0], pos[1], pos[2]))
+
+
 def mirrorFaceCtlPos():
     ctls = mc.ls('Face_L_*_Tweak_Ctrl')
     for ctl in ctls:
@@ -466,7 +522,7 @@ def deleteTempLocs():
         mc.delete(tmpLocs)
 
 
-def resetSelectedTweakCtls():
+def matchTweaksToOffsetGrp():
     for ctl in mc.ls(sl=True):
         if not ctl.endswith('Tweak_Ctrl'):
             continue
@@ -474,11 +530,19 @@ def resetSelectedTweakCtls():
         trsLib.match(ctl, drv)
 
 
-def temp():
-    oldNode = 'Lwr_In_Blink_ControlDriver'
-    newNode = 'Lwr_Blink_ControlDriver'
-    oldAttrs = ['L_Blink_Lwr_In_Up', 'L_Blink_Lwr_In_Down', 'L_Blink_Lwr_Mid_Up',
-                'L_Blink_Lwr_Mid_Down', 'L_Blink_Lwr_Out_Up', 'L_Blink_Lwr_Out_Down']
+def resetSelectedTweakCtls():
+    for ctl in mc.ls(sl=True):
+        if not ctl.endswith('Tweak_Ctrl'):
+            continue
+        drv = ctl + '_Drv_Grp'
+
+        for i in ['tx', 'ty', 'tz', 'rx', 'ry', 'rz']:
+            val = mc.getAttr(drv + '.' + i)
+            mc.setAttr(ctl + '.' + i, (val * -1))
+
+        for i in ['sx', 'sy', 'sz']:
+            val = mc.getAttr(drv + '.' + i)
+            mc.setAttr(ctl + '.' + i, (1 / val))
 
 
 def getTransformDifference(trigCon):
@@ -487,21 +551,6 @@ def getTransformDifference(trigCon):
     :param fromNode: name of the control to check its values
     :return: [tx, ty, tz, rx, ry, rz, sx, sy, sz]
     """
-    # mmx = mc.createNode('multMatrix')
-    # imx = mc.createNode('inverseMatrix')
-    # dmx = mc.createNode('decomposeMatrix')
-    #
-    # mc.connectAttr(fromNode + '.worldMatrix[0]', imx + '.inputMatrix')
-    # mc.connectAttr(toNode + '.worldMatrix[0]', mmx + '.matrixIn[0]')
-    # mc.connectAttr(imx + '.outputMatrix', mmx + '.matrixIn[1]')
-    # mc.connectAttr(mmx + '.matrixSum', dmx + '.inputMatrix')
-    #
-    # attrs = ['otx', 'oty', 'otz', 'orx', 'ory', 'orz', 'osx', 'osy', 'osz']
-    # deltaTransformValues = [round(mc.getAttr(dmx + '.' + x), 3) for x in attrs]
-    #
-    # mc.delete(mmx, imx, dmx)
-    #
-    # return deltaTransformValues
     attrVals = []
     driveLoc = mc.spaceLocator(n='driveX')
     ctrlLoc = mc.spaceLocator(n='ctrlX')
@@ -525,7 +574,7 @@ def getTransformDifference(trigCon):
     ctrlRX = mc.xform(ctrlLoc, q=1, ro=1)
     mc.delete(driveLoc)
     mc.delete(ctrlLoc)
-    if parentLoc != None:
+    if parentLoc is not None:
         mc.delete(parentLoc)
     for X in [[driveTX, ctrlTX], [driveRX, ctrlRX]]:
         for i in [0, 1, 2]:
@@ -666,11 +715,11 @@ def bake():
                     if mc.objExists(driverCheck + '.' + this_driver):
                         faceDriver = driverCheck
                 for this_control in my_controls:
-                    if invert == True:
+                    if invert:
                         inv = -1
-                    if invert == False:
+                    else:
                         inv = 1
-                    if Rinvert == True:
+                    if Rinvert:
                         if 'R_' in this_control:
                             this_driver = this_driver.replace('L_', 'R_')
                             inv = -1
@@ -698,27 +747,26 @@ def bake():
                                 if myIndex == 0.0:
                                     try:
                                         myIndex = round(
-                                            mc.getAttr(faceDriver + '.' + this_driver.replace('Right', 'Left')),
-                                            3)
+                                            mc.getAttr(faceDriver + '.' + this_driver.replace('Right', 'Left')), 3)
                                     except:
                                         pass
-                                if mc.objExists(animCurve) == True:
+                                if mc.objExists(animCurve):
                                     for_key = mc.listConnections(animCurve + '.output', p=1)
                                     if not for_key:
-                                        mc.warning("[Face Bake Error] :: {} has no output.".format(animCurve))
-                                        continue
+                                        mc.warning("[Face Bake] :: {} had no output, connected it!".format(animCurve))
+                                        connectBrokenAnimCurves(animCurve)
+                                        # continue
                                     driverKeys = mc.keyframe(animCurve, q=True, floatChange=True)
                                     driverDict = {}
                                     for i in range(len(driverKeys)):
                                         driverDict[i] = round(driverKeys[i], 3)
-                                    oldVal = 0.0
                                     indexReq = 0
                                     match = False
                                     for keyIndex, indexValue in driverDict.iteritems():
                                         if indexValue == myIndex:
                                             match = True
                                             indexReq = keyIndex
-                                    if match == False:
+                                    if not match:
                                         mc.setKeyframe(for_key, f=myIndex)
                                         newKeys = mc.keyframe(animCurve, q=True, floatChange=True)
                                         newDriverDict = {}
@@ -732,10 +780,10 @@ def bake():
                                     newVal = oldVal + this_value
                                     mc.keyframe(animCurve, option='over', index=(indexReq, indexReq), absolute=1,
                                                 valueChange=newVal)
-                                    if match == False:
+                                    if not match:
                                         mc.keyTangent(animCurve, index=(indexReq, indexReq),
                                                       inTangentType='linear', outTangentType='linear')
-                                if mc.objExists(animCurve) == False:
+                                if not mc.objExists(animCurve):
                                     freshAnimCurve = mc.createNode('animCurveUA', n=animCurve)
                                     mc.connectAttr(faceDriver + '.' + this_driver, freshAnimCurve + '.input')
                                     cur = (mc.getAttr(connector + '.current')) + 1
@@ -745,7 +793,7 @@ def bake():
                                     for conec in connectors:
                                         if 'input[' in conec:
                                             my_ins.append(conec)
-                                    if my_ins != []:
+                                    if my_ins:
                                         in_num = int(my_ins[-1].split('[')[-1].replace(']', '')) + 1
                                     new_inputBlend = connector + '.input[' + str(in_num) + ']'
                                     test = mc.getAttr(new_inputBlend)
@@ -759,7 +807,7 @@ def bake():
                                                   outTangentType='linear')
                                     mc.keyTangent(freshAnimCurve, index=(1, 1), inTangentType='linear',
                                                   outTangentType='linear')
-                            if connector == None:
+                            if connector is None:
                                 channel = this_attr.replace('.', '')
                                 if 'trans' in this_attr:
                                     channel = channel.replace('translate', 'trans')
@@ -807,8 +855,6 @@ def bake():
 
 
 def importTailRig():
-    import maya.cmds as mc
-
     mc.file('C:/Users/ehsanm/Desktop/bob/bob_tail.ma', i=True)
     mc.rename('C_tail', 'C_tail_Ctrl_Grp')
     mc.parent('C_tail_Ctrl_Grp', 'Ctrl_Grp')
@@ -854,14 +900,14 @@ def fixIKVis():
 
 
 def fixGimbalVis():
-    '''
+    """
     Gimbal_Vis_HookUp
     Description: Reconnects the visibility of the gimbal ctrl
     Show: EAV
     Date Created: 29 July 2019
     Author: Ian W.S. White
     Last Updated : 7 Feb 2020
-    '''
+    """
 
     userSel = mc.ls(selection=True)
 
@@ -892,7 +938,7 @@ def mirrorMovementOn():
         if mc.objExists(c):
             rightCtrl = c.replace("_L_", "_R_")
             for a in attrs:
-                if mc.getAttr(c + a, lock=True) == False:
+                if not mc.getAttr(c + a, lock=True):
                     incoming = mc.listConnections(rightCtrl + a, destination=False, source=True)
                     if incoming:
                         if incoming[0] != c:
@@ -916,7 +962,7 @@ def mirrorMovementOff():
         if mc.objExists(c):
             rightCtrl = c.replace("_L_", "_R_")
             for a in attrs:
-                if mc.getAttr(c + a, lock=True) == False:
+                if not mc.getAttr(c + a, lock=True):
                     incoming = mc.listConnections(rightCtrl + a, destination=False, source=True)
                     if incoming:
                         if incoming[0] == c:
