@@ -41,8 +41,8 @@ GREEN_PALE = (130, 160, 130)
 PURPLE_PALE = (180, 150, 180)
 ORANGE_PALE = (200, 130, 80)
 
-dirname = __file__.split('iRig_maya')[0]
-ICON_DIR = os.path.abspath(os.path.join(dirname, 'icon'))
+DIRNAME = __file__.split('maya')[0]
+ICON_DIR = os.path.abspath(os.path.join(DIRNAME, 'icon'))
 SETTINGS_PATH = os.path.join(os.getenv("HOME"), 'testUI.uiconfig')
 
 

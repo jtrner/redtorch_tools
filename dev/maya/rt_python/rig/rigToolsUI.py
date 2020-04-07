@@ -25,12 +25,15 @@ from PySide2 import QtCore, QtWidgets
 
 # RedTorch modules
 from ..lib import qtLib
+from .. import package
 reload(qtLib)
+reload(package)
 
 # CONSTANTS
-ICON_DIR = os.path.abspath(os.path.join(__file__, '../../../../icon'))
+DIRNAME = __file__.split('maya')[0]
+ICON_DIR = os.path.abspath(os.path.join(DIRNAME, 'icon'))
 SETTINGS_PATH = os.path.join(os.getenv("HOME"), 'rigToolsUI.uiconfig')
-VERSION = '1.0.0'
+VERSION = package.__version__
 
 
 def getMayaWindow():

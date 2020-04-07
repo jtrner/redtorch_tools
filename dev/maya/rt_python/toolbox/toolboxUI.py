@@ -34,8 +34,11 @@ import maya.cmds as mc
 # RedTorch modules
 from ..lib import fileLib
 from ..lib import qtLib
+from .. import package
+
 reload(fileLib)
 reload(qtLib)
+reload(package)
 
 # CONSTANTS
 YELLOW = (200, 200, 130)
@@ -45,8 +48,10 @@ GREEN_PASTAL = (100, 160, 100)
 YELLOW_PASTAL = (210, 150, 90)
 RED = (220, 40, 40)
 GREEN = (40, 220, 40)
-ICON_DIR = os.path.abspath(os.path.join(__file__, '../../../../icon'))
+DIRNAME = __file__.split('maya')[0]
+ICON_DIR = os.path.abspath(os.path.join(DIRNAME, 'icon'))
 SETTINGS_PATH = os.path.join(os.getenv("HOME"), 'toolboxUI.uiconfig')
+VERSION = package.__version__
 
 
 def getMayaWindow():
@@ -61,7 +66,7 @@ def getMayaWindow():
 
 class UI(MayaQWidgetDockableMixin, QtWidgets.QDialog):
 
-    def __init__(self, title='RedTorch Tools', parent=getMayaWindow()):
+    def __init__(self, title='RedTorch Tools - v{}'.format(VERSION), parent=getMayaWindow()):
 
         # create window
         super(UI, self).__init__(parent=parent)

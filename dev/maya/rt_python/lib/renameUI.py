@@ -28,12 +28,13 @@ reload(utils)
 # CONSTANTS
 YELLOW = (200, 200, 130)
 GREY = (93, 93, 93)
-RED_PASTAL = (220, 100, 100p)
+RED_PASTAL = (220, 100, 100)
 GREEN_PASTAL = (100, 160, 100)
 YELLOW_PASTAL = (210, 150, 90)
 RED = (220, 40, 40)
 GREEN = (40, 220, 40)
-ICON_DIR = os.path.abspath(os.path.join(__file__, '../../../../icon'))
+DIRNAME = __file__.split('maya')[0]
+ICON_DIR = os.path.abspath(os.path.join(DIRNAME, 'icon'))
 SETTINGS_PATH = os.path.join(os.getenv("HOME"), 'renameUI.uiconfig')
 
 

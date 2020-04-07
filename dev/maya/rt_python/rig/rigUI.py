@@ -58,7 +58,8 @@ reload(component)
 # rigLib.importBlueprints()
 
 # CONSTANTS
-ICON_DIR = os.path.abspath(os.path.join(__file__, '../../../../icon'))
+DIRNAME = __file__.split('maya')[0]
+ICON_DIR = os.path.abspath(os.path.join(DIRNAME, 'icon'))
 STEPS = OrderedDict([
     ('New Scene', 'self.newScene()'),
     ('Import Model', 'self.rigBuild_instance.importModel()'),
