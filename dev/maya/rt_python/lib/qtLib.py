@@ -1,14 +1,7 @@
 """
 qtLib.py
 
-author: Ehsan Hassani Moghaddam (hassanie)
-date: 18 May 2019
-
-usage:
-This tool helps find and play the QC(s) submitted for all rigs on all shows.
-
-import qtLib
-reload(qtLib)
+Author: Ehsan Hassani Moghaddam
 
 """
 
@@ -19,15 +12,15 @@ import subprocess
 import traceback
 import functools
 
-# Qt libraries
+# Maya modules
 from PySide2 import QtCore, QtGui, QtWidgets
 
-# RedTorch modules
+# iRig modules
 from . import fileLib
-from ..general import utils as generalUtils
+from . import decoratorLib
 
 reload(fileLib)
-reload(generalUtils)
+reload(decoratorLib)
 
 # CONSTANTS
 GREY = (93, 93, 93)
@@ -48,7 +41,7 @@ GREEN_PALE = (130, 160, 130)
 PURPLE_PALE = (180, 150, 180)
 ORANGE_PALE = (200, 130, 80)
 
-dirname = __file__.split('maya')[0]
+dirname = __file__.split('iRig_maya')[0]
 ICON_DIR = os.path.abspath(os.path.join(dirname, 'icon'))
 SETTINGS_PATH = os.path.join(os.getenv("HOME"), 'testUI.uiconfig')
 
@@ -177,7 +170,7 @@ def createVLayout(parent, maxHeight=None, maxWidth=None, margins=4, spacing=4):
     return lay
 
 
-def createCB(label, labelWidthMin=40, labelWidthMax=200, parent=None):
+def createComboBox(label, labelWidthMin=40, labelWidthMax=200, maxHeight=100, parent=None):
     if parent:
         wid = None
         lay = createHLayout(parent)
@@ -187,14 +180,17 @@ def createCB(label, labelWidthMin=40, labelWidthMax=200, parent=None):
         wid = QtWidgets.QWidget()
         lay = QtWidgets.QHBoxLayout()
         wid.setLayout(lay)
-    lay.setAlignment(QtCore.Qt.AlignLeft)
+    lay.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+    # lay.setAlignment(QtCore.Qt.AlignTop)
     lb = QtWidgets.QLabel(label)
     lb.setMinimumWidth(labelWidthMin)
-    lb.setMaximumWidth(labelWidthMin)
+    lb.setMaximumWidth(labelWidthMax)
+    lb.setMaximumHeight(maxHeight)
     cb = QtWidgets.QComboBox()
     cb.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
     lay.addWidget(lb)
     lay.addWidget(cb)
+    cb.setMaximumHeight(maxHeight)
     return wid, lb, cb
 
 
@@ -211,7 +207,7 @@ def createCheckBox(label, labelWidthMin=40, labelWidthMax=200, parent=None):
     lay.setAlignment(QtCore.Qt.AlignLeft)
     lb = QtWidgets.QLabel(label)
     lb.setMinimumWidth(labelWidthMin)
-    lb.setMaximumWidth(labelWidthMin)
+    lb.setMaximumWidth(labelWidthMax)
     cb = QtWidgets.QCheckBox()
     cb.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
     lay.addWidget(lb)
@@ -232,7 +228,7 @@ def createSpinBox(label, labelWidthMin=40, labelWidthMax=200, parent=None):
     lay.setAlignment(QtCore.Qt.AlignLeft)
     lb = QtWidgets.QLabel(label)
     lb.setMinimumWidth(labelWidthMin)
-    lb.setMaximumWidth(labelWidthMin)
+    lb.setMaximumWidth(labelWidthMax)
     cb = QtWidgets.QSpinBox()
     cb.setMaximum(99999)
     cb.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -254,7 +250,7 @@ def createLineEdit(label, labelWidthMin=40, labelWidthMax=200, parent=None):
     lay.setAlignment(QtCore.Qt.AlignLeft)
     lb = QtWidgets.QLabel(label)
     lb.setMinimumWidth(labelWidthMin)
-    lb.setMaximumWidth(labelWidthMin)
+    lb.setMaximumWidth(labelWidthMax)
     cb = QtWidgets.QLineEdit()
     cb.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
     lay.addWidget(lb)
@@ -389,21 +385,36 @@ def getItemInTree(tw, text):
             return item
 
 
-def selectItemByText(tw, text):
+def selectItemByText(tw, text, parentText=None):
     """
     given a QTreeWidget and a text, select the item with that text if exists
     :param tw: QTreeWidget to look for given text
     :param text: text to lookup in the given QTreeWidget
+    :param parentText: if item is a child of another item, this is the text for parent
     :return: n/a
     """
     numItems = tw.topLevelItemCount()
+
     for i in range(numItems):
         item = tw.topLevelItem(i)
-        if item.text(0) == text:
-            tw.setCurrentItem(item)
-            break
+
+        # item is a top level item
+        if not parentText:
+            if text == item.text(0):
+                tw.setCurrentItem(item)
+            else:
+                tw.clearSelection()
+            return
+
+        # item is a child of a top level item
         else:
-            tw.clearSelection()
+            if parentText == item.text(0):
+                child_count = item.childCount()
+                for j in range(child_count):
+                    child_item = item.child(j)
+                    if text == child_item.text(0):
+                        tw.setCurrentItem(child_item)
+                        return
 
 
 def createButton(lay=None, name='newButton', command=None, iconPath=None, btnSize=None):
@@ -417,7 +428,7 @@ def createButton(lay=None, name='newButton', command=None, iconPath=None, btnSiz
         btn.clicked.connect(command)
 
     # iconPath
-    if iconPath and os.path.lexists(iconPath):
+    if iconPath and os.path.lexists(iconPath) and os.path.isfile(iconPath):
         icon = QtGui.QIcon(iconPath)
         btn.setIcon(icon)
         btn.setToolTip(name)
@@ -428,6 +439,7 @@ def createButton(lay=None, name='newButton', command=None, iconPath=None, btnSiz
         else:
             btn.setFixedWidth(btn.sizeHint().width())
     else:
+        btn.setMinimumWidth(20)
         btn.setText(name)
 
     return btn
@@ -461,6 +473,7 @@ def createColorGuide(layout, text, color, parent):
     grey_lb = QtWidgets.QLabel(text)
     layout.layout().addWidget(grey_btn)
     layout.layout().addWidget(grey_lb)
+
 
 class UI(QtWidgets.QDialog):
     def __init__(self, title='test UI', parent=getMayaWindow()):
@@ -611,7 +624,6 @@ class UI(QtWidgets.QDialog):
 
         # show the assets with playblasts in PRODUCT
         for assetName in sorted(assetNames):
-
             # no QC found
             color = GREY
 
@@ -657,21 +669,21 @@ class MenuButton(QtWidgets.QPushButton):
 
 
 def launch():
+    global testUI_obj
     if 'testUI_obj' in globals():
         testUI_obj.close()
         testUI_obj.deleteLater()
         del globals()['testUI_obj']
-    global testUI_obj
     testUI_obj = UI()
     testUI_obj.show()
 
 
 def confirmDialog(parent, title='Confirm', msg='Are you sure you?'):
     reply = QtWidgets.QMessageBox.question(parent,
-                                       title,
-                                       msg,
-                                       QtWidgets.QMessageBox.Yes,
-                                       QtWidgets.QMessageBox.No)
+                                           title,
+                                           msg,
+                                           QtWidgets.QMessageBox.Yes,
+                                           QtWidgets.QMessageBox.No)
 
     if reply == QtWidgets.QMessageBox.Yes:
         return True
@@ -798,30 +810,25 @@ class Bubble(QtWidgets.QLabel):
 
 
 def fillWidgetsWithBtns(widget, btnNames, btnSize=None):
-        widget.setMinimumWidth(10)
-        layout = FlowLayout(widget)
+    widget.setMinimumWidth(10)
+    layout = FlowLayout(widget)
 
-        for btnName in btnNames:
-            btn = QtWidgets.QPushButton(btnName)
-            if btnSize:
-                btn.setMinimumSize(btnSize, btnSize)
-                btn.setMaximumSize(btnSize, btnSize)
-            else:
-                btn.setFixedWidth(btn.sizeHint().width())
-            layout.addWidget(btn)
+    for btnName in btnNames:
+        btn = QtWidgets.QPushButton(btnName)
+        if btnSize:
+            btn.setMinimumSize(btnSize, btnSize)
+            btn.setMaximumSize(btnSize, btnSize)
+        else:
+            btn.setFixedWidth(btn.sizeHint().width())
+        layout.addWidget(btn)
 
 
-def btnsFromJson(layout, config, btnSize=None):
+def btnsFromJson(layout, config, btnSize=None, icon_dir=None):
     categoriesAndBtns_data = fileLib.loadJson(config)
-
-    # scrollArea = QtWidgets.QScrollArea()
-    # scrollArea.setWidgetResizable(True)
-    # self.mainLayout.addWidget(scrollArea)
-    # scrollLay = QtWidgets.QVBoxLayout(scrollArea)
 
     for cat, btns_data in categoriesAndBtns_data.items():
         # group by category
-        gb, lay = createGroupBox(parentLayout=layout, label=cat.title())
+        gb, lay = createGroupBox(parentLayout=layout, label=cat)
 
         lay.layout().setContentsMargins(1, 1, 1, 1)
         lay.layout().setSpacing(1)
@@ -838,14 +845,12 @@ def btnsFromJson(layout, config, btnSize=None):
 
         for btnName, btn_data in btns_data.items():
             # button
-            commandString = btn_data['command']
+            commandString = btn_data.get('command', 'print("no command found")')
 
-            iconPath = btn_data['icon']
+            iconPath = btn_data.get('icon', '')
             if not os.path.lexists(iconPath):
                 iconName = os.path.basename(iconPath)
-                iconDir = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                                       '../../../icon'))
-                iconPath = os.path.join(iconDir, iconName+'.png')
+                iconPath = os.path.join(ICON_DIR, iconName)
 
             btn = createButton(name=btnName, iconPath=iconPath, btnSize=btnSize)
             flowLayout.addWidget(btn)
@@ -893,6 +898,20 @@ def getSaveFileName(dialog, le, defaultFolder, txt='Select file', ext='json'):
         le.setText(f)
 
 
+def getOpenFileName(dialog, le, defaultFolder, txt='Select file', ext='json'):
+    defaultFolder_from_ui = le.text()
+    if defaultFolder_from_ui:
+        defaultFolder = defaultFolder_from_ui
+    f, filter = QtWidgets.QFileDialog.getOpenFileName(dialog,
+                                                      txt,
+                                                      defaultFolder,
+                                                      "{0} Files (*.{0})".format(ext),
+                                                      "",
+                                                      QtWidgets.QFileDialog.Options())
+    if f:
+        le.setText(f)
+
+
 def setOpenFileName(dialog, le, defaultFolder):
     defaultFolder_from_ui = le.text()
     if defaultFolder_from_ui:
@@ -919,8 +938,22 @@ def getExistingDir(dialog, le, defaultFolder):
         le.setText(folder)
 
 
-@generalUtils.undoChunk
-def command(commandString):
-    print commandString
-    exec commandString
+def dictToTreeWidget(tw, data):
+    tw.clear()
+    for cat, btns_data in data.items():
+        cat_item = addItemToTreeWidget(tw, cat)
+        cat_item.setFlags(cat_item.flags() | QtCore.Qt.ItemIsEditable)
+        cat_item.setExpanded(True)
+        for btn, btn_data in btns_data.items():
+            btn_item = QtWidgets.QTreeWidgetItem()
+            btn_item.setFlags(cat_item.flags() | QtCore.Qt.ItemIsEditable)
+            btn_item.setText(0, btn)
+            cat_item.addChild(btn_item)
 
+
+@decoratorLib.undoChunk
+def command(commandString):
+    print('-' * 80)
+    print(commandString)
+    print('-' * 80)
+    exec (commandString, globals(), globals())

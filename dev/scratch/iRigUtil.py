@@ -1,6 +1,6 @@
 """
 import sys
-path = os.path.join("G:/Rigging/Users/Ehsan/code_share/redtorch_tools/dev/scratch")
+path = os.path.join("G:/Rigging/Users/ehsanm/code_share/redtorch_tools/dev/scratch")
 if path in sys.path:
     sys.path.remove(path)
 sys.path.insert(0, path)
@@ -50,7 +50,7 @@ import maya.cmds as mc
 
 # import redtorch_tools
 # redtorch_tools_dir = 'D:/all_works/redtorch_tools/dev'
-redtorch_tools_dir = 'G:/Rigging/Users/Ehsan/code_share/redtorch_tools/dev'
+redtorch_tools_dir = 'G:/Rigging/Users/ehsanm/code_share/redtorch_tools/dev'
 paths = [redtorch_tools_dir, os.path.join(redtorch_tools_dir, 'maya')]
 for path in paths:
     if path in sys.path:
@@ -94,7 +94,7 @@ def rigFootSquash(geos, driverNode, name='L_foot'):
 
     import sys
     import os
-    path = os.path.join("G:/Rigging/Users/Ehsan/code_share/redtorch_tools/dev/scratch")
+    path = os.path.join("G:/Rigging/Users/ehsanm/code_share/redtorch_tools/dev/scratch")
     if path in sys.path:
         sys.path.remove(path)
     sys.path.insert(0, path)

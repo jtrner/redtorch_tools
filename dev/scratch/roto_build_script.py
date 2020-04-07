@@ -1,6 +1,6 @@
 """
 import sys
-path = os.path.join("G:/Rigging/Users/Ehsan/code_share/redtorch_tools/dev/scratch")
+path = os.path.join("G:/Rigging/Users/ehsanm/code_share/redtorch_tools/dev/scratch")
 if path in sys.path:
     sys.path.remove(path)
 sys.path.insert(0, path)
@@ -18,10 +18,13 @@ roto_build_script.post_fix()
 
 """
 import os
+import sys
 import json
 
 import maya.cmds as mc
 
+for path in sys.path:
+    print path
 from rt_python.lib import renderLib
 from rt_python.lib import connect
 from rt_python.lib import attrLib
@@ -81,7 +84,7 @@ def importTail():
     mc.setAttr('C_tail_origin_GRP.inheritsTransform', 0)
     mc.parent('C_tail_001_JNT', 'C_fk_tailBase_bind_b_jnt')
     mc.delete('C_tail_module_GRP')
-    mc.rename('C_Tail_Root_Ctrl', '??C_Tail_Root_Ctrl')
+    mc.rename('C_tail_base_CTL', 'C_Tail_Root_Ctrl')
 
 
 def fixCtlPositions():
@@ -223,7 +226,7 @@ def createSpaces():
     space.orient(
         drivers=drivers,
         drivens=['C_tail_base_ZRO'],
-        control='C_tail_base_CTL',
+        control='C_Tail_Root_Ctrl',
         name='C_tail_base_follow')
 
     #
