@@ -2,47 +2,47 @@
 "Pose": {
     "resetAsset": {
         "command": "from rt_python.lib import pose\nreload(pose)\npose.resetAsset()",
-        "icon": "resetAsset"
+        "icon": "resetAsset.png"
     },
     "bipedArmGoToTPose": {
         "command": "from rt_python.lib import pose\nreload(pose)\npose.bipedArmGoToTPose()",
-        "icon": "bipedArmGoToTPose"
+        "icon": "bipedArmGoToTPose.png"
     },
     "bipedArmGoToTPoseSelected": {
         "command": "import maya.cmds as mc\nfrom rt_python.lib import pose\nreload(pose)\npose.bipedArmGoToTPose(mc.ls(sl=True)[0])",
-        "icon": "bipedArmGoToTPoseSelected"
+        "icon": "bipedArmGoToTPoseSelected.png"
     },
     "bipedArmGoToAPose": {
         "command": "from rt_python.lib import pose\nreload(pose)\npose.bipedArmGoToAPose()",
-        "icon": "bipedArmGoToAPose"
+        "icon": "bipedArmGoToAPose.png"
     },
     "bipedArmGoToAPoseSelected": {
         "command": "import maya.cmds as mc\nfrom rt_python.lib import pose\nreload(pose)\npose.bipedArmGoToAPose(mc.ls(sl=True)[0])",
-        "icon": "bipedArmGoToAPoseSelected"
+        "icon": "bipedArmGoToAPoseSelected.png"
     },
     "resetTransforms": {
         "command": "import maya.cmds as mc\nfrom rt_python.lib import trsLib\nreload(trsLib)\n[trsLib.resetTRS(x) for x in mc.ls(sl=1)]",
-        "icon": "resetTransforms"
+        "icon": "resetTransforms.png"
     },
     "match": {
         "command": "import maya.cmds as mc\nfrom rt_python.lib import trsLib\nreload(trsLib)\ntrsLib.match(*mc.ls(sl=True))",
-        "icon": "match"
+        "icon": "match.png"
     },
     "mirrorLikeJnt": {
         "command": "from rt_python.lib import trsLib\nreload(trsLib)\ntrsLib.mirrorLikeJnt()",
-        "icon": "mirrorLikeJnt"
+        "icon": "mirrorLikeJnt.png"
     },
     "createOffsetGroup": {
         "command": "from rt_python.lib import trsLib\nreload(trsLib)\ntrsLib.insert(mode='allChilds', search='_GRP', replace='_OFS')",
-        "icon": "createOffsetGroup"
+        "icon": "createOffsetGroup.png"
     },
     "lock": {
         "command": "import maya.cmds as mc\nfrom rt_python.lib import attrLib\nreload(attrLib)\nfor node in mc.ls(sl=1):\n\tattrLib.lockHideAttrs(node=node, attrs=['t', 'r', 's', 'v'], lock=True, hide=True)",
-        "icon": "lock"
+        "icon": "lock.png"
     },
     "unlock": {
         "command": "import maya.cmds as mc\nfrom rt_python.lib import attrLib\nreload(attrLib)\nfor node in mc.ls(sl=1):\n\tattrLib.unlock(nodes=node, attrs=['t', 'r', 's', 'v'])",
-        "icon": "unlock"
+        "icon": "unlock.png"
     }
 },
 "Deformation": {
@@ -70,7 +70,7 @@
 "Joint": {
     "OrientUsingAim": {
         "command": "import maya.cmds as mc\nfrom rt_python.lib import jntLib\nreload(jntLib)\nsels=mc.ls(sl=1)\njntLib.orientUsingAim(jnts=sels[:-1] , upAim=sels[-1], aimAxes='x')",
-        "icon": "OrientUsingAim"
+        "icon": "OrientUsingAim.png"
     }
 },
 "Control": {

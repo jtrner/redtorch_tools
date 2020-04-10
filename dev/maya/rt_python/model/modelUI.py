@@ -32,7 +32,7 @@ from ..lib import qtLib
 from . import modelLib
 from ..general import workspace
 from ..general import utils as generalUtils
-from .. import package
+import package
 
 reload(qtLib)
 reload(workspace)

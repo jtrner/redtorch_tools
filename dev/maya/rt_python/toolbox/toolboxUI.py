@@ -20,21 +20,17 @@ toolboxUI.launch()
 """
 # python modules
 import os
-import sys
-import imp
-import functools
 
 # Qt modules
-from PySide2 import QtCore, QtWidgets, QtGui
+from PySide2 import QtCore, QtWidgets
 from maya.app.general.mayaMixin import MayaQWidgetDockableMixin
 
 # Maya modules
-import maya.cmds as mc
 
 # RedTorch modules
 from ..lib import fileLib
 from ..lib import qtLib
-from .. import package
+import package
 
 reload(fileLib)
 reload(qtLib)

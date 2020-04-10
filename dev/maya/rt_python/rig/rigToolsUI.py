@@ -25,7 +25,8 @@ from PySide2 import QtCore, QtWidgets
 
 # RedTorch modules
 from ..lib import qtLib
-from .. import package
+import package
+
 reload(qtLib)
 reload(package)
 
