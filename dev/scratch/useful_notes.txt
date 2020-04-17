@@ -1,3 +1,9 @@
+
+
+
+
+
+
 overal control doesn't move all sub controls on the face
 Face_C_Blink_Lwr_Down_Clamp node has missing connections
 or C_Mouth_LipUpr_Up_Mid_Anm 0 keyframe value is not on 1.0
@@ -75,3 +81,38 @@ Bob notes from Ian
 
 ========================================================================
 added horns - added fur opacity attribute on character_settings_Ctrl
+
+
+========================================================================
+# open default framework UI
+from rig_factory.controllers.rig_controller import RigController
+import rig_factory.build.utilities.controller_utilities as cut
+cut.initialize_rig_controller(log=None, controller_type=RigController)
+import rigging_widgets.widget_launchers.launch_widgets as lw
+lw.launch()
+or
+import rig_factory.build.utilities.controller_utilities as cut
+cut.initialize_rig_controller(log=None, controller_type=None)
+import rigging_widgets.widget_launchers.launch_widgets as lw
+lw.launch()
+
+
+
+========================================================================
+# open frank naming framework UI
+import rig_factory.build.frank_utilities.frank_controller_utilities as fcu
+fcu.initialize_rig_controller()
+import rigging_widgets.widget_launchers.launch_widgets as lw
+lw.launch()
+
+
+
+========================================================================
+# top group attributes
+setAttr "Character.ProxyVis" 1;
+setAttr "Character.GeoVis" 1;
+setAttr "Character.GeoLock" 1;
+setAttr "Character.CtrlVis" 1;
+setAttr "Character.JointVis" 1;
+setAttr "Character.UtilityVis" 1;
+setAttr "Character.PinkHelperVis" 1;

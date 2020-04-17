@@ -1,0 +1,109 @@
+foot bulge script- done
+Cutter face: done
+
+
+Mike face: 
+ - make rig scalable
+
+
+Roto body: wip
+
+
+Roto face: waiting to start
+
+
+Fritz face:
+- make O shape work
+
+
+Fungus: done
+
+
+sully face: handoff
+
+
+Val face: face fixes
+
+
+Clean up G:/Rigging
+
+
+
+@Ehsan, edgeFlowMirror crashing seems to be inconsistent after testing it a bit more, but if you want to have a look, then the blueprint is located here:
+Y:\RBGB\assets\type\Character\Winger\work\rig\Maya\alexc\build
+
+
+
+hmm, does it mean we can't dynamically change the iRig version inside Maya?
+Do you think the framework will need to remain maya-specific or perhaps become application-agnostic in future?
+Ah
+To do that... you'll just have to use the site package
+eg:
+import site
+site.addsitedir('path/to/iRig_v2.0.0')
+
+>> Doesn't look like there's a way to pre-pend the sys.path using site alone.
+one way you could do it is collect the sys.path list prior to running the site.addsitedir for the new iRig version, then shift new paths from their appended indexes to index 0
+
+
+
+
+utils.py:122 No defaults or template type given or found
+
+
+
+#
+toolbox requests
+---------------------------
+- move up and down buttons
+- repeatable commands
+
+
+
+G:\Pipeline\pipeline_deployed\
+G:\Rigging\icon_packages\iRig
+
+os.getenv('TT_TASKNAME')
+# Result: 'Rigging' # 
+
+# 
+import icon_shotgun as isg
+
+current_user = isg.SgPerson(1185)
+current_user = api.SgPerson(<user ID integer>)
+
+if current_user.department().name == "Rigging":
+	print 'stuff'
+
+
+
+
+
+
+import site
+
+# remove old iRig from sys.path
+for path in sys.path:
+    if 'iRig' in path:
+        sys.path.remove(path)
+
+# copy sys.path
+clean_sp = sys.path[:]
+
+# add iRig and sub modules (from .pth) to sys.path (this will add them randomly)
+site.addsitedir('D:/Pipeline/ehsanm/dev/git_repo/iRig')
+
+# copy sys.path again
+new_sp = sys.path[:]
+
+# difference between clean_sp and new_sp are the ones we should add to beginning of sys.path
+new_paths = list(set(new_sp).difference(set(new_sp)))
+
+# remove new_paths from sys.path
+for path in new_paths:
+    while path in sys.path:
+        sys.path.remove(path)
+
+# add new_paths to beginning of sys.path
+for path in new_paths:
+    sys.path.insert(0, path)
