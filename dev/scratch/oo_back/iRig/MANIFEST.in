@@ -1,0 +1,5 @@
+# Basic data files
+include README.md tox.ini pytest.ini Pipfile Pipfile.lock
+recursive-include tests *.py
+recursive-include src *.json
+recursive-include src *.png

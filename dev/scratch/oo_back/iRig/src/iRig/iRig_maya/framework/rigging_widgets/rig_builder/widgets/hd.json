@@ -1,0 +1,2324 @@
+[
+    {
+        "index": null,
+        "root_name": "main",
+        "selection_string": "C_main_Ctrl",
+        "side": "center",
+        "size": 10.0,
+        "vertices": []
+    },
+    {
+        "index": 0,
+        "root_name": "fk_spine",
+        "selection_string": "C_fk_spine_a_Ctrl",
+        "side": "center",
+        "size": 1.5000000000000002,
+        "vertices": []
+    },
+    {
+        "index": 1,
+        "root_name": "fk_spine",
+        "selection_string": "C_fk_spine_b_Ctrl",
+        "side": "center",
+        "size": 1.5000000000000002,
+        "vertices": []
+    },
+    {
+        "index": 2,
+        "root_name": "fk_spine",
+        "selection_string": "C_fk_spine_c_Ctrl",
+        "side": "center",
+        "size": 1.5000000000000002,
+        "vertices": []
+    },
+    {
+        "index": 3,
+        "root_name": "fk_spine",
+        "selection_string": "C_fk_spine_d_Ctrl",
+        "side": "center",
+        "size": 1.5000000000000002,
+        "vertices": []
+    },
+    {
+        "index": 0,
+        "root_name": "fk_neck",
+        "selection_string": "C_fk_neck_a_Ctrl",
+        "side": "center",
+        "size": 0.7500000000000001,
+        "vertices": []
+    },
+    {
+        "index": 1,
+        "root_name": "fk_neck",
+        "selection_string": "C_fk_neck_b_Ctrl",
+        "side": "center",
+        "size": 0.7500000000000001,
+        "vertices": []
+    },
+    {
+        "index": 2,
+        "root_name": "fk_neck",
+        "selection_string": "C_fk_neck_c_Ctrl",
+        "side": "center",
+        "size": 0.7500000000000001,
+        "vertices": []
+    },
+    {
+        "index": 3,
+        "root_name": "fk_neck",
+        "selection_string": "C_fk_neck_d_Ctrl",
+        "side": "center",
+        "size": 1.5000000000000002,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "arm_ik_wrist",
+        "selection_string": "L_arm_ik_wrist_Ctrl",
+        "side": "left",
+        "size": 0.8,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "arm_ik_hand",
+        "selection_string": "L_arm_ik_hand_Ctrl",
+        "side": "left",
+        "size": 0.4,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "arm_ik_elbow",
+        "selection_string": "L_arm_ik_elbow_Ctrl",
+        "side": "left",
+        "size": 0.2,
+        "vertices": []
+    },
+    {
+        "index": 1,
+        "root_name": "fk_arm",
+        "selection_string": "L_fk_arm_b_Ctrl",
+        "side": "left",
+        "size": 0.6000000000000001,
+        "vertices": []
+    },
+    {
+        "index": 2,
+        "root_name": "fk_arm",
+        "selection_string": "L_fk_arm_c_Ctrl",
+        "side": "left",
+        "size": 0.6000000000000001,
+        "vertices": []
+    },
+    {
+        "index": 3,
+        "root_name": "fk_arm",
+        "selection_string": "L_fk_arm_d_Ctrl",
+        "side": "left",
+        "size": 0.6000000000000001,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "arm_shoulder",
+        "selection_string": "L_arm_shoulder_Ctrl",
+        "side": "left",
+        "size": 1.0,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "arm_pin",
+        "selection_string": "L_arm_pin_Ctrl",
+        "side": "left",
+        "size": 0.6000000000000001,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "arm_ik_wrist",
+        "selection_string": "R_arm_ik_wrist_Ctrl",
+        "side": "right",
+        "size": 0.8,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "arm_ik_hand",
+        "selection_string": "R_arm_ik_hand_Ctrl",
+        "side": "right",
+        "size": 0.4,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "arm_ik_elbow",
+        "selection_string": "R_arm_ik_elbow_Ctrl",
+        "side": "right",
+        "size": 0.2,
+        "vertices": []
+    },
+    {
+        "index": 1,
+        "root_name": "fk_arm",
+        "selection_string": "R_fk_arm_b_Ctrl",
+        "side": "right",
+        "size": 0.6000000000000001,
+        "vertices": []
+    },
+    {
+        "index": 2,
+        "root_name": "fk_arm",
+        "selection_string": "R_fk_arm_c_Ctrl",
+        "side": "right",
+        "size": 0.6000000000000001,
+        "vertices": []
+    },
+    {
+        "index": 3,
+        "root_name": "fk_arm",
+        "selection_string": "R_fk_arm_d_Ctrl",
+        "side": "right",
+        "size": 0.6000000000000001,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "arm_shoulder",
+        "selection_string": "R_arm_shoulder_Ctrl",
+        "side": "right",
+        "size": 1.0,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "arm_pin",
+        "selection_string": "R_arm_pin_Ctrl",
+        "side": "right",
+        "size": 0.6000000000000001,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "leg_hip",
+        "selection_string": "L_leg_hip_Ctrl",
+        "side": "left",
+        "size": 0.4,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "leg_ik_ankle",
+        "selection_string": "L_leg_ik_ankle_Ctrl",
+        "side": "left",
+        "size": 0.8,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "leg_ik_knee",
+        "selection_string": "L_leg_ik_knee_Ctrl",
+        "side": "left",
+        "size": 0.6000000000000001,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "leg_ik_toe",
+        "selection_string": "L_leg_ik_toe_Ctrl",
+        "side": "left",
+        "size": 0.4,
+        "vertices": []
+    },
+    {
+        "index": 0,
+        "root_name": "fk_leg",
+        "selection_string": "L_fk_leg_a_Ctrl",
+        "side": "left",
+        "size": 0.6000000000000001,
+        "vertices": []
+    },
+    {
+        "index": 1,
+        "root_name": "fk_leg",
+        "selection_string": "L_fk_leg_b_Ctrl",
+        "side": "left",
+        "size": 0.6000000000000001,
+        "vertices": []
+    },
+    {
+        "index": 2,
+        "root_name": "fk_leg",
+        "selection_string": "L_fk_leg_c_Ctrl",
+        "side": "left",
+        "size": 0.6000000000000001,
+        "vertices": []
+    },
+    {
+        "index": 3,
+        "root_name": "fk_leg",
+        "selection_string": "L_fk_leg_d_Ctrl",
+        "side": "left",
+        "size": 0.6000000000000001,
+        "vertices": []
+    },
+    {
+        "index": 4,
+        "root_name": "fk_leg",
+        "selection_string": "L_fk_leg_e_Ctrl",
+        "side": "left",
+        "size": 0.6000000000000001,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "leg_pin",
+        "selection_string": "L_leg_pin_Ctrl",
+        "side": "left",
+        "size": 0.6000000000000001,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "leg_hip",
+        "selection_string": "R_leg_hip_Ctrl",
+        "side": "right",
+        "size": 0.4,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "leg_ik_ankle",
+        "selection_string": "R_leg_ik_ankle_Ctrl",
+        "side": "right",
+        "size": 0.8,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "leg_ik_knee",
+        "selection_string": "R_leg_ik_knee_Ctrl",
+        "side": "right",
+        "size": 0.6000000000000001,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "leg_ik_toe",
+        "selection_string": "R_leg_ik_toe_Ctrl",
+        "side": "right",
+        "size": 0.4,
+        "vertices": []
+    },
+    {
+        "index": 0,
+        "root_name": "fk_leg",
+        "selection_string": "R_fk_leg_a_Ctrl",
+        "side": "right",
+        "size": 0.6000000000000001,
+        "vertices": []
+    },
+    {
+        "index": 1,
+        "root_name": "fk_leg",
+        "selection_string": "R_fk_leg_b_Ctrl",
+        "side": "right",
+        "size": 0.6000000000000001,
+        "vertices": []
+    },
+    {
+        "index": 2,
+        "root_name": "fk_leg",
+        "selection_string": "R_fk_leg_c_Ctrl",
+        "side": "right",
+        "size": 0.6000000000000001,
+        "vertices": []
+    },
+    {
+        "index": 3,
+        "root_name": "fk_leg",
+        "selection_string": "R_fk_leg_d_Ctrl",
+        "side": "right",
+        "size": 0.6000000000000001,
+        "vertices": []
+    },
+    {
+        "index": 4,
+        "root_name": "fk_leg",
+        "selection_string": "R_fk_leg_e_Ctrl",
+        "side": "right",
+        "size": 0.6000000000000001,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "leg_pin",
+        "selection_string": "R_leg_pin_Ctrl",
+        "side": "right",
+        "size": 0.6000000000000001,
+        "vertices": []
+    },
+    {
+        "index": 0,
+        "root_name": "fk_hand_thumb",
+        "selection_string": "L_fk_hand_thumb_a_Ctrl",
+        "side": "left",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 1,
+        "root_name": "fk_hand_thumb",
+        "selection_string": "L_fk_hand_thumb_b_Ctrl",
+        "side": "left",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 2,
+        "root_name": "fk_hand_thumb",
+        "selection_string": "L_fk_hand_thumb_c_Ctrl",
+        "side": "left",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 3,
+        "root_name": "fk_hand_thumb",
+        "selection_string": "L_fk_hand_thumb_d_Ctrl",
+        "side": "left",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 0,
+        "root_name": "fk_hand_index",
+        "selection_string": "L_fk_hand_index_a_Ctrl",
+        "side": "left",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 1,
+        "root_name": "fk_hand_index",
+        "selection_string": "L_fk_hand_index_b_Ctrl",
+        "side": "left",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 2,
+        "root_name": "fk_hand_index",
+        "selection_string": "L_fk_hand_index_c_Ctrl",
+        "side": "left",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 3,
+        "root_name": "fk_hand_index",
+        "selection_string": "L_fk_hand_index_d_Ctrl",
+        "side": "left",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 0,
+        "root_name": "fk_hand_middle",
+        "selection_string": "L_fk_hand_middle_a_Ctrl",
+        "side": "left",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 1,
+        "root_name": "fk_hand_middle",
+        "selection_string": "L_fk_hand_middle_b_Ctrl",
+        "side": "left",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 2,
+        "root_name": "fk_hand_middle",
+        "selection_string": "L_fk_hand_middle_c_Ctrl",
+        "side": "left",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 3,
+        "root_name": "fk_hand_middle",
+        "selection_string": "L_fk_hand_middle_d_Ctrl",
+        "side": "left",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 0,
+        "root_name": "fk_hand_ring",
+        "selection_string": "L_fk_hand_ring_a_Ctrl",
+        "side": "left",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 1,
+        "root_name": "fk_hand_ring",
+        "selection_string": "L_fk_hand_ring_b_Ctrl",
+        "side": "left",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 2,
+        "root_name": "fk_hand_ring",
+        "selection_string": "L_fk_hand_ring_c_Ctrl",
+        "side": "left",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 3,
+        "root_name": "fk_hand_ring",
+        "selection_string": "L_fk_hand_ring_d_Ctrl",
+        "side": "left",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 0,
+        "root_name": "fk_hand_pinky",
+        "selection_string": "L_fk_hand_pinky_a_Ctrl",
+        "side": "left",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 1,
+        "root_name": "fk_hand_pinky",
+        "selection_string": "L_fk_hand_pinky_b_Ctrl",
+        "side": "left",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 2,
+        "root_name": "fk_hand_pinky",
+        "selection_string": "L_fk_hand_pinky_c_Ctrl",
+        "side": "left",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 3,
+        "root_name": "fk_hand_pinky",
+        "selection_string": "L_fk_hand_pinky_d_Ctrl",
+        "side": "left",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 0,
+        "root_name": "fk_hand_thumb",
+        "selection_string": "R_fk_hand_thumb_a_Ctrl",
+        "side": "right",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 1,
+        "root_name": "fk_hand_thumb",
+        "selection_string": "R_fk_hand_thumb_b_Ctrl",
+        "side": "right",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 2,
+        "root_name": "fk_hand_thumb",
+        "selection_string": "R_fk_hand_thumb_c_Ctrl",
+        "side": "right",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 3,
+        "root_name": "fk_hand_thumb",
+        "selection_string": "R_fk_hand_thumb_d_Ctrl",
+        "side": "right",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 0,
+        "root_name": "fk_hand_index",
+        "selection_string": "R_fk_hand_index_a_Ctrl",
+        "side": "right",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 1,
+        "root_name": "fk_hand_index",
+        "selection_string": "R_fk_hand_index_b_Ctrl",
+        "side": "right",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 2,
+        "root_name": "fk_hand_index",
+        "selection_string": "R_fk_hand_index_c_Ctrl",
+        "side": "right",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 3,
+        "root_name": "fk_hand_index",
+        "selection_string": "R_fk_hand_index_d_Ctrl",
+        "side": "right",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 0,
+        "root_name": "fk_hand_middle",
+        "selection_string": "R_fk_hand_middle_a_Ctrl",
+        "side": "right",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 1,
+        "root_name": "fk_hand_middle",
+        "selection_string": "R_fk_hand_middle_b_Ctrl",
+        "side": "right",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 2,
+        "root_name": "fk_hand_middle",
+        "selection_string": "R_fk_hand_middle_c_Ctrl",
+        "side": "right",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 3,
+        "root_name": "fk_hand_middle",
+        "selection_string": "R_fk_hand_middle_d_Ctrl",
+        "side": "right",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 0,
+        "root_name": "fk_hand_ring",
+        "selection_string": "R_fk_hand_ring_a_Ctrl",
+        "side": "right",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 1,
+        "root_name": "fk_hand_ring",
+        "selection_string": "R_fk_hand_ring_b_Ctrl",
+        "side": "right",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 2,
+        "root_name": "fk_hand_ring",
+        "selection_string": "R_fk_hand_ring_c_Ctrl",
+        "side": "right",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 3,
+        "root_name": "fk_hand_ring",
+        "selection_string": "R_fk_hand_ring_d_Ctrl",
+        "side": "right",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 0,
+        "root_name": "fk_hand_pinky",
+        "selection_string": "R_fk_hand_pinky_a_Ctrl",
+        "side": "right",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 1,
+        "root_name": "fk_hand_pinky",
+        "selection_string": "R_fk_hand_pinky_b_Ctrl",
+        "side": "right",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 2,
+        "root_name": "fk_hand_pinky",
+        "selection_string": "R_fk_hand_pinky_c_Ctrl",
+        "side": "right",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": 3,
+        "root_name": "fk_hand_pinky",
+        "selection_string": "R_fk_hand_pinky_d_Ctrl",
+        "side": "right",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "eye_aim",
+        "selection_string": "C_eye_aim_Ctrl",
+        "side": "center",
+        "size": 0.1,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "arrow",
+        "selection_string": "L_arrow_Ctrl",
+        "side": "left",
+        "size": 0.4,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "eye_aim_handle",
+        "selection_string": "L_eye_aim_handle_Ctrl",
+        "side": "left",
+        "size": 0.1,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "arrow",
+        "selection_string": "R_arrow_Ctrl",
+        "side": "right",
+        "size": 0.4,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "eye_aim_handle",
+        "selection_string": "R_eye_aim_handle_Ctrl",
+        "side": "right",
+        "size": 0.1,
+        "vertices": []
+    },
+    {
+        "index": 3,
+        "root_name": "brow",
+        "selection_string": "R_brow_d_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1644]"
+        ]
+    },
+    {
+        "index": 2,
+        "root_name": "brow",
+        "selection_string": "R_brow_c_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1403]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "brow",
+        "selection_string": "R_brow_b_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1366]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "brow",
+        "selection_string": "R_brow_a_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1445]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "brow",
+        "selection_string": "C_brow_a_fhd",
+        "side": "center",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1294]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "brow",
+        "selection_string": "L_brow_a_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[50]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "brow",
+        "selection_string": "L_brow_b_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[28]"
+        ]
+    },
+    {
+        "index": 2,
+        "root_name": "brow",
+        "selection_string": "L_brow_c_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[26]"
+        ]
+    },
+    {
+        "index": 3,
+        "root_name": "brow",
+        "selection_string": "L_brow_d_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[208]"
+        ]
+    },
+    {
+        "index": 2,
+        "root_name": "brow_up",
+        "selection_string": "R_brow_up_c_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1934]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "brow_up",
+        "selection_string": "R_brow_up_b_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1375]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "brow_up",
+        "selection_string": "R_brow_up_a_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1437]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "brow_up",
+        "selection_string": "C_brow_up_a_fhd",
+        "side": "center",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1299]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "brow_up",
+        "selection_string": "L_brow_up_a_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[3]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "brow_up",
+        "selection_string": "L_brow_up_b_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[5]"
+        ]
+    },
+    {
+        "index": 2,
+        "root_name": "brow_up",
+        "selection_string": "L_brow_up_c_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[477]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "lid_up_crease",
+        "selection_string": "L_lid_up_crease_a_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[337]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "lid_up_crease",
+        "selection_string": "L_lid_up_crease_b_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[335]"
+        ]
+    },
+    {
+        "index": 2,
+        "root_name": "lid_up_crease",
+        "selection_string": "L_lid_up_crease_c_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[350]"
+        ]
+    },
+    {
+        "index": 3,
+        "root_name": "lid_up_crease",
+        "selection_string": "L_lid_up_crease_d_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[604]"
+        ]
+    },
+    {
+        "index": 4,
+        "root_name": "lid_up_crease",
+        "selection_string": "L_lid_up_crease_e_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[331]"
+        ]
+    },
+    {
+        "index": 5,
+        "root_name": "lid_up_crease",
+        "selection_string": "L_lid_up_crease_f_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[326]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "lid_down_crease",
+        "selection_string": "L_lid_down_crease_a_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[472]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "lid_down_crease",
+        "selection_string": "L_lid_down_crease_b_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[275]"
+        ]
+    },
+    {
+        "index": 2,
+        "root_name": "lid_down_crease",
+        "selection_string": "L_lid_down_crease_c_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[547]"
+        ]
+    },
+    {
+        "index": 3,
+        "root_name": "lid_down_crease",
+        "selection_string": "L_lid_down_crease_d_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[136]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "eyelid_up_edge",
+        "selection_string": "L_eyelid_up_edge_a_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1121]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "eyelid_up_edge",
+        "selection_string": "L_eyelid_up_edge_b_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1122]"
+        ]
+    },
+    {
+        "index": 2,
+        "root_name": "eyelid_up_edge",
+        "selection_string": "L_eyelid_up_edge_c_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1123]"
+        ]
+    },
+    {
+        "index": 3,
+        "root_name": "eyelid_up_edge",
+        "selection_string": "L_eyelid_up_edge_d_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1125]"
+        ]
+    },
+    {
+        "index": 4,
+        "root_name": "eyelid_up_edge",
+        "selection_string": "L_eyelid_up_edge_e_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1129]"
+        ]
+    },
+    {
+        "index": 5,
+        "root_name": "eyelid_up_edge",
+        "selection_string": "L_eyelid_up_edge_f_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1102]"
+        ]
+    },
+    {
+        "index": 6,
+        "root_name": "eyelid_up_edge",
+        "selection_string": "L_eyelid_up_edge_g_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1104]"
+        ]
+    },
+    {
+        "index": 7,
+        "root_name": "eyelid_up_edge",
+        "selection_string": "L_eyelid_up_edge_h_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1105]"
+        ]
+    },
+    {
+        "index": 8,
+        "root_name": "eyelid_up_edge",
+        "selection_string": "L_eyelid_up_edge_i_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1106]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "eyelid_down_edge",
+        "selection_string": "L_eyelid_down_edge_a_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1120]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "eyelid_down_edge",
+        "selection_string": "L_eyelid_down_edge_b_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1119]"
+        ]
+    },
+    {
+        "index": 2,
+        "root_name": "eyelid_down_edge",
+        "selection_string": "L_eyelid_down_edge_c_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1117]"
+        ]
+    },
+    {
+        "index": 3,
+        "root_name": "eyelid_down_edge",
+        "selection_string": "L_eyelid_down_edge_d_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1115]"
+        ]
+    },
+    {
+        "index": 4,
+        "root_name": "eyelid_down_edge",
+        "selection_string": "L_eyelid_down_edge_e_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1112]"
+        ]
+    },
+    {
+        "index": 5,
+        "root_name": "eyelid_down_edge",
+        "selection_string": "L_eyelid_down_edge_f_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1110]"
+        ]
+    },
+    {
+        "index": 6,
+        "root_name": "eyelid_down_edge",
+        "selection_string": "L_eyelid_down_edge_g_fhd",
+        "side": "left",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1108]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "nose",
+        "selection_string": "C_nose_a_fhd",
+        "side": "center",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1253]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "nose",
+        "selection_string": "C_nose_b_fhd",
+        "side": "center",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1258]"
+        ]
+    },
+    {
+        "index": 2,
+        "root_name": "nose",
+        "selection_string": "C_nose_c_fhd",
+        "side": "center",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1263]"
+        ]
+    },
+    {
+        "index": 3,
+        "root_name": "nose",
+        "selection_string": "C_nose_d_fhd",
+        "side": "center",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1267]"
+        ]
+    },
+    {
+        "index": 4,
+        "root_name": "nose",
+        "selection_string": "C_nose_e_fhd",
+        "side": "center",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1272]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "nostril",
+        "selection_string": "R_nostril_a_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[2288]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "nostril",
+        "selection_string": "L_nostril_a_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[888]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "nose_base",
+        "selection_string": "R_nose_base_b_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[2339]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "nose_base",
+        "selection_string": "R_nose_base_a_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[2312]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "nose_base",
+        "selection_string": "L_nose_base_a_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[922]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "nose_base",
+        "selection_string": "L_nose_base_b_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[914]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "nose_flare",
+        "selection_string": "R_nose_flare_a_fhd",
+        "side": "right",
+        "size": 0.08000000000000002,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[2194]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "nose_flare",
+        "selection_string": "L_nose_flare_a_fhd",
+        "side": "left",
+        "size": 0.08000000000000002,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[832]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "up_cheek",
+        "selection_string": "L_up_cheek_a_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[873]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "up_cheek",
+        "selection_string": "L_up_cheek_b_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[131]"
+        ]
+    },
+    {
+        "index": 2,
+        "root_name": "up_cheek",
+        "selection_string": "L_up_cheek_c_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[542]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "cheek",
+        "selection_string": "L_cheek_a_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[421]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "cheek",
+        "selection_string": "L_cheek_b_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[785]"
+        ]
+    },
+    {
+        "index": 2,
+        "root_name": "cheek",
+        "selection_string": "L_cheek_c_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[588]"
+        ]
+    },
+    {
+        "index": 3,
+        "root_name": "cheek",
+        "selection_string": "L_cheek_d_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[445]"
+        ]
+    },
+    {
+        "index": 4,
+        "root_name": "cheek",
+        "selection_string": "L_cheek_e_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[540]"
+        ]
+    },
+    {
+        "index": 5,
+        "root_name": "cheek",
+        "selection_string": "L_cheek_f_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[538]"
+        ]
+    },
+    {
+        "index": 6,
+        "root_name": "cheek",
+        "selection_string": "L_cheek_g_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[551]"
+        ]
+    },
+    {
+        "index": 6,
+        "root_name": "mouth_out",
+        "selection_string": "R_mouth_out_g_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1615]"
+        ]
+    },
+    {
+        "index": 5,
+        "root_name": "mouth_out",
+        "selection_string": "R_mouth_out_f_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[2362]"
+        ]
+    },
+    {
+        "index": 4,
+        "root_name": "mouth_out",
+        "selection_string": "R_mouth_out_e_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[2366]"
+        ]
+    },
+    {
+        "index": 3,
+        "root_name": "mouth_out",
+        "selection_string": "R_mouth_out_d_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[2310]"
+        ]
+    },
+    {
+        "index": 2,
+        "root_name": "mouth_out",
+        "selection_string": "R_mouth_out_c_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[2360]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "mouth_out",
+        "selection_string": "R_mouth_out_b_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[2330]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "mouth_out",
+        "selection_string": "R_mouth_out_a_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[2334]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "mouth_out",
+        "selection_string": "C_mouth_out_a_fhd",
+        "side": "center",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1275]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "mouth_out",
+        "selection_string": "L_mouth_out_a_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[943]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "mouth_out",
+        "selection_string": "L_mouth_out_b_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[957]"
+        ]
+    },
+    {
+        "index": 2,
+        "root_name": "mouth_out",
+        "selection_string": "L_mouth_out_c_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[947]"
+        ]
+    },
+    {
+        "index": 3,
+        "root_name": "mouth_out",
+        "selection_string": "L_mouth_out_d_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[936]"
+        ]
+    },
+    {
+        "index": 4,
+        "root_name": "mouth_out",
+        "selection_string": "L_mouth_out_e_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1031]"
+        ]
+    },
+    {
+        "index": 5,
+        "root_name": "mouth_out",
+        "selection_string": "L_mouth_out_f_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[931]"
+        ]
+    },
+    {
+        "index": 6,
+        "root_name": "mouth_out",
+        "selection_string": "L_mouth_out_g_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[126]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "mouth_out",
+        "selection_string": "C_mouth_out_b_fhd",
+        "side": "center",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1323]"
+        ]
+    },
+    {
+        "index": 4,
+        "root_name": "lip_up",
+        "selection_string": "R_lip_up_e_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[2389]"
+        ]
+    },
+    {
+        "index": 3,
+        "root_name": "lip_up",
+        "selection_string": "R_lip_up_d_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[2411]"
+        ]
+    },
+    {
+        "index": 2,
+        "root_name": "lip_up",
+        "selection_string": "R_lip_up_c_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[2433]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "lip_up",
+        "selection_string": "R_lip_up_b_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[2413]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "lip_up",
+        "selection_string": "R_lip_up_a_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[2417]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "lip_up",
+        "selection_string": "C_lip_up_a_fhd",
+        "side": "center",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1281]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "lip_up",
+        "selection_string": "L_lip_up_a_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1022]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "lip_up",
+        "selection_string": "L_lip_up_b_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1020]"
+        ]
+    },
+    {
+        "index": 2,
+        "root_name": "lip_up",
+        "selection_string": "L_lip_up_c_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1018]"
+        ]
+    },
+    {
+        "index": 3,
+        "root_name": "lip_up",
+        "selection_string": "L_lip_up_d_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1049]"
+        ]
+    },
+    {
+        "index": 4,
+        "root_name": "lip_up",
+        "selection_string": "L_lip_up_e_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1016]"
+        ]
+    },
+    {
+        "index": 3,
+        "root_name": "lip_down",
+        "selection_string": "R_lip_down_d_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[2390]"
+        ]
+    },
+    {
+        "index": 2,
+        "root_name": "lip_down",
+        "selection_string": "R_lip_down_c_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[2427]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "lip_down",
+        "selection_string": "R_lip_down_b_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[2402]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "lip_down",
+        "selection_string": "R_lip_down_a_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[2405]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "lip_down",
+        "selection_string": "C_lip_down_a_fhd",
+        "side": "center",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1329]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "lip_down",
+        "selection_string": "L_lip_down_a_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1028]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "lip_down",
+        "selection_string": "L_lip_down_b_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1026]"
+        ]
+    },
+    {
+        "index": 2,
+        "root_name": "lip_down",
+        "selection_string": "L_lip_down_c_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1024]"
+        ]
+    },
+    {
+        "index": 3,
+        "root_name": "lip_down",
+        "selection_string": "L_lip_down_d_fhd",
+        "side": "left",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1017]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "up_cheek",
+        "selection_string": "R_up_cheek_a_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[2284]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "up_cheek",
+        "selection_string": "R_up_cheek_b_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1721]"
+        ]
+    },
+    {
+        "index": 2,
+        "root_name": "up_cheek",
+        "selection_string": "R_up_cheek_c_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1977]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "cheek",
+        "selection_string": "R_cheek_a_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1846]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "cheek",
+        "selection_string": "R_cheek_b_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[2000]"
+        ]
+    },
+    {
+        "index": 2,
+        "root_name": "cheek",
+        "selection_string": "R_cheek_c_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1840]"
+        ]
+    },
+    {
+        "index": 3,
+        "root_name": "cheek",
+        "selection_string": "R_cheek_d_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1919]"
+        ]
+    },
+    {
+        "index": 4,
+        "root_name": "cheek",
+        "selection_string": "R_cheek_e_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1980]"
+        ]
+    },
+    {
+        "index": 5,
+        "root_name": "cheek",
+        "selection_string": "R_cheek_f_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1965]"
+        ]
+    },
+    {
+        "index": 6,
+        "root_name": "cheek",
+        "selection_string": "R_cheek_g_fhd",
+        "side": "right",
+        "size": 0.05,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1560]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "lid_up_crease",
+        "selection_string": "R_lid_up_crease_a_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1717]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "lid_up_crease",
+        "selection_string": "R_lid_up_crease_b_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1820]"
+        ]
+    },
+    {
+        "index": 2,
+        "root_name": "lid_up_crease",
+        "selection_string": "R_lid_up_crease_c_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1819]"
+        ]
+    },
+    {
+        "index": 3,
+        "root_name": "lid_up_crease",
+        "selection_string": "R_lid_up_crease_d_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1817]"
+        ]
+    },
+    {
+        "index": 4,
+        "root_name": "lid_up_crease",
+        "selection_string": "R_lid_up_crease_e_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1813]"
+        ]
+    },
+    {
+        "index": 5,
+        "root_name": "lid_up_crease",
+        "selection_string": "R_lid_up_crease_f_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1699]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "lid_down_crease",
+        "selection_string": "R_lid_down_crease_a_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1532]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "lid_down_crease",
+        "selection_string": "R_lid_down_crease_b_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1710]"
+        ]
+    },
+    {
+        "index": 2,
+        "root_name": "lid_down_crease",
+        "selection_string": "R_lid_down_crease_c_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1972]"
+        ]
+    },
+    {
+        "index": 3,
+        "root_name": "lid_down_crease",
+        "selection_string": "R_lid_down_crease_d_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1704]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "eyelid_up_edge",
+        "selection_string": "R_eyelid_up_edge_a_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1605]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "eyelid_up_edge",
+        "selection_string": "R_eyelid_up_edge_b_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1542]"
+        ]
+    },
+    {
+        "index": 2,
+        "root_name": "eyelid_up_edge",
+        "selection_string": "R_eyelid_up_edge_c_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1543]"
+        ]
+    },
+    {
+        "index": 3,
+        "root_name": "eyelid_up_edge",
+        "selection_string": "R_eyelid_up_edge_d_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1655]"
+        ]
+    },
+    {
+        "index": 4,
+        "root_name": "eyelid_up_edge",
+        "selection_string": "R_eyelid_up_edge_e_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1870]"
+        ]
+    },
+    {
+        "index": 5,
+        "root_name": "eyelid_up_edge",
+        "selection_string": "R_eyelid_up_edge_f_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1651]"
+        ]
+    },
+    {
+        "index": 6,
+        "root_name": "eyelid_up_edge",
+        "selection_string": "R_eyelid_up_edge_g_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1520]"
+        ]
+    },
+    {
+        "index": 7,
+        "root_name": "eyelid_up_edge",
+        "selection_string": "R_eyelid_up_edge_h_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1523]"
+        ]
+    },
+    {
+        "index": 8,
+        "root_name": "eyelid_up_edge",
+        "selection_string": "R_eyelid_up_edge_i_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1524]"
+        ]
+    },
+    {
+        "index": 0,
+        "root_name": "eyelid_down_edge",
+        "selection_string": "R_eyelid_down_edge_a_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1539]"
+        ]
+    },
+    {
+        "index": 1,
+        "root_name": "eyelid_down_edge",
+        "selection_string": "R_eyelid_down_edge_b_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1538]"
+        ]
+    },
+    {
+        "index": 2,
+        "root_name": "eyelid_down_edge",
+        "selection_string": "R_eyelid_down_edge_c_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1546]"
+        ]
+    },
+    {
+        "index": 3,
+        "root_name": "eyelid_down_edge",
+        "selection_string": "R_eyelid_down_edge_d_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1723]"
+        ]
+    },
+    {
+        "index": 4,
+        "root_name": "eyelid_down_edge",
+        "selection_string": "R_eyelid_down_edge_e_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1968]"
+        ]
+    },
+    {
+        "index": 5,
+        "root_name": "eyelid_down_edge",
+        "selection_string": "R_eyelid_down_edge_f_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1535]"
+        ]
+    },
+    {
+        "index": 6,
+        "root_name": "eyelid_down_edge",
+        "selection_string": "R_eyelid_down_edge_g_fhd",
+        "side": "right",
+        "size": 0.025,
+        "vertices": [
+            "MOB_headShapeDeformed.vtx[1700]"
+        ]
+    },
+    {
+        "index": null,
+        "root_name": "face_base",
+        "selection_string": "C_face_base_Ctrl",
+        "side": "center",
+        "size": 0.5,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "sneer",
+        "selection_string": "L_sneer_Ctrl",
+        "side": "left",
+        "size": 0.2,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "sneer",
+        "selection_string": "R_sneer_Ctrl",
+        "side": "right",
+        "size": 0.2,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "squint",
+        "selection_string": "L_squint_Ctrl",
+        "side": "left",
+        "size": 0.15999999999999992,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "squint",
+        "selection_string": "R_squint_Ctrl",
+        "side": "right",
+        "size": 0.15999999999999992,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "down_lid",
+        "selection_string": "L_down_lid_Ctrl",
+        "side": "left",
+        "size": 0.1,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "down_lid",
+        "selection_string": "R_down_lid_Ctrl",
+        "side": "right",
+        "size": 0.1,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "up_lid",
+        "selection_string": "L_up_lid_Ctrl",
+        "side": "left",
+        "size": 0.04499999999999993,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "brow_in",
+        "selection_string": "L_brow_in_Ctrl",
+        "side": "left",
+        "size": 0.08999999999999986,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "brow_mid",
+        "selection_string": "L_brow_mid_Ctrl",
+        "side": "left",
+        "size": 0.08999999999999986,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "brow_out",
+        "selection_string": "L_brow_out_Ctrl",
+        "side": "left",
+        "size": 0.08999999999999986,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "up_lid",
+        "selection_string": "R_up_lid_Ctrl",
+        "side": "right",
+        "size": 0.04499999999999993,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "brow_in",
+        "selection_string": "R_brow_in_Ctrl",
+        "side": "right",
+        "size": 0.08999999999999986,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "brow_mid",
+        "selection_string": "R_brow_mid_Ctrl",
+        "side": "right",
+        "size": 0.08999999999999986,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "brow_out",
+        "selection_string": "R_brow_out_Ctrl",
+        "side": "right",
+        "size": 0.08999999999999986,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "jaw_aim_handle",
+        "selection_string": "C_jaw_aim_handle_Ctrl",
+        "side": "center",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "jaw_rotate",
+        "selection_string": "C_jaw_rotate_Ctrl",
+        "side": "center",
+        "size": 0.25,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "mouth_lips",
+        "selection_string": "C_mouth_lips_Ctrl",
+        "side": "center",
+        "size": 0.2,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "mouth_up_lip",
+        "selection_string": "C_mouth_up_lip_Ctrl",
+        "side": "center",
+        "size": 0.05,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "mouth_down_lip",
+        "selection_string": "C_mouth_down_lip_Ctrl",
+        "side": "center",
+        "size": 0.05,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "mouth_cheek",
+        "selection_string": "L_mouth_cheek_Ctrl",
+        "side": "left",
+        "size": 0.2,
+        "vertices": []
+    },
+    {
+        "index": null,
+        "root_name": "mouth_cheek",
+        "selection_string": "R_mouth_cheek_Ctrl",
+        "side": "right",
+        "size": 0.2,
+        "vertices": []
+    },
+    {
+        "index": 0,
+        "root_name": "fk_tongue",
+        "selection_string": "C_fk_tongue_a_Ctrl",
+        "side": "center",
+        "size": 0.17500000000000002,
+        "vertices": []
+    },
+    {
+        "index": 1,
+        "root_name": "fk_tongue",
+        "selection_string": "C_fk_tongue_b_Ctrl",
+        "side": "center",
+        "size": 0.17500000000000002,
+        "vertices": []
+    },
+    {
+        "index": 2,
+        "root_name": "fk_tongue",
+        "selection_string": "C_fk_tongue_c_Ctrl",
+        "side": "center",
+        "size": 0.17500000000000002,
+        "vertices": []
+    },
+    {
+        "index": 3,
+        "root_name": "fk_tongue",
+        "selection_string": "C_fk_tongue_d_Ctrl",
+        "side": "center",
+        "size": 0.17500000000000002,
+        "vertices": []
+    },
+    {
+        "index": 4,
+        "root_name": "fk_tongue",
+        "selection_string": "C_fk_tongue_e_Ctrl",
+        "side": "center",
+        "size": 0.17500000000000002,
+        "vertices": []
+    },
+    {
+        "index": 5,
+        "root_name": "fk_tongue",
+        "selection_string": "C_fk_tongue_f_Ctrl",
+        "side": "center",
+        "size": 0.17500000000000002,
+        "vertices": []
+    },
+    {
+        "index": 6,
+        "root_name": "fk_tongue",
+        "selection_string": "C_fk_tongue_g_Ctrl",
+        "side": "center",
+        "size": 0.17500000000000002,
+        "vertices": []
+    }
+]

@@ -94,7 +94,7 @@ or
 import rig_factory.build.utilities.controller_utilities as cut
 cut.initialize_rig_controller(log=None, controller_type=None)
 import rigging_widgets.widget_launchers.launch_widgets as lw
-lw.launch()
+lw.launch()ss
 
 
 

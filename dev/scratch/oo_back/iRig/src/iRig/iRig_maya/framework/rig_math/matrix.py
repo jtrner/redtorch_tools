@@ -1,0 +1,348 @@
+import copy
+from typing import AnyStr
+from vector import Vector
+import rig_math.decorators as dec
+
+
+class Matrix(object):
+
+    @dec.flatten_args
+    def __init__(self, *args, **kwargs):
+        super(Matrix, self).__init__()
+        scale = kwargs.pop(
+            'scale',
+            [1.0, 1.0, 1.0]
+        )
+
+        self.current_row = 0
+        self.current_column = 0
+
+        if not args or args[0] is None:
+            self.data = (
+                (scale[0], 0.0, 0.0, 0.0),
+                (0.0, scale[1], 0.0, 0.0),
+                (0.0, 0.0, scale[2], 0.0),
+                (0.0, 0.0, 0.0, 1.0)
+            )
+        elif isinstance(args[0], Matrix):
+            self.data = copy.copy(args[0].data)
+        elif isinstance(args[0], Vector):
+            translate = args[0].data
+            self.data = (
+                (scale[0], 0.0, 0.0, 0.0),
+                (0.0, scale[1], 0.0, 0.0),
+                (0.0, 0.0, scale[2], 0.0),
+                (translate[0], translate[1], translate[2], 1.0)
+            )
+        elif len(args) == 3:
+            translate = args
+            self.data = (
+                (scale[0], 0.0, 0.0, 0.0),
+                (0.0, scale[1], 0.0, 0.0),
+                (0.0, 0.0, scale[2], 0.0),
+                (translate[0], translate[1], translate[2], 1.0)
+            )
+        elif len(args) == 16:
+            m = args
+            self.data = (
+                (m[0], m[1], m[2], m[3]),
+                (m[4], m[5], m[6], m[7]),
+                (m[8], m[9], m[10], m[11]),
+                (m[12], m[13], m[14], m[15])
+            )
+
+        else:
+            raise Exception('Invalid matrix data : %s' % args)
+
+    def __copy__(self):
+        return self.__class__(self)
+
+    def __repr__(self):
+        return repr(self.data)
+
+    def __mul__(self, n):
+        self_transpose = self.get_transpose()
+        return Matrix([
+            [
+                sum(a * b for a, b in zip(x_row, y_col))
+                for y_col in self_transpose.data
+            ]
+            for x_row in n.data
+        ])
+
+    def __rmul__(self, n):
+        return self.__mul__(n)
+
+    #def __div__(self, n):
+    #    self_transpose = self.get_transpose()
+    #    return Matrix([[sum(a / b for a, b in zip(x_row, y_col)) for y_col in self_transpose.data] for x_row in n.data])
+
+    def __add__(self, m):
+        return Matrix((a + b for a, b in zip(c, d)) for c, d in zip(self.data, m.data))
+
+    def __sub__(self, m):
+        return Matrix((a - b for a, b in zip(c, d)) for c, d in zip(self.data, m.data))
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, k):
+        row, column = divmod(k, len(self.data))
+        return self.data[row][column]
+
+    def mirror_matrix(self, axis='x'):
+        # type: (AnyStr) -> None
+        """
+        Mirrors all values in a given column effectively mirroring the
+        matrix across that axis.
+        :param axis:
+            Axis to mirror the matrix across.
+        """
+
+        axis = {'x': 0, 'y': 1, 'z': 2}[axis.lower()]
+
+        self.data = tuple(
+            tuple(
+                column * -1 if i == axis else column
+                for i, column in enumerate(row)
+            )
+            for row in self.data
+        )
+
+    def rows(self):
+        return len(self.data)
+
+    def cols(self):
+        return len(self.data[0]) if self.rows() > 0 else 0
+
+    def set_scale(self, scale):
+        d = self.data
+        self.data = (
+            (scale[0], d[0][1], d[0][2], d[0][3]),
+            (d[1][0], scale[1], d[1][2], d[1][3]),
+            (d[2][0], d[2][1], scale[2], d[2][3]),
+            (d[3][0], d[3][1], d[3][2], d[3][3])
+        )
+
+    def set_translation(self, translate):
+        d = self.data
+        self.data = (
+            d[0],
+            d[1],
+            d[2],
+            (translate[0], translate[1], translate[2], d[3][3])
+        )
+
+    def get_translation(self):
+        return Vector([self.data[3][0], self.data[3][1], self.data[3][2]])
+
+    def get_scale(self):
+        return Vector([self.data[0][0], self.data[1][1], self.data[2][2]])
+
+    def get_transpose(self):
+        result = self.__new__(self.__class__)
+        result.data = zip(*self.data)
+        return result
+
+    def flip_x(self):
+        d = self.data
+        self.data = (
+            (d[0][0]*-1, d[0][1]*-1, d[0][2]*-1, d[0][3]),
+            (d[1][0], d[1][1], d[1][2], d[1][3]),
+            (d[2][0], d[2][1], d[2][2], d[2][3]),
+            (d[3][0], d[3][1], d[3][2], d[3][3])
+        )
+
+    def flip_y(self):
+        d = self.data
+        self.data = (
+            (d[0][0], d[0][1], d[0][2], d[0][3]),
+            (d[1][0]*-1, d[1][1]*-1, d[1][2]*-1, d[1][3]),
+            (d[2][0], d[2][1], d[2][2], d[2][3]),
+            (d[3][0], d[3][1], d[3][2], d[3][3])
+        )
+
+    def flip_z(self):
+        d = self.data
+        self.data = (
+            (d[0][0], d[0][1], d[0][2], d[0][3]),
+            (d[1][0], d[1][1], d[1][2], d[1][3]),
+            (d[2][0]*-1, d[2][1]*-1, d[2][2]*-1, d[2][3]),
+            (d[3][0], d[3][1], d[3][2], d[3][3])
+        )
+
+    def invert_matrix(self, tol=8):
+        """
+        Returns the inverse of the passed in matrix.
+        :param self:
+            The matrix to be inverted
+        :param tol:
+            The decimal place tolerance of the check
+        :return:
+            The inverse of the matrix self
+        """
+
+        # Make sure self's matrix can be inverted.
+        det = get_determinant(self)
+        if det == 0:
+            raise ArithmeticError("Singular Matrix!")
+
+        # Converts self & identity_matrix to lists, self_matrix_list & identity_matrix_list, to use for row ops
+        matrix_len = len(self)
+        self_matrix_list = [list(row) for row in self.data]
+        identity_matrix = Matrix()
+        identity_matrix_list = [list(row) for row in identity_matrix.data]
+
+        # Perform row operations
+        indices = list(range(matrix_len))  # to allow flexible row referencing ***
+        for fd in range(matrix_len):  # fd stands for focus diagonal
+            fd_scale = 1.0 / self_matrix_list[fd][fd]
+
+            # FIRST: scale fd row with fd inverse.
+            for col_ind in range(matrix_len):
+                self_matrix_list[fd][col_ind] *= fd_scale
+                identity_matrix_list[fd][col_ind] *= fd_scale
+
+            # SECOND: operate on all rows except fd row as follows:
+            for row_ind in indices[0:fd] + indices[fd + 1:]:
+
+                # *** skip row with fd in it.
+                cr_scale = self_matrix_list[row_ind][fd]  # cr stands for "current row".
+                for col_ind in range(matrix_len):
+
+                    # cr - cr_scale * fd row, but one element at a time.
+                    self_matrix_list[row_ind][col_ind] = (
+                        self_matrix_list[row_ind][col_ind]
+                        - (cr_scale * self_matrix_list[fd][col_ind])
+                    )
+                    identity_matrix_list[row_ind][col_ind] = (
+                        identity_matrix_list[row_ind][col_ind]
+                        - (cr_scale * identity_matrix_list[fd][col_ind])
+                    )
+
+        # Check if identity_matrix_list is an inverse of self's matrix with specified tolerance
+        if check_matrix_equality(identity_matrix, (self * Matrix(identity_matrix_list)), tol):
+            result = Matrix()
+            result.data = [tuple(x) for x in identity_matrix_list]
+            return result
+        else:
+            raise ArithmeticError("Matrix inverse out of tolerance.")
+
+
+# Compose a matrix given three points in space
+def compose_matrix(position, aim_position, up_position, rotate_order='xyz'):
+    z_vector = up_position - position
+    y_vector = aim_position - position
+    x_vector = z_vector.cross_product(y_vector)
+    z_vector = x_vector.cross_product(y_vector)
+    matrix_list = []
+    vector_dictionary = dict(
+        x=x_vector,
+        y=y_vector,
+        z=z_vector
+    )
+    vector_list = [x for x in rotate_order]
+    for i in range(3):
+        matrix_list.extend(vector_dictionary[vector_list[i]].unit().data)
+        matrix_list.append(0.0)
+    matrix_list.extend(position.data)
+    matrix_list.append(1.0)
+    return Matrix(matrix_list)
+
+
+def get_determinant(matrix, determinant=0):
+    """
+    Returns the determinant of the passed in matrix
+    :param matrix:
+        The matrix to get the determinant from
+    :param determinant:
+        The scalar property of a square matrix and determines if matrix can be inverted
+    :return:
+        The determinant of matrix
+    """
+    if len(matrix) == 2 and len(matrix[0]) == 2:
+        return matrix[0][0] * matrix[1][1] - matrix[1][0] * matrix[0][1]
+
+    for fc in range(len(matrix)):  # fc stands for "focus column"
+        matrix_of_minors = list(matrix.data[1:]) if isinstance(matrix, Matrix) else matrix[1:]
+        for i in range(len(matrix_of_minors)):
+            matrix_of_minors[i] = (matrix_of_minors[i][0:fc] + matrix_of_minors[i][fc + 1:])
+
+        sign = (-1.0) ** (fc % 2)
+        sub_det = get_determinant(matrix_of_minors)
+        group_add = matrix.data[0][fc] if isinstance(matrix, Matrix) else matrix[0][fc]
+        determinant += group_add * sign * sub_det
+
+    return determinant
+
+
+def check_matrix_equality(matrix_a, matrix_b, tol=None):
+    """
+    Checks the equality of two matrices.
+        :param matrix_a: The first matrix
+        :param matrix_b: The second matrix
+        :param tol: The decimal place tolerance of the check
+        :return: The boolean result of the equality check
+    """
+    if len(matrix_a) != len(matrix_b) or len(matrix_a.data) != len(matrix_b.data):
+        return False
+
+    for i in range(len(matrix_a)):
+        for j in range(len(matrix_a.data)):
+            if tol is None:
+                if matrix_a[i][j] != matrix_b[i][j]:
+                    return False
+            else:
+                if round(matrix_a.data[i][j], tol) != round(matrix_b.data[i][j], tol):
+                    return False
+    return True
+
+
+if __name__ == '__main__':
+    import time
+    start = time.clock()
+    A = Matrix([1.1420124411346515,
+                0.2069316824165058,
+                -0.06242937504513529,
+                0.0,
+                -0.20747263041466735,
+                1.143610300440735,
+                -0.004599143099335427,
+                0.0,
+                0.06060738969028955,
+                0.015662799899880907,
+                1.1605998383494647,
+                0.0,
+                6.519688021492048,
+                2.359322138202952,
+                -8.289179625144275,
+                1.0])
+    print A.invert_matrix()
+    end = time.clock()
+    print end-start
+    # inverse_result = Matrix()
+    # print inverse_result.invert_matrix()
+
+    # Script to run in Maya
+    # import maya.cmds as mc
+    #
+    # space_1 = mc.xform('locator1', ws=True, m=True, q=True)
+    # space_2 = mc.xform('locator2', ws=True, m=True, q=True)
+    #
+    # local_space = mc.xform('locator1', ws=False, m=True, q=True)
+    #
+    # import rig_math.matrix as mtx
+    #
+    # reload(mtx)
+    #
+    # world_matrix_1 = mtx.Matrix(space_1)
+    # world_matrix_2 = mtx.Matrix(space_2)
+    #
+    # local_matrix = (world_matrix_2.invert_matrix()) * world_matrix_1
+    #
+    # print local_space
+    # print local_matrix
+    #
+    # loc = mc.spaceLocator()[0]
+    # mc.parent(loc, 'locator2')
+    # mc.xform(loc, ws=False, m=list(local_matrix))

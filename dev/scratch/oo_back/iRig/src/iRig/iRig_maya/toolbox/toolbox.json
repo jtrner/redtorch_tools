@@ -1,0 +1,45 @@
+{
+    "General": {
+        "Rename UI": {
+            "command": "from iRig_maya.lib import renameUI\nreload(renameUI)\nrenameUI.launch()", 
+            "icon": "renameUI.png",
+            "annotation": "Rename UI: an awesome renamer tool"
+        }
+    },
+    "Control": {
+        "Control UI": {
+            "command": "from iRig_maya.lib import controlUI\nreload(controlUI)\ncontrolUI.launch()\n\n",
+            "icon": "control_3.png",
+            "annotation": "Control UI: A library for altering, importing and exporting control shapes"
+        }
+    },
+    "Deform": {
+        "Export Import": {
+            "command": "from iRig_maya.lib import deformUI\nreload(deformUI)\ndeformUI.launch()",
+            "icon": "import_export.png",
+            "annotation": "Deform UI: A library for importing and exporting deformers"
+        },
+        "ngSkinTools": {
+            "command": "from ngSkinTools.ui.mainwindow import MainWindow\nMainWindow.open()",
+            "icon": "ngSkinTools.png",
+            "annotation": "Opens ngSkinTools UI"
+        },
+        "cometSaveWeights": {
+            "command": "import maya.mel as mm\nimport iRig_maya\n\n\niRig_maya_dir = os.path.dirname(iRig_maya.__file__)\nmel_script = 'cometSaveWeights'\n\ncomet_save_weights_path = os.path.join(iRig_maya_dir, 'mel', mel_script + '.mel')\ncomet_save_weights_path = comet_save_weights_path.replace('\\\\', '/')\nmm.eval('source \"{}\"'.format(comet_save_weights_path))\nmm.eval(mel_script)\n",
+            "annotation": "Comet Save Weights UI",
+            "icon": "weights.png"
+        },
+        "edgeFlowMirrorUI": {
+            "command": "from iRig_maya.lib import edgeFlowMirrorUI\nreload(edgeFlowMirrorUI)\nedgeFlowMirrorUI.showUI()\n",
+            "annotation": "Edge Flow Mirror UI",
+            "icon": "mirror_2.png"
+        }
+    },
+    "Geometry": {
+        "Color Geo": {
+            "command": "import maya_ui.color_tone as cui\nct = cui.ColorTone_UI()\nct.ui()",
+            "annotation": "UI for assigning colored shaders to geometries",
+            "icon": "geometry_color.png"
+        }
+    }
+}

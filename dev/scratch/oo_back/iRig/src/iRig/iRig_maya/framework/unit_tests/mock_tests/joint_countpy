@@ -1,0 +1,172 @@
+"""
+Tests if joint_count is maintained between states (toggle_state, guide/rig states)
+"""
+
+from rig_factory.controllers.rig_controller import RigController
+import rig_factory.objects as obs
+
+obs.register_classes()
+
+
+def get_subclasses(base_class):
+    sub_classes = list(base_class.__subclasses__())
+    for sub_class in sub_classes:
+        sub_classes.extend(get_subclasses(sub_class))
+    return sub_classes
+
+
+def create_rig():
+    controller = RigController.get_controller(mock=True)
+    controller.root = controller.create_object(
+        obs.ContainerGuide,
+        root_name='root'
+    )
+
+    for index, class_guide in enumerate(get_subclasses(obs.PartGuide)):
+        class_name = class_guide.__name__
+        if 'BipedLeg' not in class_name:  # TODO: remove this if statement after Paxton refactors bipedleg 9.3.2019
+            guide_obj = controller.root.create_part(
+                class_guide,
+                root_name='{0}_{1}'.format(index, class_name)
+            )
+            if guide_obj.toggle_class is None:
+                joint_parent = controller.root
+                matrix_list = []
+                for ind in range(5):
+                    joint = controller.root.create_part(
+                        obs.Joint,
+                        root_name='{0}_{1}'.format(guide_obj.name, ind),
+                        parent=joint_parent
+                    )
+                    matrix_list.append(joint.get_matrix())
+                spine = controller.root.create_part(
+                    obs.BipedSpineGuide,
+                    root_name=guide_obj.name,
+                    matrix=matrix_list
+                )
+                guide_obj.toggle_class = spine.toggle_class
+
+    for index, class_guide in enumerate(get_subclasses(obs.PartGroupGuide)):
+        class_name = class_guide.__name__
+        if 'Eye' not in class_name:
+            controller.root.create_part(
+                class_guide,
+                root_name='{0}_{1}'.format(index, class_name)
+            )
+    return controller
+
+
+# py test
+def test_joint_count():
+    controller = create_rig()
+    part_count = len(controller.root.get_parts())
+    joint_count = len(controller.root.get_joints())
+    part_guide_joint_count = {}
+
+    for part in controller.root.get_parts():
+        part_guide_joint_count['{0}_{1}'.format(part.side, part.root_name)] = list(part.get_joints())
+
+    controller.toggle_state()
+
+    part_joint_count = {}
+    for part in controller.root.get_parts():
+        part_joint_count['{0}_{1}'.format(part.side, part.root_name)] = list(part.get_joints())
+
+    if not part_count == len(controller.root.get_parts()):
+        report_str = list(['\n----- Parts mismatching report -----'])
+        report_str.append(
+            'Total part count mismatch(es)! Guide has {0} parts, build has {1} parts.'.format(part_count, len(
+                controller.root.get_parts())))
+        raise Exception('\n'.join(report_str))
+
+    if not joint_count == len(controller.root.get_joints()):
+        report_str = list(['\n----- Joints mismatching report -----'])
+        report_str.append(
+            'Total joint count mismatch(es)! Guide has {0} joints, build has {1} joints.'.format(joint_count, len(
+                controller.root.get_joints())))
+        raise Exception('\n'.join(report_str))
+
+    if not len(part_guide_joint_count) == len(part_joint_count):
+        report_str = list(['\n----- Part joints mismatching report -----'])
+        for part in controller.root.get_parts():
+            guide_count = len(part_guide_joint_count['{0}_{1}'.format(part.side, part.root_name)])
+            current_count = len(part_joint_count['{0}_{1}'.format(part.side, part.root_name)])
+            report_str.append(
+                'Count mismatches: {0}_{1}, Guide: {2}, Rig: {3}'.format(part.side, part.root_name, guide_count,
+                                                                         current_count))
+        report_str.append("Total part's joint count mismatch(es)! Guide has {0} joints, build has {1} joints.".format(
+            len(part_guide_joint_count), len(part_joint_count)))
+        raise Exception('\n'.join(report_str))
+
+
+def test_joint_group():
+    """
+    # TODO: add joint_group (joint_group is not in joint.get_ancestors())
+    Test if a part's joints are under its joint group
+    :return: None
+    """
+    controller = create_rig()
+
+    report_str = list(['\n----- Joint group mismatching report -----'])
+    for part in controller.root.get_parts():
+        joint_group = part.joint_group
+        for joint in part.joints:
+            if joint_group not in joint.get_ancestors():
+                report_str.append(
+                    'Joint not under joint group! Part Type: {0},  Joint Name: {1}, '.format(type(part), joint))
+    if len(report_str) > 1:
+        raise Exception('\n'.join(report_str))
+
+
+def test_disconnected_joints():
+    """
+    Test if a part's disconnected joints property is False and checks if the joint is parented to another joint
+    according to it's hierarchy
+    :return: None
+    """
+    controller = create_rig()
+
+    report_str = list(['\n----- Disconnected joints report -----'])
+    for part in controller.root.get_parts():
+        if isinstance(part, obs.Part):
+            if part.disconnected_joints is False:
+                for i, joint in enumerate(part.joints):
+                    if i != 0:
+                        if joint.parent != part.joints[i-1]:
+                            report_str.append(
+                                'Invalid parent! Joint, {0}, should be parented to {1}'.format(joint, part.joints[i-1]))
+    if len(report_str) > 1:
+        raise Exception('\n'.join(report_str))
+
+
+def test_handle_type():
+    """
+    Test if a part's handle type is a subclass of CurveHandle
+    :return: None
+    """
+    controller = create_rig()
+
+    report_str = list(['\n----- Invalid handle type report -----'])
+    for part in controller.root.get_parts():
+        for handle in part.handles:
+            if not isinstance(handle, obs.CurveHandle):
+                report_str.append('Handle type mismatch: {0} is not a CurveHandle type'.format(handle))
+    if len(report_str) > 1:
+        raise Exception('\n'.join(report_str))
+
+
+def test_joint_type():
+    """
+    Test if a part's joint type is a subclass of Joint
+    :return: None
+    """
+    controller = create_rig()
+
+    report_str = list(['\n----- Invalid joint type report -----'])
+    for part in controller.root.get_parts():
+        for joint in part.joints:
+            if not isinstance(joint, obs.Joint):
+                report_str.append('Handle type mismatch: {0} is not a joint type'.format(joint))
+    if len(report_str) > 1:
+        raise Exception('\n'.join(report_str))
+

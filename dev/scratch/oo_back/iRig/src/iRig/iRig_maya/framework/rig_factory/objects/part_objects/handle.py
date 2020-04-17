@@ -1,0 +1,304 @@
+from rig_factory.objects.node_objects.transform import Transform
+from rig_factory.objects.node_objects.joint import Joint
+from rig_factory.objects.node_objects.locator import Locator
+from rig_factory.objects.node_objects.depend_node import DependNode
+from rig_factory.objects.node_objects.mesh import Mesh
+from rig_factory.objects.rig_objects.cone import Cone
+from rig_factory.objects.rig_objects.line import Line
+from rig_factory.objects.part_objects.part import Part, PartGuide
+import rig_factory.environment as env
+from rig_factory.objects.base_objects.properties import DataProperty, ObjectListProperty
+import rig_factory.environment as env
+
+
+class HandleGuide(PartGuide):
+
+    default_settings = dict(
+        root_name='handle',
+        size=1.0,
+        side='center',
+        shape='cube'
+    )
+
+    shape = DataProperty(
+        name='shape'
+    )
+
+    def __init__(self, **kwargs):
+        super(HandleGuide, self).__init__(**kwargs)
+        self.toggle_class = Handle.__name__
+
+    @classmethod
+    def create(cls, controller, **kwargs):
+        """
+        Use rig_objects.handle_guide.CubeHandleGuide
+        """
+        handle_positions = kwargs.get('handle_positions', dict())
+        kwargs.setdefault('side', 'center')
+        this = super(HandleGuide, cls).create(controller, **kwargs)
+        side = this.side
+        size = this.size
+
+        root_name = this.root_name
+
+        # Create nodes
+
+        joint = this.create_child(
+            Joint,
+            index=0
+        )
+
+        handle_1 = this.create_handle(
+            index=0
+        )
+        handle_2 = this.create_handle(
+            index=1,
+        )
+        up_handle = this.create_handle(
+            index=0,
+            root_name='%s_up' % root_name
+        )
+        locator_1 = handle_1.create_child(
+            Locator
+        )
+        locator_2 = handle_2.create_child(
+            Locator
+        )
+        up_locator = up_handle.create_child(
+            Locator
+        )
+        up_line = this.create_child(
+            Line,
+            index=0
+        )
+        aim_line = this.create_child(
+            Line,
+            index=1
+        )
+        default_position_1 = list(env.side_aim_vectors[side])
+        default_position_1[1] *= size
+        default_position_2 = list(env.side_up_vectors[side])
+        default_position_2[2] *= size
+        position_1 = handle_positions.get(handle_1.name, [0.0, 0.0, 0.0])
+        position_2 = handle_positions.get(handle_2.name, default_position_1)
+        up_position = handle_positions.get(up_handle.name, default_position_2)
+        handle_1.plugs['translate'].set_value(position_1)
+        handle_2.plugs['translate'].set_value(position_2)
+        up_handle.plugs['translate'].set_value(up_position)
+        cube_transform = this.create_child(
+            Transform,
+            root_name='%s_cube' % root_name
+        )
+        cube_node = cube_transform.create_child(
+            DependNode,
+            node_type='polyCube',
+        )
+        distance_node = this.create_child(
+            DependNode,
+            node_type='distanceBetween',
+        )
+        cube_mesh = cube_transform.create_child(
+            Mesh
+        )
+        multiply = this.create_child(
+            DependNode,
+            node_type='multiplyDivide',
+        )
+
+        cone_x = joint.create_child(
+            Cone,
+            root_name='%s_cone_x' % root_name,
+            size=size,
+            axis=[1.0, 0.0, 0.0]
+        )
+        cone_y = joint.create_child(
+            Cone,
+            root_name='%s_cone_y' % root_name,
+            size=size,
+            axis=[0.0, 1.0, 0.0]
+        )
+        cone_z = joint.create_child(
+            Cone,
+            root_name='%s_cone_z' % root_name,
+            size=size,
+            axis=[0.0, 0.0, 1.0]
+        )
+
+        # Constraints
+
+        joint.zero_rotation()
+        controller.create_aim_constraint(
+            handle_2,
+            joint,
+            worldUpType='object',
+            worldUpObject=up_handle,
+            aimVector=env.aim_vector,
+            upVector=env.up_vector
+        )
+
+        controller.create_point_constraint(
+            handle_1,
+            joint
+        )
+
+        controller.create_point_constraint(
+            handle_1,
+            cube_transform
+        )
+        controller.create_aim_constraint(
+            handle_2,
+            cube_transform,
+            worldUpType='object',
+            worldUpObject=up_handle,
+            aimVector=env.aim_vector,
+            upVector=env.up_vector
+        )
+
+        # Attributes
+
+        size_plug = this.plugs['size']
+        size_plug.connect_to(multiply.plugs['input1X'])
+        multiply.plugs['input2X'].set_value(0.25)
+        cube_node.plugs['output'].connect_to(cube_mesh.plugs['inMesh'])
+        locator_1.plugs['worldPosition'].element(0).connect_to(distance_node.plugs['point1'])
+        locator_2.plugs['worldPosition'].element(0).connect_to(distance_node.plugs['point2'])
+        locator_1.plugs['worldPosition'].element(0).connect_to(up_line.curve.plugs['controlPoints'].element(0))
+        up_locator.plugs['worldPosition'].element(0).connect_to(up_line.curve.plugs['controlPoints'].element(1))
+        locator_1.plugs['worldPosition'].element(0).connect_to(aim_line.curve.plugs['controlPoints'].element(0))
+        locator_2.plugs['worldPosition'].element(0).connect_to(aim_line.curve.plugs['controlPoints'].element(1))
+
+        size_plug.connect_to(cube_node.plugs['height'])
+        size_plug.connect_to(cube_node.plugs['depth'])
+        size_plug.connect_to(cube_node.plugs['width'])
+
+        multiply.plugs['outputX'].connect_to(handle_1.plugs['size'])
+        multiply.plugs['outputX'].connect_to(handle_2.plugs['size'])
+        multiply.plugs['outputX'].connect_to(up_handle.plugs['size'])
+
+        locator_1.plugs['visibility'].set_value(False)
+        locator_2.plugs['visibility'].set_value(False)
+        up_locator.plugs['visibility'].set_value(False)
+        cube_mesh.plugs['overrideEnabled'].set_value(True)
+        cube_mesh.plugs['overrideDisplayType'].set_value(2)
+        cube_transform.plugs['overrideEnabled'].set_value(True)
+        cube_transform.plugs['overrideDisplayType'].set_value(2)
+        joint.plugs.set_values(
+            overrideEnabled=True,
+            overrideDisplayType=2,
+            radius=size*0.25
+        )
+        up_handle.plugs['radius'].set_value(size*0.25)
+        handle_1.plugs['radius'].set_value(size*0.25)
+        handle_2.plugs['radius'].set_value(size*0.25)
+
+        size_plug.connect_to(cone_x.plugs['size'])
+        size_plug.connect_to(cone_y.plugs['size'])
+        size_plug.connect_to(cone_z.plugs['size'])
+        cone_x.plugs.set_values(
+            overrideEnabled=True,
+            overrideDisplayType=2,
+        )
+        cone_y.plugs.set_values(
+            overrideEnabled=True,
+            overrideDisplayType=2,
+        )
+        cone_z.plugs.set_values(
+            overrideEnabled=True,
+            overrideDisplayType=2,
+        )
+        # Shaders
+        root = this.get_root()
+        handle_1.mesh.assign_shading_group(root.shaders[side].shading_group)
+        handle_2.mesh.assign_shading_group(root.shaders[side].shading_group)
+        up_handle.mesh.assign_shading_group(root.shaders[side].shading_group)
+        cube_mesh.assign_shading_group(root.shaders[side].shading_group)
+        cone_x.mesh.assign_shading_group(root.shaders['x'].shading_group)
+        cone_y.mesh.assign_shading_group(root.shaders['y'].shading_group)
+        cone_z.mesh.assign_shading_group(root.shaders['z'].shading_group)
+
+        root = this.get_root()
+        if root:
+            root.add_plugs(
+                [
+                    handle_1.plugs['tx'],
+                    handle_1.plugs['ty'],
+                    handle_1.plugs['tz'],
+                    handle_2.plugs['tx'],
+                    handle_2.plugs['ty'],
+                    handle_2.plugs['tz'],
+                    up_handle.plugs['tx'],
+                    up_handle.plugs['ty'],
+                    up_handle.plugs['tz'],
+
+                ]
+            )
+        this.base_handles = [handle_1]
+        this.joints = [joint]
+        return this
+
+
+class Handle(Part):
+
+    deformers = ObjectListProperty(
+        name='deformers'
+    )
+
+    geometry = ObjectListProperty(
+        name='geometry'
+    )
+
+    shape = DataProperty(
+        name='shape'
+    )
+
+    def __init__(self, **kwargs):
+        super(Handle, self).__init__(**kwargs)
+
+    @classmethod
+    def create(cls, controller, **kwargs):
+        this = super(Handle, cls).create(controller, **kwargs)
+        size = this.size
+        matrices = this.matrices
+        joint = this.create_child(
+            Joint,
+            index=0,
+            matrix=matrices[0],
+            parent=this.joint_group
+        )
+        handle = this.create_handle(
+            shape=this.shape if this.shape else 'cube',
+            size=size,
+            matrix=matrices[0]
+        )
+        joint.zero_rotation()
+        joint.plugs.set_values(
+            overrideEnabled=True,
+            overrideDisplayType=2
+        )
+        controller.create_parent_constraint(
+            handle,
+            joint
+        )
+        controller.create_scale_constraint(
+            handle,
+            joint
+        )
+
+        root = this.get_root()
+        if root:
+            root.add_plugs(
+                [
+                    handle.plugs['tx'],
+                    handle.plugs['ty'],
+                    handle.plugs['tz'],
+                    handle.plugs['rx'],
+                    handle.plugs['ry'],
+                    handle.plugs['rz'],
+                    handle.plugs['sx'],
+                    handle.plugs['sy'],
+                    handle.plugs['sz']
+                ]
+            )
+
+        this.joints = [joint]
+        return this

@@ -1,0 +1,103 @@
+//Curved Extract and application to Surface
+//Mel
+
+//////////////////////////////////////////////////////////////////////////
+///Andre lacroix 
+///Playmobile CurveExtract tool for the animation departement
+/////////////////////////////////////////////////////////////////////////
+
+
+if (`window -exists CurveExtract`) deleteUI CurveExtract;
+
+window -toolbox 1 -sizeable false -title "CurveExtract" CurveExtract ; 
+    columnLayout -adj 1 -w 300 mainCol;
+   
+              text -label "         "  -h 3;     
+        rowLayout -nc 2;
+            button -label "Curve Extract" -w 140 -h 50 -command "CurveExt()";
+            
+          setParent..;
+              text -label "         "  -h 3;
+   rowLayout -nc 2;
+            button -label "ProjectCurve" -w 80 -h 30 -command ProjectCurveOnMeshOptions;
+              button -label "MergeC" -w 58 -h 30 -command AttachCurveOptions;
+              setParent..;
+                  text -label "         "  -h 3;   
+
+       rowLayout -nc 2;
+            button -label "Curve Built Option" -w 140 -h 20 -command RebuildCurveOptions;
+              setParent..;
+                  text -label "         "  -h 3;
+       rowLayout -nc 2;
+            button -label "ReverseCurve" -w 140 -h 20 -command "Reverse()";
+              setParent..;
+                  text -label "         "  -h 3;        
+       rowLayout -nc 2;
+            button -label "Motion Path" -w 140 -h 20 -command AttachToPathOptions;
+          setParent..;     
+            
+
+showWindow CurveExtract;
+
+global proc Reverse()
+{
+reverseCurve;
+}
+
+
+
+global proc CurveExt()
+{
+int $counter = 0;
+int $colors[] = {6, 13, 14, 17, 20, 9};
+
+float $bxmin = -1;
+float $bxmax = -1;
+float $bymin = -1;
+float $bymax = -1;
+float $bzmin = -1;
+float $bzmax = -1;
+
+string $sel[] = `ls -sl`;
+for($eachObj in $sel)
+{
+    string $beforeMPath[] = `ls -type "snapshotShape"`;
+    select -r $eachObj;
+    string $motionTrail = `doMotionTrail 1 { "snapshot  -motionTrail 1  -increment 1 -startTime `playbackOptions -query -min` -endTime `playbackOptions -query -max`", "line", "1", "animCurve"}`;
+    string $afterMPath[] = `ls -type "snapshotShape"`;
+    string $motionPaths[] = stringArrayRemove($beforeMPath, $afterMPath);
+    string $each = $motionPaths[`size($motionPaths)` - 1];
+
+    float $points[] = `getAttr ($each + ".points")`;
+    string $curveCmd = "curve -n \"" + $each + "Curve\" -d 1 ";
+    int $i = 0;
+    for($i = 0; $i < `size($points)`; $i += 4)
+        $curveCmd += ("-p " + $points[$i] + " " + $points[$i + 1] + " " + $points[$i + 2] + " -k " + ($i / 3) + " ");
+    eval $curveCmd;
+    
+    delete `listRelatives -p $each`;
+    
+    setAttr ($each + "Curve.overrideEnabled") 1;
+    setAttr ($each + "Curve.overrideColor") $colors[$counter];
+    $counter++;
+    
+    float $bmin[] = `getAttr ($each + "Curve.boundingBoxMin")`;
+    float $bmax[] = `getAttr ($each + "Curve.boundingBoxMax")`;
+   
+    if($bxmin == -1 || $bmin[0] < $bxmin)
+        $bxmin = $bmin[0];
+    if($bxmax == -1 || $bmax[0] > $bxmax)
+        $bxmax = $bmax[0];
+   
+    if($bymin == -1 || $bmin[1] < $bymin)
+        $bymin = $bmin[1];
+    if($bymax == -1 || $bmax[1] > $bymax)
+        $bymax = $bmax[1];
+   
+    if($bzmin == -1 || $bmin[2] < $bzmin)
+        $bzmin = $bmin[2];
+    if($bzmax == -1 || $bmax[2] > $bzmax)
+        $bzmax = $bmax[2];
+}
+}
+//////6, 13, 14, 17, 20, 9////////
