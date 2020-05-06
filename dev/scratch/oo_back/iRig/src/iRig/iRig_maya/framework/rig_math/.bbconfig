@@ -1,9 +1,0 @@
-{
-  "release": {
-    "master": {
-      "name": "",
-      "location": "%PIPE_DEV%/Rigging/rigging_framework",
-      "branch": ""
-    }
-  }
-}

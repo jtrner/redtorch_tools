@@ -1,2 +1,0 @@
-
-shot_controller = None
