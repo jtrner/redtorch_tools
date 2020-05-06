@@ -59,13 +59,13 @@ removeList = []
 for modKey, mod in syscopy.iteritems():
     if sys.modules[modKey]:
         if hasattr(mod, '__file__'):
-            if 'rigging_framework' in sys.modules[modKey].__file__:
+            if 'framework' in sys.modules[modKey].__file__:
                 print sys.modules[modKey].__file__
                 removeList.append(modKey)
 for mod in removeList:
-    sys.modules.pop(mod)
+    del sys.modules[mod]
 
-import workflow.rigging_callbacks.controller_utilities as cut
+import rig_factory.build.utilities.controller_utilities as cut
 cut.initialize_rig_controller()
 import rigging_widgets.widget_launchers.launch_widgets as lw
 lw.launch()
@@ -92,9 +92,9 @@ import rigging_widgets.widget_launchers.launch_widgets as lw
 lw.launch()
 or
 import rig_factory.build.utilities.controller_utilities as cut
-cut.initialize_rig_controller(log=None, controller_type=None)
+cut.initialize_rig_controller()
 import rigging_widgets.widget_launchers.launch_widgets as lw
-lw.launch()ss
+lw.launch()
 
 
 

@@ -107,3 +107,133 @@ for path in new_paths:
 # add new_paths to beginning of sys.path
 for path in new_paths:
     sys.path.insert(0, path)
+
+#####################
+Otis: eye projection, add neck, rig fixed figner models if ready
+Roto: update model, eye projection
+
+#####################
+
+import maya.cmds as mc
+
+driver_crv = 'Face_L_eyelid_lwr_lid_driver_crv'
+cvs = mc.ls(driver_crv + '.cv[*]', fl=True)
+
+num_divisions = 4
+
+poses = []
+for i in range(0, len(cvs)-2, num_divisions):
+    print i
+    pos = mc.xform(cvs[i], q=True, ws=True, t=True)
+    poses.append(pos)
+
+pos = mc.xform(cvs[len(cvs)-1], q=True, ws=True, t=True)
+poses.append(pos)
+
+wire_crv = 'Face_L_eyelid_lwr_lid_wire'
+
+#####################
+2020-04-21
+Ehsan
+. yesterday:
+- Otis: basic body and arm/legs rig published
+
+. today:
+- Otis: eye projection, add neck, rig fixed figner models if ready
+- Roto: update model, eye projection
+- Tylor: eyelid script
+
+
+#####################
+2020-04-22
+Ehsan
+. yesterday:
+- Roto: new rig with latest model, eye projection is published
+- Tylor: spent a couple of hours on the eyelid system
+
+
+. today:
+- Otis: eye projection, add neck, rig fixed figner models if ready
+- Tylor: eyelid script
+
+
+#############################
+Rituparna Roy - 2020-04-22
+
+pure python
+list comprehention - yes
+re - no
+decorators - familiar
+numpy - familiar
+has written kt-tree system
+
+
+python.cmds
+experienced
+
+
+python.api
+familiar
+has written a shrink wrap for herself
+
+
+pyside, pyqt
+yes, has written fitting tool UI in Animal Logic
+
+
+3d math
+matrix - basic understanding
+vector - good understanding
+
+
+facial rigging
+FACS - no production exp but knows what it is
+cartoon - has done curve based facial rig in the past
+
+
+deformation system:
+good knowledge
+
+
+houdini:
+forgot to ask :\
+
+
+git:
+experienced
+
+
+
+nCloth:
+good knowledge
+
+
+
+maya muscle:
+good knowledge
+
+
+
+fur:
+familiar with fertility (MPC fur system)
+
+
+
+- Their strengthes and weaknesses: 
+She has a lot of experience in different companies and projects. Seemed to lack some advanced math, but should be good for what we're looking for.
+- Would you hire them? 
+Yes
+- Their level: 
+Mid Senior
+- Any aditional info: 
+She's also easy to work with from my past experience.
+    
+
+
+iRigLoader
+bake_2.png
+crvLib
+display
+toolbox.json
+toolboxUI
+package
