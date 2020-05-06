@@ -30,7 +30,7 @@ from maya.app.general.mayaMixin import MayaQWidgetDockableMixin
 # RedTorch modules
 from ..lib import fileLib
 from ..lib import qtLib
-from . import package
+from .. import package
 
 reload(fileLib)
 reload(qtLib)

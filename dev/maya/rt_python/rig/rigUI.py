@@ -41,7 +41,7 @@ from ..lib import attrLib
 from . import rigLib
 from ..general import workspace
 from ..general import utils as generalUtils
-import package
+from .. import package
 from . import component
 
 reload(qtLib)
