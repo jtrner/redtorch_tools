@@ -1,31 +1,46 @@
-foot bulge script- done
-Cutter face: done
+Senior rigger:
+- needs to be able to write Python code fluently
+- know Maya API, know 3d related math
+- must have a good understanding of human and animal (body and facial) anatomy
+- should have years of experience rigging different kinds of cartoon and creatures
+- must be familiar with git
+- should be able to write an auto-rigging system
+- must be able to write PySide UIs
+- needs to have experience rigging muscles.
 
 
-Mike face: 
- - make rig scalable
+---------------------------------------------------------------------------------------------------------------------------------------
 
+- dynamic chain system
+- auto prop rigger
 
-Roto body: wip
+- auto texture system
 
+---------------------------------------------------------------------------------------------------------------------------------------
 
-Roto face: waiting to start
+- document framework
 
+---------------------------------------------------------------------------------------------------------------------------------------
 
-Fritz face:
-- make O shape work
+- got to branch that has conflics
+- git pull origin master
 
+---------------------------------------------------------------------------------------------------------------------------------------
 
-Fungus: done
+iRig Tools
+- right click option
+- reference buttons from to tabs
+- collapsable to button groups
+- tab shortcut
+- dockable windows
+- all tabs in one tab?
 
+---------------------------------------------------------------------------------------------------------------------------------------
 
-sully face: handoff
+- what's OT policy?
 
+---------------------------------------------------------------------------------------------------------------------------------------
 
-Val face: face fixes
-
-
-Clean up G:/Rigging
 
 
 

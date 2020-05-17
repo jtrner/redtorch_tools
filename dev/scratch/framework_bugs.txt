@@ -1,0 +1,20 @@
+
+1-
+. build a biped
+. delete legs, neck and thumb
+. build errors
+
+2-  
+. add 2 or 3 LayeredRibbonChain
+. add a handle part and parent it to last ribbon LayeredRibbonChain
+. build and your handle will be parented to some random joint
+
+3-
+. LayeredRibbonSplineChain and gimbals tweak vis controls not connected
+
+4-
+. Set handle size and shape doesn't work for multiple selection
+
+5-
+. changing handle shape doesn't change gimbal shape
+
