@@ -1077,5 +1077,3 @@ def launch():
         del globals()['workspace_obj']
     workspace_obj = UI()
     workspace_obj.show()
-
-# TODO: publish system

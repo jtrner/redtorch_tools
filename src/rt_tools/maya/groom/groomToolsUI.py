@@ -41,7 +41,6 @@ GREEN_PASTAL = (100, 160, 100)
 YELLOW_PASTAL = (210, 150, 90)
 RED = (220, 40, 40)
 GREEN = (40, 220, 40)
-ICON_DIR = os.path.abspath(os.path.join(__file__, '../../../../icon'))
 SETTINGS_PATH = os.path.join(os.getenv("HOME"), 'xgenUI.uiconfig')
 
 

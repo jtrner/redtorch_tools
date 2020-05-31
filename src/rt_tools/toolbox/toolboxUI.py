@@ -74,9 +74,12 @@ class UI(MayaQWidgetDockableMixin, QtWidgets.QDialog):
         self.user_btn_json = None
         self.can_edit = True
 
-        self.setWindowFlags(self.windowFlags()
-                            | QtCore.Qt.WindowCloseButtonHint
-                            | QtCore.Qt.WindowMinimizeButtonHint)
+        self.setWindowFlags(
+            self.windowFlags()
+            & ~QtCore.Qt.WindowContextHelpButtonHint
+            #| QtCore.Qt.WindowCloseButtonHint
+            #| QtCore.Qt.WindowMinimizeButtonHint
+        )
         self.setWindowTitle(title)
         self.resize(300, 600)
 
@@ -97,11 +100,11 @@ class UI(MayaQWidgetDockableMixin, QtWidgets.QDialog):
         self.tabs.addTab(self.main_w, "Rig && CFX")
         self.populateMainTab()
 
-        # shows tab
-        self.shows_w = QtWidgets.QWidget()
-        self.shows_lay = QtWidgets.QVBoxLayout(self.shows_w)
-        self.tabs.addTab(self.shows_w, SHOW_NAME)
-        self.populateShowsTab()
+        # # shows tab
+        # self.shows_w = QtWidgets.QWidget()
+        # self.shows_lay = QtWidgets.QVBoxLayout(self.shows_w)
+        # self.tabs.addTab(self.shows_w, SHOW_NAME)
+        # self.populateShowsTab()
 
         # users tab
         self.users_w = QtWidgets.QWidget()
@@ -238,7 +241,7 @@ class UI(MayaQWidgetDockableMixin, QtWidgets.QDialog):
         selected_user = self.users_box.currentText()
 
         self.user_btn_json = USER_TOOLBOX_JSON.format(selected_user)
-        print 'Using This toolbox.json: ', self.user_btn_json
+        print('Using This toolbox.json: ', self.user_btn_json)
         if not (self.user_btn_json and os.path.lexists(self.user_btn_json)):
             if selected_user != os.getenv('USERNAME'):
                 logger.error('Could not find toolbox.json here "{}"'.format(self.user_btn_json))

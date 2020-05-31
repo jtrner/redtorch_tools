@@ -80,14 +80,11 @@ def repeatable_cmd(function):
     """
     def wrapper(cmd_string):
         # make it repeatable for later
-        try:
-
-            # create a string from given command to make it repeatable
-            cmd_string_flatten = json.dumps(cmd_string)
-            commandToRepeat = 'python({})'.format(cmd_string_flatten)
-
+        cmd_string_flatten = json_dumps(cmd_string)
+        if cmd_string_flatten is not None:
             try:
                 # make commanad repeatable
+                commandToRepeat = 'python({})'.format(cmd_string_flatten)
                 mc.repeatLast(ac=commandToRepeat, acl=function.__name__)
 
                 # run the command
@@ -96,10 +93,15 @@ def repeatable_cmd(function):
             except Exception as e:
                 raise e
 
-        except:
-            cmd_string()
-
-        # execute it
-        return function(cmd_string)
+        # if given cmd is a callable function instead of a string
+        else:
+            return cmd_string()
 
     return wrapper
+
+
+def json_dumps(cmd_string):
+    try:
+        return json.dumps(cmd_string)
+    except:
+        return None

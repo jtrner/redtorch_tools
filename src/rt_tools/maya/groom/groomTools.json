@@ -1,67 +1,67 @@
 {
 "Display": {
   "Preview": {
-    "command": "from rt_python.groom import groomLib\nreload(groomLib)\ngroomLib.preview()",
-    "icon": "xgPreviewRefresh"
+    "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.preview()",
+    "icon": "xgPreviewRefresh.png"
   },
   "Hide /Show": {
-    "command": "from rt_python.groom import groomLib\nreload(groomLib)\ngroomLib.hideShow()",
-    "icon": "xgToggleGuide"
+    "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.hideShow()",
+    "icon": "xgToggleGuide.png"
   },
   "Set Guide Width": {
-    "command": "from rt_python.groom import groomLib\nreload(groomLib)\ngroomLib.setGuideWidth()",
-    "icon": "xgToggleWidth"
+    "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.setGuideWidth()",
+    "icon": "xgToggleWidth.png"
   }
 },
 "Style": {
   "Create Guide": {
-    "command": "from rt_python.groom import groomLib\nreload(groomLib)\ngroomLib.createGuide()",
-    "icon": "xgGuideContext"
+    "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.createGuide()",
+    "icon": "xgGuideContext.png"
   },
   "Comb": {
-    "command": "from rt_python.groom import groomLib\nreload(groomLib)\ngroomLib.comb()",
-    "icon": "xgGuideSculptTool"
+    "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.comb()",
+    "icon": "xgGuideSculptTool.png"
   },
   "Length Lock / Unlock": {
-    "command": "from rt_python.groom import groomLib\nreload(groomLib)\ngroomLib.lenLockToggle()",
-    "icon": "xgToggleGuideReference"
+    "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.lenLockToggle()",
+    "icon": "xgToggleGuideReference.png"
   }
 },
 "Select": {
     "Obj Mode": {
-        "command": "from rt_python.groom import groomLib\nreload(groomLib)\ngroomLib.objMode()",
-        "icon": "objectMode"
+        "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.objMode()",
+        "icon": "objectMode.png"
     },
     "Edit Mode": {
-        "command": "from rt_python.groom import groomLib\nreload(groomLib)\ngroomLib.editMode()",
-        "icon": "componentMode"
+        "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.editMode()",
+        "icon": "componentMode.png"
     }
 },
 "Curve": {
     "Average Curves": {
-        "command": "from rt_python.groom import groomLib\nreload(groomLib)\ngroomLib.averageAndDelete()",
+        "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.averageAndDelete()",
         "icon": ""
     },
     "Spiral...": {
-        "command": "from rt_python.groom import groomLib\nreload(groomLib)\ngroomLib.spiral_ui()",
+        "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.spiral_ui()",
         "icon": ""
     },
     "Shorter": {
-        "command": "from rt_python.groom import groomLib\nreload(groomLib)\ngroomLib.decreaseLen()",
+        "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.decreaseLen()",
         "icon": ""
     },
     "Longer": {
-        "command": "from rt_python.groom import groomLib\nreload(groomLib)\ngroomLib.increaseLen()",
+        "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.increaseLen()",
         "icon": ""
     }
 },
 "Extra": {
     "Export / Import": {
-        "command": "from rt_python.groom import groomUI\nreload(groomUI)\ngroomUI.launch()",
+        "command": "from rt_tools.maya.groom import groomUI\nreload(groomUI)\ngroomUI.launch()",
         "icon": ""
     },
-    "Update xgen_Pref": {
-        "command": "from rt_python.groom import groomLib\nreload(groomLib)\ngroomLib.updatePref()",
+    "Update Pref": {
+        "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.updatePref()",
         "icon": ""
     }
 }

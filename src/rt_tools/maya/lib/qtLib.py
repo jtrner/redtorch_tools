@@ -48,7 +48,6 @@ ICON_DIR = os.path.abspath(
         'icon'
     )
 )
-
 SETTINGS_PATH = os.path.join(os.getenv("HOME"), 'testUI.uiconfig')
 
 

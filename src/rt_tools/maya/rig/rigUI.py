@@ -950,10 +950,10 @@ class UI(QtWidgets.QDialog):
         if self.rigBuilderPath in sys.path:
             sys.path.remove(self.rigBuilderPath)
         sys.path.insert(0, self.rigBuilderPath)
-        print self.rigBuilderPath
+        print(self.rigBuilderPath)
         rigBuild = __import__('rigBuild', fromlist=['dummy'])
         reload(rigBuild)
-        print rigBuild
+        print( rigBuild)
         self.rigBuild_instance = rigBuild.RigBuild()
         time_elapsed = datetime.now() - start_time
         msg = 'Ready! Codes were loaded in: {}'.format(str(time_elapsed).split('.')[0])
@@ -990,7 +990,7 @@ class UI(QtWidgets.QDialog):
             time_elapsed = datetime.now() - start_time
             msg = 'Rig was built in: {}'.format(str(time_elapsed).split('.')[0])
             qtLib.printMessage(self.info_lb, 'SUCCESS -> ' + msg, mode='info')
-        except Exception, e:
+        except Exception as e:
             qtLib.printMessage(self.info_lb, 'ERROR -> ' + str(e), mode='error')
             raise e
 
@@ -1005,7 +1005,7 @@ class UI(QtWidgets.QDialog):
             qtLib.printMessage(self.info_lb, 'SUCCESS -> {}'.format(item.text(0)), mode='info')
             # self.info_lb.update()
             self.info_lb.repaint()
-        except Exception, e:
+        except Exception as e:
             item.setText(1, 'Failed')
             self.setItemColor(item, 1, qtLib.RED)
             qtLib.printMessage(self.info_lb, 'ERROR -> ' + str(e), mode='error')
@@ -1185,8 +1185,8 @@ class UI(QtWidgets.QDialog):
         # export scripts
         scriptAndDataDir = os.path.dirname(self.rigBuilderPath)
         publishDir = os.path.join(os.path.dirname(fileFullName), 'build')
-        print scriptAndDataDir
-        print publishDir
+        print(scriptAndDataDir)
+        print(publishDir)
         fileLib.copy(scriptAndDataDir, publishDir)
 
         qtLib.printMessage(self.info_lb, message='Rig published successfully!')
