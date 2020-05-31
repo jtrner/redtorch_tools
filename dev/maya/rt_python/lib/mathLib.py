@@ -1,11 +1,7 @@
 """
-path = '/sw/dev/hassanie/ehm_stuff/ehm_lib'
-if path not in sys.path:
-    sys.path.insert(0, path)
+mathLib.py
 
-import mathLib
-reload(mathLib)
-
+Usage:
 u, v, w = mathLib.barycentricFromObjs(a='a', b='b', c='c', p='p')
 
 aa = mc.xform('aa', q=True, ws=True, t=True)
@@ -153,6 +149,5 @@ def moveAlongTransform(node, transform, move=(0, 1, 0)):
     ofsPos = mc.xform(node, q=True, ws=True, t=True)
     ofsMat = matrixFromPose(ofsPos)
     mat2 = matrixFromPose(move)
-    newMat =  mat2 * mat * ofsMat * invMat
+    newMat = mat2 * mat * ofsMat * invMat
     mc.xform(node, ws=True, t=(newMat[12], newMat[13], newMat[14]))
-

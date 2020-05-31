@@ -1,7 +1,7 @@
 import os
 
 
-__version__ = "2.27.1"
+__version__ = "2.28.0"
 __author__ = "Ehsan Hassani Moghaddam"
-__comment__ = "2.27.1 - removed extra files"
+__comment__ = "2.28.0 -> ooo 0001"
 os.environ["REDTORCH_TOOLS_VERSION"] = __version__

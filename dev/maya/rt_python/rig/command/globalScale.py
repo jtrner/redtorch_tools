@@ -2,21 +2,11 @@
 name: globalScale.py
 
 Author: Ehsan Hassani Moghaddam
-
-History:
-    05/24/16 (ehassani)     first release!
     
 """
 import maya.cmds as mc
 
-from ...lib import trsLib
-
-# reload all imported modules from dev
-import types
-for name, val in globals().items():
-    if isinstance(val, types.ModuleType):
-        if val.__name__.startswith('dev'):
-            reload(val)
+from iRig.iRig_maya.lib import trsLib
 
 
 def run(dist=None, globalScaleAttr=None, name="unknown") :
@@ -28,7 +18,7 @@ def run(dist=None, globalScaleAttr=None, name="unknown") :
         distShape = dist
     else:
         outAttr = 'distance'
-        if dist.type() == 'transform': # if transform node of distance node is selected, then select it's shape
+        if dist.type() == 'transform':
             distShape = trsLib.getShapes(node=dist)[0]
         else:
             distShape = dist

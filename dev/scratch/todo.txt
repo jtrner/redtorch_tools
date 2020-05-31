@@ -1,12 +1,43 @@
-Senior rigger:
-- needs to be able to write Python code fluently
-- know Maya API, know 3d related math
-- must have a good understanding of human and animal (body and facial) anatomy
-- should have years of experience rigging different kinds of cartoon and creatures
-- must be familiar with git
-- should be able to write an auto-rigging system
-- must be able to write PySide UIs
-- needs to have experience rigging muscles.
+
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+global scale of cartoony eye
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+Hey Ehsan, hope you are doing well
+I am trying to bake the face with the iRig Face button for a while, and even though it works great for most of the baking, I realized at certain/most of the time, it does not mirror the Face_C*Ctrls left/right movements. 
+
+Forexample, when I am baking the C_Jaw to translateX 1,  it is not baking for translateX -1 as it used to do for the original face Baking 
+I'm not sure if I am doing something wrong in this version, but I just thought if you could test and see if that is working fine for you
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+
+import sys
+import copy
+import maya.cmds as mc
+
+
+# remove old modules from Python memory
+syscopy = copy.copy(sys.modules)
+removeList = []
+for modKey, mod in syscopy.iteritems():
+    if sys.modules[modKey]:
+        if hasattr(mod, '__file__'):
+            if 'rig_tools' in sys.modules[modKey].__file__.replace('\\', '/'):
+                print sys.modules[modKey].__file__
+                removeList.append(modKey)
+            if 'icon_api' in sys.modules[modKey].__file__.replace('\\', '/'):
+                print sys.modules[modKey].__file__
+                removeList.append(modKey)
+for mod in removeList:
+    sys.modules.pop(mod)
+
+from iRig.iRig_maya.rig_tools.frankenstein import ui as rig_frankenstein_ui
+frank_ui = rig_frankenstein_ui.Frankenstein_Widget()
+frank_ui.show()
 
 
 ---------------------------------------------------------------------------------------------------------------------------------------
