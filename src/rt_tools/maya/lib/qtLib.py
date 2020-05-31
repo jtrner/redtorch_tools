@@ -405,14 +405,17 @@ def selectItemByText(tw, text, parentText=None):
 
         # item is a top level item
         if not parentText:
+            print('no parent')
+            print(text, item.text(0))
             if text == item.text(0):
                 tw.setCurrentItem(item)
+                return
             else:
                 tw.clearSelection()
-            return
 
         # item is a child of a top level item
         else:
+            print('has parent')
             if parentText == item.text(0):
                 child_count = item.childCount()
                 for j in range(child_count):
