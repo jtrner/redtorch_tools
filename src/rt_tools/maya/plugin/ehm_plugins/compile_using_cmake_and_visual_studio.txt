@@ -1,0 +1,5 @@
+- create a build directory beside "source" and "cmake" folders
+- open shell and run this command: cmake -G "Visual Studio 14 2015 Win64" -MAYA_VERSION=2019 ../
+- this will create your visual studio project
+- compile it in visual studio
+

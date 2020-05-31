@@ -3,12 +3,13 @@
 2- Make a python shelf button from code below: ( do not use \ in the path, use / instead! )
 
 import sys
-path = "D:/all_works/redtorch_tools/dev/maya"
+path = "D:/all_works/redtorch_tools/src"
 if path in sys.path:
     sys.path.remove(path)
 sys.path.insert(0, path)
-from rt_python.toolbox import toolboxUI
+from rt_tools.toolbox import toolboxUI
 reload(toolboxUI)
 toolboxUI.launch()
+
 
 3- enjoy

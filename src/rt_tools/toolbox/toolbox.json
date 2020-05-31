@@ -1,0 +1,43 @@
+{
+"General": {
+	"productUI": {
+		"command": "from rt_tools.maya.general import productUI\nreload(productUI)\nproductUI.launch()",
+		"icon": "productUI.png"
+	},
+	"workspaceUI": {
+		"command": "from rt_tools.maya.general import workspaceUI\nreload(workspaceUI)\nworkspaceUI.launch()",
+		"icon": "workspaceUI.png"
+	},
+	"renameUI": {
+		"command": "from rt_tools.maya.lib import renameUI\nreload(renameUI)\nrenameUI.launch()",
+		"icon": "renameUI.png"
+	}
+},
+"Model": {
+	"modelUI": {
+		"command": "from rt_tools.maya.model import modelUI\nreload(modelUI)\nmodelUI.launch()",
+		"icon": "modelUI.png"
+	}},
+"Groom": {
+	"xgenUI": {
+		"command": "from rt_tools.maya.groom import groomToolsUI\nreload(groomToolsUI)\ngroomToolsUI.launch()",
+		"icon": "groomToolsUI.png"
+	}
+},
+"Lookdev": {
+	"renderUI": {
+		"command": "from rt_tools.maya.lib import renderUI\nreload(renderUI)\nrenderUI.launch()",
+		"icon": "renderUI.png"
+	}
+},
+"Rig": {
+	"rigUI": {
+		"command": "from rt_tools.maya.rig import rigUI\nreload(rigUI)\nrigUI.launch()",
+		"icon": "rigUI.png"
+	},
+	"rigToolsUI": {
+		"command": "from rt_tools.maya.rig import rigToolsUI\nreload(rigToolsUI)\nrigToolsUI.launch()",
+		"icon": "rigToolsUI.png"
+	}
+}
+}
