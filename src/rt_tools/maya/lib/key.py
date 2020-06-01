@@ -23,7 +23,7 @@ def setDriven(drvr, drvn, drvrValues, drvnValues, itt='linear', ott='linear'):
 def create3CurvePrincipleAnimCurve(curveType='mid'):
     """
     creates an animCurve based on 3 curves principle from the book "Art of Moving Points"
-    from rt_python.lib import key
+    from rt_tools.maya.lib import key
     reload(key)
     key.create3CurvePrincipleAnimCurve(curveType='mid')
     :param curveType: 'start', 'mid' or 'end'
@@ -56,7 +56,7 @@ def create3CurvePrincipleAnimCurve(curveType='mid'):
 def create5CurvePrincipleAnimCurve(curveType='mid', name='newAnimCurve'):
     """
     creates an animCurve based on 3 curves principle from the book "Art of Moving Points"
-    from rt_python.lib import key
+    from rt_tools.maya.lib import key
     reload(key)
     key.key.create5CurvePrincipleAnimCurve(curveType='end')
     :param curveType: 'start', 'startMid', 'mid', 'endMid' or 'end'

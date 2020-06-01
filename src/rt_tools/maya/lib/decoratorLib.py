@@ -95,7 +95,12 @@ def repeatable_cmd(function):
 
         # if given cmd is a callable function instead of a string
         else:
-            return cmd_string()
+            cmd_string()
+
+        # print executed code
+        print('-' * 80)
+        print(cmd_string)
+        print('-' * 80)
 
     return wrapper
 

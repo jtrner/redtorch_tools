@@ -147,7 +147,7 @@ def reverseShape(self, objs=None, axis='x'):
 
 def blendShapeGeosUnderTwoGroups(originalGroup, editedGroup, deleteHistory=False, space='local'):
     """
-    from rt_python.lib import meshLib
+    from rt_tools.maya.lib import meshLib
     meshLib.blendShapeGeosUnderTwoGroups(originalGroup='model_GRP', editedGroup='model_GRP1', deleteHistory=True)
 
     """

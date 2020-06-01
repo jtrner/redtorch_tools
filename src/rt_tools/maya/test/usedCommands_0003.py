@@ -61,7 +61,7 @@ workspace.publishAsset(jobDir='D:/all_works/01_projects', job='behnam_for_turbos
     seq='asset', shot='lion', task='model', ext=None)
 
 
-from rt_python.anim import exportImportAnim
+from rt_tools.maya.anim import exportImportAnim
 reload(exportImportAnim)
 animUI = exportImportAnim.ExportImportAnim()
 animUI.UI()

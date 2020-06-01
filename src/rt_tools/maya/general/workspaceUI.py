@@ -12,7 +12,7 @@ import sys
 path = os.path.join("D:/all_works/redtorch_tools/dev/maya")
 if path not in sys.path:
     sys.path.insert(0, path)
-from rt_python.general import workspaceUI
+from rt_tools.maya.general import workspaceUI
 reload(workspaceUI)
 workspaceUI.launch()
 

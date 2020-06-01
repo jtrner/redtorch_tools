@@ -14,7 +14,7 @@ if path in sys.path:
     sys.path.remove(path)
 sys.path.insert(0, path)
 
-from rt_python.anim import exportImportAnim
+from rt_tools.maya.anim import exportImportAnim
 reload(exportImportAnim)
 
 animUI = exportImportAnim.ExportImportAnim()

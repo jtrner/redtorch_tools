@@ -14,7 +14,7 @@ global proc shelf_EHM_Rig () {
         -manage 1
         -visible 1
         -preventOverride 0
-        -annotation "import sys\npath = os.path.join(\"D:/all_works/redtorch_tools/dev/maya\")\nif path in sys.path:\n    sys.path.remove(path)\nsys.path.insert(0, path)\nfrom rt_python.toolbox import toolboxUI\nreload(toolboxUI)\ntoolboxUI.launch()" 
+        -annotation "import sys\npath = os.path.join(\"D:/all_works/redtorch_tools/dev/maya\")\nif path in sys.path:\n    sys.path.remove(path)\nsys.path.insert(0, path)\nfrom rt_tools.maya.toolbox import toolboxUI\nreload(toolboxUI)\ntoolboxUI.launch()"
         -enableBackground 0
         -backgroundColor 0 0 0 
         -highlightColor 0.321569 0.521569 0.65098 
@@ -34,7 +34,7 @@ global proc shelf_EHM_Rig () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "import sys\npath = os.path.join(\"D:/all_works/redtorch_tools/dev/maya\")\nif path in sys.path:\n    sys.path.remove(path)\nsys.path.insert(0, path)\nfrom rt_python.toolbox import toolboxUI\nreload(toolboxUI)\ntoolboxUI.launch()" 
+        -command "import sys\npath = os.path.join(\"D:/all_works/redtorch_tools/dev/maya\")\nif path in sys.path:\n    sys.path.remove(path)\nsys.path.insert(0, path)\nfrom rt_tools.maya.toolbox import toolboxUI\nreload(toolboxUI)\ntoolboxUI.launch()"
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1
@@ -156,12 +156,12 @@ global proc shelf_EHM_Rig () {
         -manage 1
         -visible 1
         -preventOverride 0
-        -annotation "import maya.cmds as mc\nfrom rt_python.lib import trsLib\nreload(trsLib)\n[trsLib.resetTRS(x) for x in mc.ls(sl=1)]" 
+        -annotation "import maya.cmds as mc\nfrom rt_tools.maya.lib import trsLib\nreload(trsLib)\n[trsLib.resetTRS(x) for x in mc.ls(sl=1)]"
         -enableBackground 0
         -backgroundColor 0 0 0 
         -highlightColor 0.321569 0.521569 0.65098 
         -align "center" 
-        -label "import maya.cmds as mc\nfrom rt_python.lib import trsLib\nreload(trsL..." 
+        -label "import maya.cmds as mc\nfrom rt_tools.maya.lib import trsLib\nreload(trsL..."
         -labelOffset 0
         -rotation 0
         -flipX 0
@@ -176,7 +176,7 @@ global proc shelf_EHM_Rig () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "import maya.cmds as mc\nfrom rt_python.lib import trsLib\nreload(trsLib)\n[trsLib.resetTRS(x) for x in mc.ls(sl=1)]" 
+        -command "import maya.cmds as mc\nfrom rt_tools.maya.lib import trsLib\nreload(trsLib)\n[trsLib.resetTRS(x) for x in mc.ls(sl=1)]"
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1
@@ -191,12 +191,12 @@ global proc shelf_EHM_Rig () {
         -manage 1
         -visible 1
         -preventOverride 0
-        -annotation "from rt_python.lib import common\nreload(common)\ncommon.removePasted()" 
+        -annotation "from rt_tools.maya.lib import common\nreload(common)\ncommon.removePasted()"
         -enableBackground 0
         -backgroundColor 0 0 0 
         -highlightColor 0.321569 0.521569 0.65098 
         -align "center" 
-        -label "from rt_python.lib import common\nreload(common)\ncommon.removePasted..." 
+        -label "from rt_tools.maya.lib import common\nreload(common)\ncommon.removePasted..."
         -labelOffset 0
         -rotation 0
         -flipX 0
@@ -211,7 +211,7 @@ global proc shelf_EHM_Rig () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "from rt_python.lib import common\nreload(common)\ncommon.removePasted()" 
+        -command "from rt_tools.maya.lib import common\nreload(common)\ncommon.removePasted()"
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1
@@ -226,12 +226,12 @@ global proc shelf_EHM_Rig () {
         -manage 1
         -visible 1
         -preventOverride 0
-        -annotation "from rt_python.lib import namespace\nreload(namespace)\nnamespace.removeAll()\n" 
+        -annotation "from rt_tools.maya.lib import namespace\nreload(namespace)\nnamespace.removeAll()\n"
         -enableBackground 0
         -backgroundColor 0 0 0 
         -highlightColor 0.321569 0.521569 0.65098 
         -align "center" 
-        -label "from rt_python.lib import namespace\nreload(namespace)\nnamespace.rem..." 
+        -label "from rt_tools.maya.lib import namespace\nreload(namespace)\nnamespace.rem..."
         -labelOffset 0
         -rotation 0
         -flipX 0
@@ -246,7 +246,7 @@ global proc shelf_EHM_Rig () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "from rt_python.lib import namespace\nreload(namespace)\nnamespace.removeAll()\n" 
+        -command "from rt_tools.maya.lib import namespace\nreload(namespace)\nnamespace.removeAll()\n"
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1
@@ -295,7 +295,7 @@ global proc shelf_EHM_Rig () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "from rt_python.lib import controlUI\nreload(controlUI)\nif 'controlUI_win' in globals():\n    controlUI_win.deleteLater()\n    del globals()['controlUI_win']\ncontrolUI_win = controlUI.UI()\ncontrolUI_win.show()" 
+        -command "from rt_tools.maya.lib import controlUI\nreload(controlUI)\nif 'controlUI_win' in globals():\n    controlUI_win.deleteLater()\n    del globals()['controlUI_win']\ncontrolUI_win = controlUI.UI()\ncontrolUI_win.show()"
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1
@@ -330,15 +330,15 @@ global proc shelf_EHM_Rig () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "from rt_python.lib import crvLib\nreload(curve)\ncrvLib.toggleCVs()" 
+        -command "from rt_tools.maya.lib import crvLib\nreload(curve)\ncrvLib.toggleCVs()"
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1
-        -mi "first" ( "from rt_python.lib import crvLib\ncrvLib.selectFirst()" )
+        -mi "first" ( "from rt_tools.maya.lib import crvLib\ncrvLib.selectFirst()" )
         -mip 0
-        -mi "last" ( "from rt_python.lib import crvLib\ncrvLib.selectLast()\n" )
+        -mi "last" ( "from rt_tools.maya.lib import crvLib\ncrvLib.selectLast()\n" )
         -mip 1
-        -mi "nonFirst" ( "from rt_python.lib import crvLib\ncrvLib.selectNonFirst()" )
+        -mi "nonFirst" ( "from rt_tools.maya.lib import crvLib\ncrvLib.selectNonFirst()" )
         -mip 2
     ;
     shelfButton
@@ -408,7 +408,7 @@ global proc shelf_EHM_Rig () {
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1
-        -mi "mirror slider" ( "from rt_python.lib import slider\nslider.mirrorSliders(nodes=None)" )
+        -mi "mirror slider" ( "from rt_tools.maya.lib import slider\nslider.mirrorSliders(nodes=None)" )
         -mip 0
     ;
     shelfButton
@@ -566,7 +566,7 @@ global proc shelf_EHM_Rig () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "from rt_python.lib import renderLib\nreload(renderLib)\nrenderLib.saveImage()" 
+        -command "from rt_tools.maya.lib import renderLib\nreload(renderLib)\nrenderLib.saveImage()"
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1
@@ -601,7 +601,7 @@ global proc shelf_EHM_Rig () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "from rt_python.lib import renderLib\nreload(renderLib)\nrenderLib.assignArnoldMtl(mc.ls(sl=True), name='C_feather_MTL')" 
+        -command "from rt_tools.maya.lib import renderLib\nreload(renderLib)\nrenderLib.assignArnoldMtl(mc.ls(sl=True), name='C_feather_MTL')"
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1
@@ -770,11 +770,11 @@ global proc shelf_EHM_Rig () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "# export selected or all skinClusters in scene\nfrom rt_python.lib import skincluster\npath = mc.internalVar(uad=True)\nwgtFiles = os.path.join(path, '..', '..', 'Desktop')\nselected = mc.ls(sl=True)\nif selected:\n    geos = selected\nelse:\n    geos = mc.listRelatives('geometry_GRP', ad=True, type='mesh', ni=True)\n    geos = [mc.listRelatives(x, p=True)[0] for x in geos]\n    geos = list(set(geos))\nreload(skincluster)\nskincluster.exportData(geos=geos, dataPath=wgtFiles)\n" 
+        -command "# export selected or all skinClusters in scene\nfrom rt_tools.maya.lib import skincluster\npath = mc.internalVar(uad=True)\nwgtFiles = os.path.join(path, '..', '..', 'Desktop')\nselected = mc.ls(sl=True)\nif selected:\n    geos = selected\nelse:\n    geos = mc.listRelatives('geometry_GRP', ad=True, type='mesh', ni=True)\n    geos = [mc.listRelatives(x, p=True)[0] for x in geos]\n    geos = list(set(geos))\nreload(skincluster)\nskincluster.exportData(geos=geos, dataPath=wgtFiles)\n"
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1
-        -mi "importSkin" ( "# import selected or all skinClusters in scene\nfrom rt_python.lib import skincluster\npath = mc.internalVar(uad=True)\nwgtFiles = os.path.join(path, '..', '..', 'Desktop')\nskincluster.importData(dataPath=wgtFiles)\n" )
+        -mi "importSkin" ( "# import selected or all skinClusters in scene\nfrom rt_tools.maya.lib import skincluster\npath = mc.internalVar(uad=True)\nwgtFiles = os.path.join(path, '..', '..', 'Desktop')\nskincluster.importData(dataPath=wgtFiles)\n" )
         -mip 0
     ;
     shelfButton
@@ -890,7 +890,7 @@ global proc shelf_EHM_Rig () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "from rt_python.lib import jntLib\njntLib.toggleDisplaySize()\n" 
+        -command "from rt_tools.maya.lib import jntLib\njntLib.toggleDisplaySize()\n"
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1
@@ -911,7 +911,7 @@ global proc shelf_EHM_Rig () {
         -manage 1
         -visible 1
         -preventOverride 0
-        -annotation "from rt_python.lib import jntLib\njntLib.resetOrient()\n" 
+        -annotation "from rt_tools.maya.lib import jntLib\njntLib.resetOrient()\n"
         -enableBackground 0
         -backgroundColor 0 0 0 
         -highlightColor 0.321569 0.521569 0.65098 
@@ -931,7 +931,7 @@ global proc shelf_EHM_Rig () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "from rt_python.lib import jntLib\njntLib.resetOrient()\n" 
+        -command "from rt_tools.maya.lib import jntLib\njntLib.resetOrient()\n"
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1
@@ -1051,7 +1051,7 @@ global proc shelf_EHM_Rig () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "from rt_python.lib import trsLib\nfor geo in mc.ls(sl=True):\n    trsLib.removeOrigShapes(geo)" 
+        -command "from rt_tools.maya.lib import trsLib\nfor geo in mc.ls(sl=True):\n    trsLib.removeOrigShapes(geo)"
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1

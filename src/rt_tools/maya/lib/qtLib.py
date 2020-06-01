@@ -1056,7 +1056,8 @@ def dictToTreeWidget(tw, data):
 @decoratorLib.repeatable_cmd
 @decoratorLib.undoChunk
 def run_command(commandString):
-    print('-' * 80)
-    print(commandString)
-    print('-' * 80)
+    pass
+    # print('-' * 80)
+    # print(commandString)
+    # print('-' * 80)
     # exec (commandString, globals(), globals())

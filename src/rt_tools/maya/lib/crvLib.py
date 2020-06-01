@@ -1185,7 +1185,7 @@ def averageAndDelete():
 
 def setLength(crv, length):
     """
-    from rt_python.lib import crvLib
+    from rt_tools.maya.lib import crvLib
     reload(crvLib)
     [crvLib.setLength(crv=x, length=1) for x in mc.ls(sl=True)]
     """
@@ -1223,7 +1223,7 @@ def setLength(crv, length):
 
 def increaseLen(crv, percent=5):
     """
-    from rt_python.lib import crvLib
+    from rt_tools.maya.lib import crvLib
     reload(crvLib)
     [crvLib.increaseLen(crv=x, percent=5) for x in mc.ls(sl=True)]
     """
@@ -1234,7 +1234,7 @@ def increaseLen(crv, percent=5):
 
 def decreaseLen(crv, percent=5):
     """
-    from rt_python.lib import crvLib
+    from rt_tools.maya.lib import crvLib
     reload(crvLib)
     [crvLib.decreaseLen(crv=x, percent=5) for x in mc.ls(sl=True)]
     """

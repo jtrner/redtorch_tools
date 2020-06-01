@@ -154,7 +154,7 @@ def deform():
     connect.importJointConstraints(dataPath=constrainsPath)
 
     # # export muscleJnts constriants
-    # from rt_python.lib import connect
+    # from rt_tools.maya.lib import connect
     #
     # nodes = mc.ls('*StartModule_GRP', '*StartEnd_GRP', long=True)
     # nodes = [x.split('|')[-1] for x in nodes if 'C_muscleJnt_GRP' in x]

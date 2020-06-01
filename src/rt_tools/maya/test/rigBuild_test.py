@@ -1,5 +1,5 @@
 """
-from rt_python.rig import rigBuild_test
+from rt_tools.maya.rig import rigBuild_test
 reload(rigBuild_test)
 test = rigBuild_test.Test()
 # test.deleteOldRig()

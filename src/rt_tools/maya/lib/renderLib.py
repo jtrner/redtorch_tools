@@ -388,7 +388,7 @@ def createEyeRamp(name='eye'):
 def assignRandomShaders(nodes=None, applyToAll=False, colorRange=(0, 1), mtlType='lambert'):
     """
     :usage:
-        from rt_python.lib import renderLib
+        from rt_tools.maya.lib import renderLib
         renderLib.assignRandomShaders(applyToAll=True, colorRange=(0.1, 0.8))
     """
     if applyToAll:
@@ -1076,7 +1076,7 @@ def substanceToMayaSoftware(textureDir):
 
 def renderSequence(frames, melCmd=None, resolution=[1280, 720], renderer='arnold', sample=3):
     """
-    from rt_python.lib import renderLib
+    from rt_tools.maya.lib import renderLib
     reload(renderLib)
     frames = [1, 10, 20, 45, 81]
     renderLib.renderSequence(frames=frames,

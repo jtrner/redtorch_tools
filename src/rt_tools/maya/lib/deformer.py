@@ -563,7 +563,7 @@ def copySkinFromReference():
 
 def copySkin(src=None, targets=None, useSelection=False):
     """
-    from rt_python.lib import deformer
+    from rt_tools.maya.lib import deformer
     deformer.copySkin(useSelection=True)
     """
     if useSelection:
@@ -601,7 +601,7 @@ def copySkin(src=None, targets=None, useSelection=False):
 
 def mirrorSkin(sources=None, useSelection=False):
     """
-    from rt_python.lib import deformer
+    from rt_tools.maya.lib import deformer
     deformer.mirrorSkin(useSelection=True)
     """
     if useSelection:

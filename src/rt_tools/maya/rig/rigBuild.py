@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 import maya.cmds as mc
 
-from rt_python.rig import rigBuild_base
+from rt_tools.maya.rig import rigBuild_base
 
 reload(rigBuild_base)
 

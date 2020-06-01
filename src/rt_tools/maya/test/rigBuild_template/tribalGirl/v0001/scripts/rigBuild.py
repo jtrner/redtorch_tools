@@ -44,10 +44,10 @@ path = os.path.join("D:",
 if path not in sys.path:
     sys.path.append(path)
 
-from rt_python.rig.command import *
-from rt_python.rig.component import *
-from rt_python.lib import *
-from rt_python.general import *
+from rt_tools.maya.rig.command import *
+from rt_tools.maya.rig.component import *
+from rt_tools.maya.lib import *
+from rt_tools.maya.general import *
 
 # reload all imported modules from dev
 import types

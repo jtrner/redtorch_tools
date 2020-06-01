@@ -1048,7 +1048,7 @@ def extractTargets(bls, neutral='neutral', prefix='', targets=None, splitConfig=
     }
 
     :usage:
-    from rt_python.lib import shapeLib
+    from rt_tools.maya.lib import shapeLib
     reload(shapeLib)
     shapeLib.extractTargets(bls='blendShape1', neutral='C_body_GEO')
 

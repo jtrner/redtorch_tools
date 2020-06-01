@@ -27,59 +27,59 @@ if path not in sys.path:
 # ---------------
 import maya.cmds as mc
 
-from rt_python.lib import util
+from rt_tools.maya.lib import util
 
 reload(util)
 
-from rt_python.lib import trsLib
+from rt_tools.maya.lib import trsLib
 
 reload(trsLib)
 
-from rt_python.lib import jntLib
+from rt_tools.maya.lib import jntLib
 
 reload(jntLib)
 
-from rt_python.lib import strLib
+from rt_tools.maya.lib import strLib
 
 reload(strLib)
 
-from rt_python.rig.component import root
+from rt_tools.maya.rig.component import root
 
 reload(root)
 
-from rt_python.rig.component import model
+from rt_tools.maya.rig.component import model
 
 reload(model)
 
-from rt_python.rig.component import skeleton
+from rt_tools.maya.rig.component import skeleton
 
 reload(skeleton)
 
-from rt_python.rig.component import skincluster
+from rt_tools.maya.rig.component import skincluster
 
 reload(skincluster)
 
-from rt_python.rig.component import spineBiped
+from rt_tools.maya.rig.component import spineBiped
 
 reload(spineBiped)
 
-from rt_python.rig.component import headBiped
+from rt_tools.maya.rig.component import headBiped
 
 reload(headBiped)
 
-from rt_python.rig.component import shoulderBiped
+from rt_tools.maya.rig.component import shoulderBiped
 
 reload(shoulderBiped)
 
-from rt_python.rig.component import armBiped
+from rt_tools.maya.rig.component import armBiped
 
 reload(armBiped)
 
-from rt_python.rig.component import legBiped
+from rt_tools.maya.rig.component import legBiped
 
 reload(legBiped)
 
-from rt_python.rig.component import finger
+from rt_tools.maya.rig.component import finger
 
 reload(finger)
 

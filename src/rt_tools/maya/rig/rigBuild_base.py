@@ -164,7 +164,7 @@ class RigBuild_base(object):
 
         for bluGrp, info in modules.items():
             self.INSTANCES[bluGrp] = {}
-            package = sys.modules['rt_python.rig.component.' + info['name']]
+            package = sys.modules['rt_tools.maya.rig.component.' + info['name']]
             classObj = getattr(package, info['type'])
             self.INSTANCES[bluGrp]['class'] = classObj(**info['data'])
             self.INSTANCES[bluGrp]['data'] = info['data']

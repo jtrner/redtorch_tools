@@ -8,7 +8,7 @@ path = os.path.join("D:/all_works/redtorch_tools/dev/maya")
 if path in sys.path:
     sys.path.remove(path)
 sys.path.insert(0, path)
-from rt_python.general import groomUI
+from rt_tools.maya.general import groomUI
 reload(groomUI)
 groomUI.launch()
 
