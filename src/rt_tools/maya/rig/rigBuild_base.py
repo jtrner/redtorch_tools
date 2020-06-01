@@ -10,7 +10,7 @@ import maya.cmds as mc
 from rt_tools.maya.general import workspace
 from rt_tools.maya.lib import attrLib
 from rt_tools.maya.lib import connect
-from rt_tools.maya.lib import deformLibLib
+from rt_tools.maya.lib import deformLib
 
 from .component import arm
 from .component import chain

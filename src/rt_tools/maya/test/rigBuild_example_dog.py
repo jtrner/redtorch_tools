@@ -46,7 +46,7 @@ from ..rig.component import eyes
 from ..rig.component import finger
 from ..rig.component import model
 from ..rig.component import skeleton
-from ..rig.lib import deformLib
+from ..lib import deformLib
 
 from ..lib import control
 from ..lib import attrLib

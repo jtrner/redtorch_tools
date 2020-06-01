@@ -463,7 +463,7 @@ def _lineToLists(wgts, numVerts, numInfs):
 
 def copySkin(src=None, targets=None, useSelection=False):
     """
-    from rt_tools.maya.lib import deformLibLib
+    from rt_tools.maya.lib import deformLib
     deformLib.copySkin(useSelection=True)
     """
     if useSelection:

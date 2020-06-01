@@ -42,7 +42,7 @@ rot = [rad.x * 57.2958,
        rad.y * 57.2958,
        rad.z * 57.2958]
 
-print rot
+print(rot)
 
 
 
@@ -51,7 +51,7 @@ print rot
 import maya.cmds as mc
 import maya.OpenMaya as om
 
-from ...lib import deformLibLib
+from ...lib import deformLib
 from ...lib import trsLib
 
 
@@ -96,17 +96,17 @@ def ExtractDeltas(src, tgt):
 
 
 def printMatrix(mMatrix):
-    print  mMatrix(0,0), '\t', mMatrix(0,1), '\t', mMatrix(0,2), '\t', mMatrix(0,3)
-    print ''
-    print  mMatrix(1,0), '\t', mMatrix(1,1), '\t', mMatrix(1,2), '\t', mMatrix(1,3)
-    print ''
-    print  mMatrix(2,0), '\t', mMatrix(2,1), '\t', mMatrix(2,2), '\t', mMatrix(2,3)
-    print ''
-    print  mMatrix(3,0), '\t', mMatrix(3,1), '\t', mMatrix(3,2), '\t', mMatrix(3,3)
+    print(  mMatrix(0,0), '\t', mMatrix(0,1), '\t', mMatrix(0,2), '\t', mMatrix(0,3))
+    print( '')
+    print(  mMatrix(1,0), '\t', mMatrix(1,1), '\t', mMatrix(1,2), '\t', mMatrix(1,3))
+    print( '')
+    print(  mMatrix(2,0), '\t', mMatrix(2,1), '\t', mMatrix(2,2), '\t', mMatrix(2,3))
+    print( '')
+    print(  mMatrix(3,0), '\t', mMatrix(3,1), '\t', mMatrix(3,2), '\t', mMatrix(3,3))
 
 
 def printVec(mVec):
-    print  mVec.x, '\t', mVec.y, '\t', mVec.z
+    print(  mVec.x, '\t', mVec.y, '\t', mVec.z)
 
 
 def vecToMatrix(mVec):

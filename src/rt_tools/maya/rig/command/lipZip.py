@@ -36,7 +36,7 @@ from ...lib import connect
 from ...lib import attrLib
 from ...lib import trsLib
 from ...lib import strLib
-from ...lib import deformLibLib
+from ...lib import deformLib
 
 reload(crvLib)
 reload(jntLib)

@@ -55,7 +55,7 @@ from rt_tools.maya.rig.component import skeleton
 
 reload(skeleton)
 
-from rt_tools.maya.rig.lib import deformLib
+from rt_tools.maya.lib import deformLib
 
 reload(skincluster)
 
