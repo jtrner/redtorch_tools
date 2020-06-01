@@ -155,7 +155,7 @@ def meshes():
 #
 #         #
 #
-#     # deformer.replaceInfluence('pCube1', srcJnts=['joint2'], tgtJnt='joint1', error=False)
+#     # deformLib.replaceInfluence('pCube1', srcJnts=['joint2'], tgtJnt='joint1', error=False)
 
 def deleteMocapSkeleton():
     # TODO: transfer skinWeights from skeleton joints to result joints

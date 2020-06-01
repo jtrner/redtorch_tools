@@ -55,7 +55,7 @@ from rt_tools.maya.rig.component import skeleton
 
 reload(skeleton)
 
-from rt_tools.maya.rig.component import skincluster
+from rt_tools.maya.rig.lib import deformLib
 
 reload(skincluster)
 
@@ -348,7 +348,7 @@ mc.hide(_root.setup_grp)
 # deformation
 # ---------------
 
-skin = skincluster.Skincluster()
+skin = deformLib.()
 skin.geometry_list = trsLib.getHierarchyByType(node="model_GRP", type="mesh")
 skin.joint_list = trsLib.getHierarchyByType(node="skeleton_GRP", type="joint")
 skin.weight_file = skin_weightPath

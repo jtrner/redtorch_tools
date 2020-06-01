@@ -15,7 +15,7 @@ from PySide2 import QtCore, QtWidgets
 import maya.cmds as mc
 
 # rt_tools modules
-from rt_tools.maya.lib import deformLib
+from rt_tools.maya.lib import deformLibLib
 from rt_tools.maya.lib import qtLib
 from rt_tools.maya.lib import decoratorLib
 

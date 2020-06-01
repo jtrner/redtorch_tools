@@ -245,7 +245,7 @@ def deform():
     # import skinClusters
     wgtFiles = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                             '..', 'data', 'skinCluster'))
-    skincluster.Skincluster.importData(dataPath=wgtFiles)
+    deformLib..importData(dataPath=wgtFiles)
 
 
 def post():
@@ -464,7 +464,7 @@ def importBlendShapes():
 
 def corneaBulge():
     pos = mc.objectCenter('L_eye_JNT')
-    data = deformer.createSoftMod(geos=['C_head_GEO', 'C_eyelashes_GEO'],
+    data = deformLib.createSoftMod(geos=['C_head_GEO', 'C_eyelashes_GEO'],
                                   name='L_lid',
                                   position=pos)
     baseCtl, ctl, sMod, sHnd = data
@@ -476,7 +476,7 @@ def corneaBulge():
     mc.setAttr(baseCtl + '.r', -3.28, 18, -13.55)
 
     pos = mc.objectCenter('R_eye_JNT')
-    data = deformer.createSoftMod(geos=['C_head_GEO', 'C_eyelashes_GEO'],
+    data = deformLib.createSoftMod(geos=['C_head_GEO', 'C_eyelashes_GEO'],
                                   name='R_lid',
                                   position=pos)
     baseCtl, ctl, sMod, sHnd = data

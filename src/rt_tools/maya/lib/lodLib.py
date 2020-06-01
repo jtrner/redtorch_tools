@@ -10,7 +10,7 @@ History:
 """
 import maya.cmds as mc
 
-from . import deformer
+from . import deformLiber
 from . import trsLib
 
 
@@ -29,8 +29,8 @@ def createAnimLod():
     skeletonJnts = []
     for geo in geos:
         for jnt, rslJnt in zip(jnts, rslJnts):
-            deformer.replaceInfluence(geo, srcJnts=[jnt], tgtJnt=rslJnt)
+            deformLib.replaceInfluence(geo, srcJnts=[jnt], tgtJnt=rslJnt)
             skeletonJnts.append(jnt)
         mc.select(geo)
-        mc.skinPercent(deformer.getSkinCluster(geo), normalize=True)
+        mc.skinPercent(deformLib.getSkinCluster(geo), normalize=True)
     mc.delete(list(set(skeletonJnts)))

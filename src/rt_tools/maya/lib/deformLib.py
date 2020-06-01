@@ -57,7 +57,7 @@ def bind_geo(components):
 
 def importSkin(dataPath):
     """
-    import skincluster weights from given path
+    import deformLib weights from given path
     """
 
     # search given path for skin wgt files
@@ -126,11 +126,11 @@ def exportSkin(geos, dataPath):
         logger.info('Exported skinculster for "{0}"'.format(node))
 
     if notSkinnedGeos:
-        print 'No skincluster node found on nodes bellow, export skipped!'
-        print '.................................................................'
+        print('No skincluster node found on nodes bellow, export skipped!')
+        print('.................................................................')
         for x in notSkinnedGeos:
-            print x
-        print '.................................................................'
+            print(x)
+        print('.................................................................')
 
 
 def getInfs(skin):
@@ -453,9 +453,9 @@ def _lineToLists(wgts, numVerts, numInfs):
     :return: list of weight lists
     """
     wgtsList = []
-    for i in xrange(numVerts):
+    for i in range(numVerts):
         tempList = [i]
-        for j in xrange(numInfs):
+        for j in range(numInfs):
             tempList.append(float(wgts[(i * numInfs) + j]))
         wgtsList.append(tempList)
     return wgtsList
@@ -463,7 +463,7 @@ def _lineToLists(wgts, numVerts, numInfs):
 
 def copySkin(src=None, targets=None, useSelection=False):
     """
-    from rt_tools.maya.lib import deformLib
+    from rt_tools.maya.lib import deformLibLib
     deformLib.copySkin(useSelection=True)
     """
     if useSelection:
@@ -473,7 +473,7 @@ def copySkin(src=None, targets=None, useSelection=False):
         src = sels[0]
         targets = sels[1:]
 
-    if isinstance(targets, basestring):
+    if not isinstance(targets, (list, tuple)):
         targets = [targets]
 
     # get joints from src

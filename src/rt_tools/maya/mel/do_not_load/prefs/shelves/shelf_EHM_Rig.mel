@@ -770,11 +770,11 @@ global proc shelf_EHM_Rig () {
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "# export selected or all skinClusters in scene\nfrom rt_tools.maya.lib import skincluster\npath = mc.internalVar(uad=True)\nwgtFiles = os.path.join(path, '..', '..', 'Desktop')\nselected = mc.ls(sl=True)\nif selected:\n    geos = selected\nelse:\n    geos = mc.listRelatives('geometry_GRP', ad=True, type='mesh', ni=True)\n    geos = [mc.listRelatives(x, p=True)[0] for x in geos]\n    geos = list(set(geos))\nreload(skincluster)\nskincluster.exportData(geos=geos, dataPath=wgtFiles)\n"
+        -command "# export selected or all skinClusters in scene\nfrom rt_tools.maya.lib import deformLib\npath = mc.internalVar(uad=True)\nwgtFiles = os.path.join(path, '..', '..', 'Desktop')\nselected = mc.ls(sl=True)\nif selected:\n    geos = selected\nelse:\n    geos = mc.listRelatives('geometry_GRP', ad=True, type='mesh', ni=True)\n    geos = [mc.listRelatives(x, p=True)[0] for x in geos]\n    geos = list(set(geos))\nreload(skincluster)\nskincluster.exportData(geos=geos, dataPath=wgtFiles)\n"
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1
-        -mi "importSkin" ( "# import selected or all skinClusters in scene\nfrom rt_tools.maya.lib import skincluster\npath = mc.internalVar(uad=True)\nwgtFiles = os.path.join(path, '..', '..', 'Desktop')\nskincluster.importData(dataPath=wgtFiles)\n" )
+        -mi "importSkin" ( "# import selected or all skinClusters in scene\nfrom rt_tools.maya.lib import deformLib\npath = mc.internalVar(uad=True)\nwgtFiles = os.path.join(path, '..', '..', 'Desktop')\nskincluster.importData(dataPath=wgtFiles)\n" )
         -mip 0
     ;
     shelfButton

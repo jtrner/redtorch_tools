@@ -51,22 +51,22 @@ print rot
 import maya.cmds as mc
 import maya.OpenMaya as om
 
-from ...lib import deformer
+from ...lib import deformLibLib
 from ...lib import trsLib
 
 
 def ExtractDeltas(src, tgt):
     
-    deformer.disableDeformers(src)
+    deformLib.disableDeformers(src)
     crr, crrShape = trsLib.duplicateClean(src)
     crr = mc.rename(crr, tgt+'_corrective')
-    deformer.enableDeformers(src)
+    deformLib.enableDeformers(src)
     
-    skin = deformer.getSkinCluster(src)
+    skin = deformLib.getSkinCluster(src)
     
     numVerts = mc.polyEvaluate(crr, v=True)
 
-    for i in xrange(numVerts):
+    for i in range(numVerts):
         v = '.vtx[{0}]'.format(i)
 
         jnts = mc.skinPercent(skin, src+v, q=True, t=None)
@@ -167,10 +167,10 @@ def toMatrix(mMatrix):
 def setPose(base, tgt):
     numVerts = mc.polyEvaluate(base, v=True)
 
-    for i in xrange(numVerts):
+    for i in range(numVerts):
         v = '.vtx[{0}]'.format(i)
         pos = mc.xform(tgt+v, q=True, ws=True, t=True)
-        for i in xrange(10):
+        for i in range(10):
             mc.xform(base+v, ws=True, t=pos)
 
 

@@ -20,7 +20,7 @@ display.setColor(color='yellow')
 display.setColor(color='maroon')
 display.setColor(obj=mc.ls(sl=True)[0], color='yellow')
 
-deformer.copySkin()
+deformLib.copySkin()
 
 planarizeJnts.adjustFingers()
 
@@ -33,8 +33,8 @@ shapeLib.extractTargets('C_head_BLS', neutral='C_head_GEO')
 geo = mc.ls(sl=True)[0]
 path = mc.internalVar(uad=True)
 wgtFile = os.path.join(path, '..', '..', 'Desktop', geo+'.wgt')
-deformer.importSkin(wgtFile)
-skincluster.Skincluster.importData(dataPath=wgtFiles)
+deformLib.importSkin(wgtFile)
+deformLib..importData(dataPath=wgtFiles)
 
 # to do
 # pose should support user defined attrs

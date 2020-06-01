@@ -31,8 +31,8 @@ print mc.getAttr(scatter + '.outPoints')
 
 
 
-from rt_tools.maya.lib import deformer
-deformer.copySkin(useSelection=True)
+from rt_tools.maya.lib import deformLiber
+deformLib.copySkin(useSelection=True)
 
 from rt_tools.maya.lib import meshLib
 meshLib.blendShapeGeosUnderTwoGroups(originalGroup='model_GRP', editedGroup='output_model_GRP', deleteHistory=True)
@@ -65,8 +65,8 @@ display.setColor(color='yellow')
 display.setColor(color='maroon')
 display.setColor(obj=mc.ls(sl=True)[0], color='yellow')
 
-from rt_tools.maya.lib import deformer
-deformer.copySkin(useSelection=True)
+from rt_tools.maya.lib import deformLiber
+deformLib.copySkin(useSelection=True)
 
 planarizeJnts.adjustFingers()
 
@@ -79,8 +79,8 @@ shapeLib.extractTargets('C_head_BLS', neutral='C_head_GEO')
 geo = mc.ls(sl=True)[0]
 path = mc.internalVar(uad=True)
 wgtFile = os.path.join(path, '..', '..', 'Desktop', geo+'.wgt')
-deformer.importSkin(wgtFile)
-skincluster.Skincluster.importData(dataPath=wgtFiles)
+deformLib.importSkin(wgtFile)
+deformLib..importData(dataPath=wgtFiles)
 
 # to do
 # pose should support user defined attrs
@@ -112,21 +112,21 @@ animUI.importAnim( nameSpace=None, replaceString=None)
 
 
 # lattice
-import python.lib.deformer as deformer
+import rt_tools.maya.lib.deformLib as deformer
 reload(deformer)
 for ffd in ['C_upperTeeth_FFD', 'L_eye_FFD']:
     ffd_json = os.path.join(mc.internalVar(uad=True), '..', '..', 'Desktop', ffd+'.json')
-    deformer.exportFFD(ffd=ffd, path=ffd_json)
+    deformLib.exportFFD(ffd=ffd, path=ffd_json)
 
-import python.lib.deformer as deformer
+import rt_tools.maya.lib.deformLib as deformer
 reload(deformer)
 for ffd in ['upperTeeth_FFD']:  # 'R_eye_FFD'
     ffd_json = os.path.join(mc.internalVar(uad=True), '..', '..', 'Desktop', ffd+'.json')
-    deformer.importFFD(path=ffd_json)
+    deformLib.importFFD(path=ffd_json)
 
-import python.lib.deformer as deformer
+import rt_tools.maya.lib.deformLib as deformer
 reload(deformer)
-deformer.mirrorFFD(ffd='L_eye_FFD')
+deformLib.mirrorFFD(ffd='L_eye_FFD')
 
 import python.lib.trsLib as trsLib
 trsLib.mirror('L_Eye_00__GRP', copy=True)
@@ -141,9 +141,9 @@ for grp in grps:
 
 
 # copy Skin From Reference
-import python.lib.deformer as deformer
+import rt_tools.maya.lib.deformLib as deformer
 reload(deformer)
-deformer.copySkinFromReference()
+deformLib.copySkinFromReference()
 
 
 # transfer In Connections
@@ -184,28 +184,28 @@ for crv in curves:
 
 
 # exportBlsWgts
-import python.lib.deformer as deformer
+import rt_tools.maya.lib.deformLib as deformer
 reload(deformer)
 bls = 'blendShape1'
 bls_json = os.path.join(mc.internalVar(uad=True), '..', '..', 'Desktop', bls+'.json')
-deformer.exportBlsWgts(bls=bls, path=bls_json)
-deformer.getWgtsFromCrvAndAnimCrv(geo='C_Bottle_00__MSH', crv='lips_wgt_crv', curveType='mid')
-deformer.getPoints(geo='C_Bottle_00__MSH', asMPoint=False)
+deformLib.exportBlsWgts(bls=bls, path=bls_json)
+deformLib.getWgtsFromCrvAndAnimCrv(geo='C_Bottle_00__MSH', crv='lips_wgt_crv', curveType='mid')
+deformLib.getPoints(geo='C_Bottle_00__MSH', asMPoint=False)
 
 
 # importDeformerWgts
-import python.lib.deformer as deformer
+import rt_tools.maya.lib.deformLib as deformer
 reload(deformer)
 a = mc.cluster()
-deformer.createShrinkWrap(driver='L_Sclera_00__MSH',
+deformLib.createShrinkWrap(driver='L_Sclera_00__MSH',
                           driven='L_Pupils_00__MSH',
                           projection=4,
                           offset=0)
-import python.lib.deformer as deformer
+import rt_tools.maya.lib.deformLib as deformer
 reload(deformer)
 node = 'shrinkWrap1'
 wgts_json = os.path.join(mc.internalVar(uad=True), '..', '..', 'Desktop', node+'.json')
-deformer.exportDeformerWgts(node=node, path=wgts_json)
-deformer.importDeformerWgts(path=wgts_json, newNode='shrinkWrap2')
+deformLib.exportDeformerWgts(node=node, path=wgts_json)
+deformLib.importDeformerWgts(path=wgts_json, newNode='shrinkWrap2')
 for i, esm in enumerate(a):
     print i, esm

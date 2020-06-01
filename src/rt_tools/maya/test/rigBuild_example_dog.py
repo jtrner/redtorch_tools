@@ -46,12 +46,12 @@ from ..rig.component import eyes
 from ..rig.component import finger
 from ..rig.component import model
 from ..rig.component import skeleton
-from ..rig.component import skincluster
+from ..rig.lib import deformLib
 
 from ..lib import control
 from ..lib import attrLib
 from ..lib import connect
-from ..lib import deformer
+from ..lib import deformLib
 from ..lib import fileLib
 from ..lib import container
 from ..lib import shapeLib
@@ -169,10 +169,10 @@ def deform():
     # import skinClusters
     wgtFiles = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                             '..', 'data', 'skinCluster'))
-    skincluster.importData(dataPath=wgtFiles)
+    deformLib.importSkin(dataPath=wgtFiles)
 
     # wrap scalp
-    deformer.wrap(driver='C_body_GEO', driven='scalp')
+    deformLib.wrap(driver='C_body_GEO', driven='scalp')
 
 
 def post():
@@ -356,7 +356,7 @@ def importBlendShapes():
 
 def corneaBulge():
     pos = mc.objectCenter('L_eye_JNT')
-    data = deformer.createSoftMod(geos=['C_head_GEO', 'C_eyelashes_GEO'],
+    data = deformLib.createSoftMod(geos=['C_head_GEO', 'C_eyelashes_GEO'],
                                   name='L_lid',
                                   position=pos)
     baseCtl, ctl, sMod, sHnd = data
@@ -368,7 +368,7 @@ def corneaBulge():
     mc.setAttr(baseCtl + '.r', -3.28, 18, -13.55)
 
     pos = mc.objectCenter('R_eye_JNT')
-    data = deformer.createSoftMod(geos=['C_head_GEO', 'C_eyelashes_GEO'],
+    data = deformLib.createSoftMod(geos=['C_head_GEO', 'C_eyelashes_GEO'],
                                   name='R_lid',
                                   position=pos)
     baseCtl, ctl, sMod, sHnd = data

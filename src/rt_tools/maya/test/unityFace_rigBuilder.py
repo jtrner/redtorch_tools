@@ -41,7 +41,7 @@ import faceTools.lib.fileLib as fileLib
 import faceTools.lib.attrLib as attrLib
 import faceTools.lib.shape as shape
 import faceTools.lib.key as key
-import faceTools.lib.deformer as deformer
+import rt_tools.maya.lib.deformLib as deformer
 import faceTools.lib.psi as psi
 import faceTools.lib.control as control
 import faceTools.lib.container as container
@@ -135,7 +135,7 @@ def build():
 def deform():
     # import skinClusters
     wgtFiles = os.path.join(os.path.dirname(__file__), 'data', 'skinCluster')
-    skincluster.Skincluster.importData(dataPath=wgtFiles)
+    deformLib..importData(dataPath=wgtFiles)
 
     # auto skin for facial hair
     mainDir = os.path.dirname(__file__)
@@ -152,7 +152,7 @@ def deform():
     configJson = os.path.join(mainDir, 'config', 'copy_skin_config.json')
     config_data = fileLib.loadJson(configJson)
     for driver, drivens in config_data.items():
-        deformer.copySkin(src=driver, targets=drivens)
+        deformLib.copySkin(src=driver, targets=drivens)
 
 
 def post():
@@ -176,7 +176,7 @@ def post():
 
     # invert shapes
     mainDir = os.path.dirname(__file__)
-    # bls = deformer.getDeformers('C_head_GEO', 'blendShape')[0]
+    # bls = deformLib.getDeformers('C_head_GEO', 'blendShape')[0]
     configJson = os.path.join(mainDir, 'config', 'psi_config.json')
     shape.invertShapes('C_head_GEO', 'C_head_BLS', configJson)
 
@@ -266,7 +266,7 @@ def importBlendShapes():
 
 def corneaBulge():
     pos = mc.objectCenter('L_eye_JNT')
-    data = deformer.createSoftMod(geos=mc.ls('C_head_GEO', 'C_brows_GEO', 'L_*Lash_GEO', 'L_tearDuct_GEO'),
+    data = deformLib.createSoftMod(geos=mc.ls('C_head_GEO', 'C_brows_GEO', 'L_*Lash_GEO', 'L_tearDuct_GEO'),
                                   name='L_lid',
                                   position=pos)
     baseCtl, ctl, sMod, sHnd = data
@@ -279,7 +279,7 @@ def corneaBulge():
     mc.setAttr(baseCtl + '.r', -3.28, 18, -13.55)
 
     pos = mc.objectCenter('R_eye_JNT')
-    data = deformer.createSoftMod(geos=mc.ls('C_head_GEO', 'C_brows_GEO', 'R_*Lash_GEO', 'R_tearDuct_GEO'),
+    data = deformLib.createSoftMod(geos=mc.ls('C_head_GEO', 'C_brows_GEO', 'R_*Lash_GEO', 'R_tearDuct_GEO'),
                                   name='R_lid',
                                   position=pos)
     baseCtl, ctl, sMod, sHnd = data
@@ -471,7 +471,7 @@ def attachToHead(geos, faces, name, targets=None, useTranslationOnly=True):
 
         # convert deformations to blendShapes
         tgts = shape.extractTargets(bls='C_head_BLS', neutral=dup, targets=targets, ignoreNames=True)
-        dfrmNodes = deformer.getAllDeformers(geo, ignoredDeformersList=['tweak'])
+        dfrmNodes = deformLib.getAllDeformers(geo, ignoredDeformersList=['tweak'])
         bls = geo.replace('GEO', 'BLS')
         if mc.objExists(bls):
             mc.delete(bls)
@@ -525,7 +525,7 @@ def attachToHead_edge(geos, edges, name, numJnts=20):
 
         # convert deformations to blendShapes
         tgts = shape.extractTargets(bls='C_head_BLS', neutral=dup, ignoreNames=True)
-        dfrmNodes = deformer.getAllDeformers(geo, ignoredDeformersList=['tweak'])
+        dfrmNodes = deformLib.getAllDeformers(geo, ignoredDeformersList=['tweak'])
         bls = mc.blendShape(tgts, geo, n=geo.replace('GEO', 'BLS'))[0]
         # put blendShape before all other deformers
         if dfrmNodes:
@@ -585,7 +585,7 @@ def cleanupAndExport(geos, mainScene):
 
         # 1. delete all deformers except blendShapes
     for geo in geos:
-        dfrms = deformer.getAllDeformers(geo, ignoredDeformersList=['blendShape'])
+        dfrms = deformLib.getAllDeformers(geo, ignoredDeformersList=['blendShape'])
         if dfrms:
             mc.delete(dfrms)
 
@@ -684,7 +684,7 @@ def mount(bodyNs='quinn_skin_master', headNs='unityFace_rigMid_highest'):
     mc.hide(neckJnt, neckCtl + 'Shape', headCtl + 'Shape')
 
     # copy complete body skin to separated body and head geos
-    deformer.copySkin(src=completeGeo, targets=[bodyGeo, headGeo])
+    deformLib.copySkin(src=completeGeo, targets=[bodyGeo, headGeo])
 
     # outliner cleanup
     mc.delete(mc.ls(mocapModelGrp, skeletonGrp, settingGrp, starterGrp, neckControlGrp, controlGrp))

@@ -47,19 +47,19 @@
 },
 "Deformation": {
     "MirrorSkinCluster": {
-        "command": "from rt_tools.maya.lib import deformer\nreload(deformer)\ndeformer.mirrorSkin(useSelection=True)",
+        "command": "from rt_tools.maya.lib import deformLiber\nreload(deformer)\ndeformLib.mirrorSkin(useSelection=True)",
         "icon": ""
     },
     "CopySkinCluster": {
-        "command": "from rt_tools.maya.lib import deformer\nreload(deformer)\ndeformer.copySkin(useSelection=True)",
+        "command": "from rt_tools.maya.lib import deformLiber\nreload(deformer)\ndeformLib.copySkin(useSelection=True)",
         "icon": ""
     },
     "ExportSkinCluster": {
-        "command": "from rt_tools.maya.lib import skincluster\nreload(skincluster)\nskincluster.exportSkinToDesktop()",
+        "command": "from rt_tools.maya.lib import deformLib\nreload(skincluster)\ndeformLib.exportSkinToDesktop()",
         "icon": ""
     },
     "ImportSkinCluster": {
-        "command": "from rt_tools.maya.lib import skincluster\nreload(skincluster)\nskincluster.importSkinFromDesktop()",
+        "command": "from rt_tools.maya.lib import deformLib\nreload(skincluster)\ndeformLib.importSkinFromDesktop()",
         "icon": ""
     },
     "Shape UI": {

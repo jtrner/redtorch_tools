@@ -458,7 +458,7 @@ class UI(QtWidgets.QDialog):
                 cmd = partial(self.uiSettingTobluAttr, wid=widget, attr=attr)
                 widget.valueChanged.connect(cmd)
             elif attrType == 'enum':
-                parWidget, lb, widget = qtLib.createCB(attrName, labelWidthMin=80)
+                parWidget, lb, widget = qtLib.createComboBox(attrName, labelWidthMin=80)
                 widgets_data[attr] = parWidget
                 #
                 choices = mc.attributeQuery(attr, node=node, listEnum=True)[0].split(':')

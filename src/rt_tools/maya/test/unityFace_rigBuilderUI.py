@@ -46,7 +46,7 @@ import faceTools.lib.common as common
 import faceTools.lib.face as face
 import faceTools.lib.shape as shape
 import faceTools.lib.control as control
-import faceTools.lib.deformer as deformer
+import rt_tools.maya.lib.deformLib as deformer
 import faceTools.lib.solve as solve
 import faceTools.lib.pose as pose
 import faceTools.component.skincluster as skincluster
@@ -847,13 +847,13 @@ class UI(QtWidgets.QDialog):
         selected = mc.ls(sl=True)
         if selected:
             geos = selected
-        skincluster.Skincluster.exportData(geos=geos, dataPath=wgtDir)
+        deformLib..exportData(geos=geos, dataPath=wgtDir)
 
     def skinImport(self):
         # import selected or all skinClusters in scene
         wgtDir = self.skinPath_le.text()
         wgtDir = wgtDir.format(PROJECT=os.path.dirname(__file__))
-        skincluster.Skincluster.importData(dataPath=wgtDir)
+        deformLib..importData(dataPath=wgtDir)
 
     def controlExport(self):
         ctlDir = self.controlPath_le.text()
@@ -896,7 +896,7 @@ class UI(QtWidgets.QDialog):
             e = 'Select a blendShape node or a geo that has blendShape on.'
             self.printMessage('ERROR -> ' + str(e), mode='error')
         if mc.nodeType(nodes[0]) != 'blendShape':
-            blss = deformer.getDeformers(nodes[0], 'blendShape')
+            blss = deformLib.getDeformers(nodes[0], 'blendShape')
         else:
             blss = nodes[0]
         if not blss:
@@ -1045,7 +1045,7 @@ class UI(QtWidgets.QDialog):
     @common.undoChunk
     def copySkin(self):
         try:
-            deformer.copySkin(src='C_head_GEO', targets=mc.ls(sl=True))
+            deformLib.copySkin(src='C_head_GEO', targets=mc.ls(sl=True))
             self.printMessage('SUCCESS -> Copied skinClusters', mode='info')
         except Exception, e:
             self.printMessage('ERROR -> ' + str(e), mode='error')

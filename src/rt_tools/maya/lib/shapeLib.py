@@ -7,7 +7,7 @@ import maya.cmds as mc
 import maya.OpenMaya as om
 import maya.OpenMayaAnim as oma
 
-from . import deformer
+from . import deformLiber
 from . import fileLib
 from . import trsLib
 from . import attrLib
@@ -1517,18 +1517,18 @@ def splitUsing3CurvePrinciple(bls, geoOrGeoGrp, split_config_file, weight_crv):
             if baseWeightsPath:
                 if baseWeightsPath.startswith('.'):
                     baseWeightsPath = os.path.join(split_config_file, baseWeightsPath)
-                deformer.importBlsWgts(path=baseWeightsPath, newBls=bls)
+                deformLib.importBlsWgts(path=baseWeightsPath, newBls=bls)
                 if invertWeights:
-                    deformer.invertBlsWgts(bls)
+                    deformLib.invertBlsWgts(bls)
             else:
-                deformer.resetBlsWgts(bls)
+                deformLib.resetBlsWgts(bls)
 
             #
             targets = regionData.get('targets', [])
             for tgt in targets:
                 # set per target weights using 3 curve principle system
                 for i, geo in enumerate(geos):
-                    deformer.setBlsWgtsFromCrv(bls=bls, geo=geo, crv=weight_crv,
+                    deformLib.setBlsWgtsFromCrv(bls=bls, geo=geo, crv=weight_crv,
                                                target=tgt, geoIdx=i, curveType=curveType)
 
                 # duplicate and name resulting shape
@@ -1782,7 +1782,7 @@ def importBls(geos, blsFile):
 
 
 def disableBlendShapes(geo):
-    blss = deformer.getDeformers(geo, 'blendShape')
+    blss = deformLib.getDeformers(geo, 'blendShape')
     if not blss:
         mc.error('"{}" does not have a blendShape node on it!'.format(geo))
     for bls in blss:
@@ -1790,7 +1790,7 @@ def disableBlendShapes(geo):
 
 
 def enableBlendShapes(geo):
-    blss = deformer.getDeformers(geo, 'blendShape')
+    blss = deformLib.getDeformers(geo, 'blendShape')
     if not blss:
         mc.error('"{}" does not have a blendShape node on it!'.format(geo))
     for bls in blss:
@@ -1975,7 +1975,7 @@ def generateObjs(geo, configJson=None):
     data = fileLib.loadJson(configJson, ordered=True)
 
     # disable all deformers except skinCluster
-    allDeformers = deformer.getAllDeformers(obj=geo, ignoredDeformersList=['skinCluster'])
+    allDeformers = deformLib.getAllDeformers(obj=geo, ignoredDeformersList=['skinCluster'])
     for dfrm in allDeformers:
         mc.setAttr(dfrm + '.envelope', 0)
 
@@ -2004,7 +2004,7 @@ def generateObjs(geo, configJson=None):
         mc.refresh()
 
     # enable all deformers
-    allDeformers = deformer.getAllDeformers(obj=geo, ignoredDeformersList=['skinCluster'])
+    allDeformers = deformLib.getAllDeformers(obj=geo, ignoredDeformersList=['skinCluster'])
     for dfrm in allDeformers:
         mc.setAttr(dfrm + '.envelope', 1)
 

@@ -36,7 +36,7 @@ from ...lib import connect
 from ...lib import attrLib
 from ...lib import trsLib
 from ...lib import strLib
-from ...lib import deformer
+from ...lib import deformLibLib
 
 reload(crvLib)
 reload(jntLib)
@@ -44,7 +44,7 @@ reload(connect)
 reload(attrLib)
 reload(trsLib)
 reload(strLib)
-reload(deformer)
+reload(deformLib)
 
 
 def setupJnts(geo, upperLipEdgeIds, lowerLipEdgeIds, numJnts=20, name='C_lipZip'):
@@ -141,7 +141,7 @@ def setupDeformations(srcGeo='C_head_GEO', tgtGeo=None, lipZipData=None, name='C
     lowToMidJnts = mc.ls(lowToMidJnts, type='joint')
     uppToMidJnts = mc.ls(uppToMidJnts, type='joint')
 
-    deformer.steal(srcGeo=srcGeo, tgtGeo=tgtGeo)
+    deformLib.steal(srcGeo=srcGeo, tgtGeo=tgtGeo)
 
     dup, dupShape = trsLib.duplicateClean(srcGeo, name=name + 'RigLayer_GEO')
     mc.blendShape(tgtGeo, dup, w=(0, 1), n=name + 'RigLayer_BLS')
@@ -159,8 +159,8 @@ def setupDeformations(srcGeo='C_head_GEO', tgtGeo=None, lipZipData=None, name='C
     skinPath = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                             '../../data/skinCluster',
                                             dup + '.wgt'))
-    skinData = deformer.importSkin(skinPath)
-    deformer.setSkinData(skinData, skin=skn)
+    skinData = deformLib.importSkin(skinPath)
+    deformLib.setSkinData(skinData, skin=skn)
 
     for baseJ, j in zip(lowJnts+uppJnts, lowToMidJnts+uppToMidJnts):
         outs = [x for x in mc.listConnections(j + '.worldMatrix', p=1) if mc.nodeType(x) == 'skinCluster']
@@ -177,7 +177,7 @@ def setupDeformations(srcGeo='C_head_GEO', tgtGeo=None, lipZipData=None, name='C
 
     #     # convert deformations to blendShapes
     #     tgts = shape.extractTargets(bls='C_head_BLS', neutral=dup, ignoreNames=True)
-    #     dfrmNodes = deformer.getAllDeformers(geo, ignoredDeformersList=['tweak'])
+    #     dfrmNodes = deformLib.getAllDeformers(geo, ignoredDeformersList=['tweak'])
     #     bls = mc.blendShape(tgts, geo, n=geo.replace('GEO', 'BLS'))[0]
     #     # put blendShape before all other deformers
     #     if dfrmNodes:

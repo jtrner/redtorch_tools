@@ -7,10 +7,10 @@ import os
 import maya.cmds as mc
 
 # redtorch modules
-from ..general import workspace
-from ..lib import attrLib
-from ..lib import connect
-from ..lib import skincluster
+from rt_tools.maya.general import workspace
+from rt_tools.maya.lib import attrLib
+from rt_tools.maya.lib import connect
+from rt_tools.maya.lib import deformLibLib
 
 from .component import arm
 from .component import chain
@@ -29,7 +29,7 @@ from .component import tail
 reload(workspace)
 reload(attrLib)
 reload(connect)
-reload(skincluster)
+reload(deformLib)
 
 reload(arm)
 reload(chain)
@@ -197,7 +197,7 @@ class RigBuild_base(object):
         skincluster_dir = '{0}/{1}/{2}/{3}/task/rig/users/{4}/{5}/data/skincluster'
         skincluster_dir = skincluster_dir.format(self.JOBS_DIR, self.job, self.seq,
                                                  self.shot, self.user, self.version)
-        skincluster.importData(dataPath=skincluster_dir)
+        deformLib.importSkin(dataPath=skincluster_dir)
 
         print('rigBuild_base.deform() success')
 
