@@ -11,8 +11,12 @@ import sys
 import subprocess
 import traceback
 import functools
+import weakref
 
 # Maya modules
+import maya.cmds as mc
+import maya.OpenMayaUI as omui
+from shiboken2 import wrapInstance
 from PySide2 import QtCore, QtGui, QtWidgets
 
 # rt_tools modules
@@ -41,13 +45,8 @@ GREEN_PALE = (130, 160, 130)
 PURPLE_PALE = (180, 150, 180)
 ORANGE_PALE = (200, 130, 80)
 
-ICON_DIR = os.path.abspath(
-    os.path.join(
-        __file__.split('rt_tools')[0],
-        'rt_tools',
-        'icon'
-    )
-)
+dirname = __file__.split('rt_tools')[0]
+ICON_DIR = os.path.abspath(os.path.join(dirname, 'rt_tools', 'icon'))
 SETTINGS_PATH = os.path.join(os.getenv("HOME"), 'testUI.uiconfig')
 
 
@@ -405,17 +404,14 @@ def selectItemByText(tw, text, parentText=None):
 
         # item is a top level item
         if not parentText:
-            print('no parent')
-            print(text, item.text(0))
             if text == item.text(0):
                 tw.setCurrentItem(item)
-                return
             else:
                 tw.clearSelection()
+            return
 
         # item is a child of a top level item
         else:
-            print('has parent')
             if parentText == item.text(0):
                 child_count = item.childCount()
                 for j in range(child_count):
@@ -910,7 +906,6 @@ def btnsFromJson(layout, config, btnSize=None):
         lay.layout().setSpacing(1)
 
         w = QtWidgets.QWidget()
-        layout.addWidget(w)
         lay.addWidget(w)
 
         gb.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
@@ -1053,11 +1048,97 @@ def dictToTreeWidget(tw, data):
                 btn_item.addChild(rc_btn_item)
 
 
+def dock_window(dialog_class):
+    """
+    Author: Lior ben horin
+    From: https://gist.github.com/liorbenhorin/.../Simple_MayaDockingClass.py
+    :param dialog_class:
+    :return:
+    """
+    try:
+        # mc.workspaceControl(dialog_class.CONTROL_NAME, e=True, close=True)
+        mc.deleteUI(dialog_class.CONTROL_NAME)
+    except:
+        pass
+
+    # building the workspace control with maya.cmds
+    main_control = mc.workspaceControl(
+        dialog_class.CONTROL_NAME,
+        tabToControl=["AttributeEditor", -1],
+        initialWidth=300,
+        minimumWidth=dialog_class.minimumWidth,
+        widthProperty='free',
+        label=dialog_class.DOCK_LABEL_NAME
+    )
+
+    # now lets get a C++ pointer to it using OpenMaya
+    control_widget = omui.MQtUtil.findControl(dialog_class.CONTROL_NAME)
+
+    # convert the C++ pointer to Qt object we can use
+    control_wrap = wrapInstance(long(control_widget), QtWidgets.QWidget)
+
+    # control_wrap is the widget of the docking window and now we can start working with it:
+    control_wrap.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+    win = dialog_class(control_wrap)
+
+    # after maya is ready we should restore the window since it may not be visible
+    def launch_dock_ui():
+        mc.workspaceControl(main_control, e=True, rs=True)
+        mc.workspaceControl(main_control, e=True, label=dialog_class.DOCK_LABEL_NAME)
+    mc.evalDeferred(launch_dock_ui)
+
+    # will return the class of the dock content.
+    return win.run()
+
+
+class DockingUI(QtWidgets.QWidget):
+    """
+    usage:
+    my_dock = dock_window(DockingUI)
+    """
+    instances = list()
+    CONTROL_NAME = 'my_workspcae_control'
+    DOCK_LABEL_NAME = 'my workspcae control'
+    minimumWidth = 50
+
+    def __init__(self, parent=None):
+        super(DockingUI, self).__init__(parent)
+
+        # let's keep track of our docks so we only have one at a time.
+        DockingUI.delete_instances()
+        self.__class__.instances.append(weakref.proxy(self))
+
+        self.window_name = self.CONTROL_NAME
+        self.ui = parent
+        self.main_layout = parent.layout()
+        self.main_layout.setContentsMargins(2, 2, 2, 2)
+
+        # here we can start coding our UI
+        self.my_label = QtWidgets.QLabel('hello world!')
+        self.main_layout.addWidget(self.my_label)
+
+    @staticmethod
+    def delete_instances():
+        for ins in DockingUI.instances:
+            try:
+                print ('Delete {}'.format(ins))
+                ins.setParent(None)
+                ins.deleteLater()
+            except:
+                # ignore the fact that the actual parent has already been deleted by Maya...
+                pass
+
+            DockingUI.instances.remove(ins)
+            del ins
+
+    def run(self):
+        return self
+
+
 @decoratorLib.repeatable_cmd
 @decoratorLib.undoChunk
 def run_command(commandString):
-    pass
-    # print('-' * 80)
-    # print(commandString)
-    # print('-' * 80)
-    # exec (commandString, globals(), globals())
+    print('-' * 80)
+    print(commandString)
+    print('-' * 80)
+    exec (commandString, globals(), globals())

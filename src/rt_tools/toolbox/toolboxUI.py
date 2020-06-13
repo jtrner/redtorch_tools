@@ -13,6 +13,7 @@ import os
 import sys
 import subprocess
 import logging
+import weakref
 from collections import OrderedDict
 from functools import partial
 
@@ -40,71 +41,77 @@ YELLOW_PASTAL = (210, 150, 90)
 RED = (220, 40, 40)
 GREEN = (40, 220, 40)
 
+redtorch_version = package.__version__
+USER = os.getenv('USERNAME')
 SHOW_NAME = os.getenv('JOB', 'RND')
 DIR_NAME = __file__.split('toolbox')[0]
 ICON_DIR = os.path.abspath(os.path.join(DIR_NAME, 'icon'))
 SETTINGS_PATH = os.path.join(os.getenv("HOME"), 'toolboxUI.uiconfig')
 BUTTON_EDIT_SETTINGS_PATH = os.path.join(os.getenv("HOME"), 'buttonEditUI.uiconfig')
 USERS_DIR = 'D:/all_works/Users'
-SHOWS_DIR = 'D:/all_works/01_projects'
 USER_TOOLBOX_JSON = 'D:/all_works/Users/{}/toolbox/toolbox.json'
-redtorch_version = package.__version__
+
+# use the local copy of show code if available
+SHOWS_DIR = "D:/all_works/{}/{}".format(USER, SHOW_NAME)
+if not os.path.lexists(SHOWS_DIR):
+    SHOWS_DIR = 'D:/all_works/01_projects/{}'.format(SHOW_NAME)
+
+# add show to sys.path
+while SHOWS_DIR in sys.path:
+    sys.path.remove(SHOWS_DIR)
+sys.path.insert(0, SHOWS_DIR)
 
 
-def getMayaWindow():
-    for obj in QtWidgets.QApplication.topLevelWidgets():
-        try:
-            if obj.objectName() == 'MayaWindow':
-                return obj
-        except:
-            continue
-    raise RuntimeError('Could not find MayaWindow instance')
+class DockingUI(QtWidgets.QWidget):
+    """
+    usage:
+        my_dock = qtLib.dock_window(DockingUI)
+    """
+    instances = list()
 
+    CONTROL_NAME = 'iRig_Toolbox_Dock_Control'
+    DOCK_LABEL_NAME = 'RT ' + redtorch_version.replace('redtorch_', '')
+    minimumWidth = 280
 
-class UI(MayaQWidgetDockableMixin, QtWidgets.QDialog):
+    def __init__(self, parent=None):
+        super(DockingUI, self).__init__(parent)
 
-    def __init__(self, title='RT: ' + redtorch_version.replace('redtorch_', ''),
-                 parent=getMayaWindow()):
+        # let's keep track of our docks so we only have one at a time.
+        DockingUI.delete_instances()
+        self.__class__.instances.append(weakref.proxy(self))
 
-        # create window
-        super(UI, self).__init__(parent=parent)
+        # here we can start coding our UI
 
         self.edit_btns_ui = None
         self.edit_btns_ui_is_closed = True
         self.user_btn_json = None
         self.can_edit = True
 
-        self.setWindowFlags(
-            self.windowFlags()
-            & ~QtCore.Qt.WindowContextHelpButtonHint
-            #| QtCore.Qt.WindowCloseButtonHint
-            #| QtCore.Qt.WindowMinimizeButtonHint
-        )
-        self.setWindowTitle(title)
-        self.resize(300, 600)
+        # scroll area
+        scroll = QtWidgets.QScrollArea()
+        scroll.setWidgetResizable(True)
+        parent.layout().addWidget(scroll)
 
-        # main layout
-        self.mainLayout = QtWidgets.QVBoxLayout()
-        self.setLayout(self.mainLayout)
-        self.mainLayout.setContentsMargins(8, 8, 8, 8)
-        self.mainLayout.setSpacing(6)
-        self.mainLayout.setAlignment(QtCore.Qt.AlignTop)
+        # layout inside scroll area
+        self.main_w = QtWidgets.QWidget()
+        self.main_lay = QtWidgets.QVBoxLayout(self.main_w)
+        scroll.setWidget(self.main_w)
 
         # tabs
         self.tabs = QtWidgets.QTabWidget()
-        self.mainLayout.addWidget(self.tabs)
+        self.main_lay.addWidget(self.tabs)
 
         # department tab
-        self.main_w = QtWidgets.QWidget()
-        self.main_lay = QtWidgets.QVBoxLayout(self.main_w)
-        self.tabs.addTab(self.main_w, "Rig && CFX")
+        self.rig_and_cfx_w = QtWidgets.QWidget()
+        self.rig_and_cfx_lay = QtWidgets.QVBoxLayout(self.rig_and_cfx_w)
+        self.tabs.addTab(self.rig_and_cfx_w, "Rig && CFX")
         self.populateMainTab()
 
-        # # shows tab
-        # self.shows_w = QtWidgets.QWidget()
-        # self.shows_lay = QtWidgets.QVBoxLayout(self.shows_w)
-        # self.tabs.addTab(self.shows_w, SHOW_NAME)
-        # self.populateShowsTab()
+        # shows tab
+        self.shows_w = QtWidgets.QWidget()
+        self.shows_lay = QtWidgets.QVBoxLayout(self.shows_w)
+        self.tabs.addTab(self.shows_w, SHOW_NAME)
+        self.populateShowsTab()
 
         # users tab
         self.users_w = QtWidgets.QWidget()
@@ -112,61 +119,59 @@ class UI(MayaQWidgetDockableMixin, QtWidgets.QDialog):
         self.tabs.addTab(self.users_w, "Users")
         self.populateUsersTab()
 
-        # restore UI settings
-        self.restoreUI()
+    @staticmethod
+    def delete_instances():
+        for ins in DockingUI.instances:
+            try:
+                ins.setParent(None)
+                ins.deleteLater()
+            except:
+                # ignore the fact that the actual parent has already been deleted by Maya...
+                pass
+            DockingUI.instances.remove(ins)
+            del ins
 
-    def closeEvent(self, event):
-        """
-        Save UI current size and position
-        :return: n/a
-        """
-        self.closed = True
+    @staticmethod
+    def get_all_users():
+        if not os.path.lexists(USERS_DIR):
+            return [USER]
 
-        # settings path
-        settings = QtCore.QSettings(SETTINGS_PATH, QtCore.QSettings.IniFormat)
+        # load list of users from given json
+        all_users = os.listdir(USERS_DIR)
 
-        # window size and position
-        settings.setValue("geometry", self.saveGeometry())
+        # add current user to beginning of list
+        if USER in all_users:
+            all_users.remove(USER)
+        all_users.insert(0, USER)
 
-    def restoreUI(self):
-        """
-        Restore UI size and position that if was last used
-        :return: n/a
-        """
-        self.closed = False
-        if os.path.exists(SETTINGS_PATH):
-            settings = QtCore.QSettings(SETTINGS_PATH, QtCore.QSettings.IniFormat)
-
-            # window size and position
-            self.restoreGeometry(settings.value("geometry"))
+        return all_users
 
     def populateMainTab(self):
-        # ======================================================================
-        contexts_lay = QtWidgets.QVBoxLayout()
-        self.main_lay.layout().addLayout(contexts_lay)
-
         # add buttons from data in json file
         btns_json = os.path.join(os.path.dirname(__file__), 'toolbox.json')
-        qtLib.btnsFromJson(contexts_lay, config=btns_json, btnSize=32)
+        qtLib.btnsFromJson(
+            self.rig_and_cfx_lay.layout(),
+            config=btns_json,
+            btnSize=32
+        )
 
     def populateShowsTab(self):
-        # ======================================================================
-        show_lay = QtWidgets.QVBoxLayout()
-        self.shows_lay.layout().addLayout(show_lay)
-
         # add buttons from data in json file
-        show_btns_json = os.path.join(SHOWS_DIR, SHOW_NAME, 'toolbox', 'toolbox.json')
+        show_btns_json = os.path.join(SHOWS_DIR, 'toolbox', 'toolbox.json')
 
         if not os.path.lexists(show_btns_json):
             fileLib.saveJson(show_btns_json, {})
-        qtLib.btnsFromJson(show_lay, config=show_btns_json, btnSize=32)
+        qtLib.btnsFromJson(
+            self.shows_lay.layout(),
+            config=show_btns_json,
+            btnSize=32
+        )
 
     def populateUsersTab(self):
-        # ======================================================================
         #  combo box
         _, _, self.users_box = qtLib.createComboBox(
             'User:', labelWidthMin=50, maxHeight=25, parent=self.users_lay)
-        all_users = UI.get_all_users()
+        all_users = DockingUI.get_all_users()
         self.users_box.addItems(all_users)
 
         self.users_box.currentTextChanged.connect(self.populate_user_buttons)
@@ -182,7 +187,7 @@ class UI(MayaQWidgetDockableMixin, QtWidgets.QDialog):
         self.addRightClickMenu(self.users_w, rmb_data=rightClickOptions)
 
     def openToolBoxDirectory(self):
-        # which tab of redtorch Toolbox is active?
+        # which tab of iRig Toolbox is active?
         currentTabIndex = self.tabs.currentIndex()
 
         # Rig & CFX tab
@@ -190,7 +195,7 @@ class UI(MayaQWidgetDockableMixin, QtWidgets.QDialog):
 
         # show tab
         if currentTabIndex == 1:
-            folderPath = os.path.join(SHOWS_DIR, SHOW_NAME, 'toolbox')
+            folderPath = os.path.join(SHOWS_DIR, 'toolbox')
 
         # user tab
         elif currentTabIndex == 2:
@@ -205,9 +210,8 @@ class UI(MayaQWidgetDockableMixin, QtWidgets.QDialog):
             subprocess.Popen(['xdg-open', folderPath])
 
     def editButtons(self):
-        user = os.getenv('USERNAME')
         selected_user = self.users_box.currentText()
-        if user != selected_user:
+        if USER != selected_user:
             logger.error('You can\'t edit other users\' buttons, your changes will be disregarded!')
             self.can_edit = False
         else:
@@ -218,22 +222,6 @@ class UI(MayaQWidgetDockableMixin, QtWidgets.QDialog):
             self.edit_btns_ui.deleteLater()
         self.edit_btns_ui = EditBtnsUI(parent=self)
         self.edit_btns_ui.show()
-
-    @staticmethod
-    def get_all_users():
-        # load list of users from given json
-        if not os.path.lexists(USERS_DIR):
-            all_users = []
-        else:
-            all_users = os.listdir(USERS_DIR)
-
-        # add current user to beginning of list
-        user = os.getenv('USERNAME')
-        if user in all_users:
-            all_users.remove(user)
-        all_users.insert(0, user)
-
-        return all_users
 
     def populate_user_buttons(self):
         qtLib.clearLayout(self.user_lay)
@@ -272,10 +260,13 @@ class UI(MayaQWidgetDockableMixin, QtWidgets.QDialog):
 
         menu.exec_(tw.mapToGlobal(event))
 
+    def run(self):
+        return self
+
 
 class EditBtnsUI(MayaQWidgetDockableMixin, QtWidgets.QDialog):
 
-    def __init__(self, title='Edit redtorch buttons UI', parent=getMayaWindow()):
+    def __init__(self, title='Edit Toolbox buttons UI', parent=qtLib.getMayaWindow()):
 
         # create window
         super(EditBtnsUI, self).__init__(parent=parent)
@@ -782,10 +773,4 @@ def rename_key_in_OrderedDict(orderedDict, oldKey, newKey):
 
 
 def launch():
-    global redtorch_toolbox
-    if 'redtorch_toolbox' in globals():
-        redtorch_toolbox.close()
-        redtorch_toolbox.deleteLater()
-        del globals()['redtorch_toolbox']
-    redtorch_toolbox = UI()
-    redtorch_toolbox.show(dockable=False)
+    qtLib.dock_window(DockingUI)

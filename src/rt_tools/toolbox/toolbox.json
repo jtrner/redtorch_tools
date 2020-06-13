@@ -1,43 +1,189 @@
 {
-"General": {
-	"productUI": {
-		"command": "from rt_tools.maya.general import productUI\nreload(productUI)\nproductUI.launch()",
-		"icon": "productUI.png"
-	},
-	"workspaceUI": {
-		"command": "from rt_tools.maya.general import workspaceUI\nreload(workspaceUI)\nworkspaceUI.launch()",
-		"icon": "workspaceUI.png"
-	},
-	"renameUI": {
-		"command": "from rt_tools.maya.lib import renameUI\nreload(renameUI)\nrenameUI.launch()",
-		"icon": "renameUI.png"
-	}
-},
-"Model": {
-	"modelUI": {
-		"command": "from rt_tools.maya.model import modelUI\nreload(modelUI)\nmodelUI.launch()",
-		"icon": "modelUI.png"
-	}},
-"Groom": {
-	"xgenUI": {
-		"command": "from rt_tools.maya.groom import groomToolsUI\nreload(groomToolsUI)\ngroomToolsUI.launch()",
-		"icon": "groomToolsUI.png"
-	}
-},
-"Lookdev": {
-	"renderUI": {
-		"command": "from rt_tools.maya.lib import renderUI\nreload(renderUI)\nrenderUI.launch()",
-		"icon": "renderUI.png"
-	}
-},
-"Rig": {
-	"rigUI": {
-		"command": "from rt_tools.maya.rig import rigUI\nreload(rigUI)\nrigUI.launch()",
-		"icon": "rigUI.png"
-	},
-	"rigToolsUI": {
-		"command": "from rt_tools.maya.rig import rigToolsUI\nreload(rigToolsUI)\nrigToolsUI.launch()",
-		"icon": "rigToolsUI.png"
-	}
-}
+    "General": {
+        "productUI": {
+            "command": "from rt_tools.maya.general import productUI\nreload(productUI)\nproductUI.launch()",
+            "icon": "productUI.png",
+            "annotation": ""
+        },
+        "workspaceUI": {
+            "command": "from rt_tools.maya.general import workspaceUI\nreload(workspaceUI)\nworkspaceUI.launch()",
+            "icon": "workspaceUI.png",
+            "annotation": ""
+        },
+        "renameUI": {
+            "command": "from rt_tools.maya.lib import renameUI\nreload(renameUI)\nrenameUI.launch()",
+            "icon": "renameUI.png",
+            "annotation": ""
+        }
+    },
+    "Model": {
+        "modelUI": {
+            "command": "from rt_tools.maya.model import modelUI\nreload(modelUI)\nmodelUI.launch()",
+            "icon": "modelUI.png",
+            "annotation": ""
+        }
+    },
+    "Groom": {
+        "Preview": {
+            "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.preview()",
+            "icon": "xgPreviewRefresh.png"
+        },
+        "Hide /Show": {
+            "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.hideShow()",
+            "icon": "xgToggleGuide.png"
+        },
+        "Set Guide Width": {
+            "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.setGuideWidth()",
+            "icon": "xgToggleWidth.png"
+        },
+        "Create Guide": {
+            "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.createGuide()",
+            "icon": "xgGuideContext.png"
+        },
+        "Comb": {
+            "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.comb()",
+            "icon": "xgGuideSculptTool.png"
+        },
+        "Length Lock / Unlock": {
+            "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.lenLockToggle()",
+            "icon": "xgToggleGuideReference.png"
+        },
+        "Obj Mode": {
+            "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.objMode()",
+            "icon": "objectMode.png",
+            "annotation": ""
+        },
+        "Edit Mode": {
+            "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.editMode()",
+            "icon": "componentMode.png",
+            "annotation": ""
+        },
+        "Average Curves": {
+            "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.averageAndDelete()",
+            "icon": "curve_average.png",
+            "annotation": ""
+        },
+        "Spiral...": {
+            "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.spiral_ui()",
+            "icon": "groom_sprint_ui.png",
+            "annotation": ""
+        },
+        "Shorter": {
+            "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.decreaseLen()",
+            "icon": "curve_shorten.png",
+            "annotation": ""
+        },
+        "Longer": {
+            "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.increaseLen()",
+            "icon": "curve_elongate.png",
+            "annotation": ""
+        },
+        "Export / Import": {
+            "command": "from rt_tools.maya.groom import groomUI\nreload(groomUI)\ngroomUI.launch()",
+            "icon": "groom_import_export.png",
+            "annotation": ""
+        },
+        "Update Pref": {
+            "command": "from rt_tools.maya.groom import groomLib\nreload(groomLib)\ngroomLib.updatePref()",
+            "icon": "groom_update_pref.png",
+            "annotation": ""
+        }
+    },
+    "Lookdev": {
+        "renderUI": {
+            "command": "from rt_tools.maya.lib import renderUI\nreload(renderUI)\nrenderUI.launch()",
+            "icon": "renderUI.png",
+            "annotation": ""
+        }
+    },
+    "Rig": {
+        "rigUI": {
+            "command": "from rt_tools.maya.rig import rigUI\nreload(rigUI)\nrigUI.launch()",
+            "icon": "rigUI.png",
+            "annotation": ""
+        },
+        "MirrorSkinCluster": {
+            "command": "from rt_tools.maya.lib import deformLib\nreload(deformLib)\ndeformLib.mirrorSkin(useSelection=True)",
+            "icon": "mirror_objects_purple.png",
+            "annotation": ""
+        },
+        "CopySkinCluster": {
+            "command": "from rt_tools.maya.lib import deformLib\nreload(deformLib)\ndeformLib.copySkin(useSelection=True)",
+            "icon": "copy_skin.png",
+            "annotation": ""
+        },
+        "ExportSkinCluster": {
+            "command": "from rt_tools.maya.lib import deformLib\nreload(skincluster)\ndeformLib.exportSkinToDesktop()",
+            "icon": "export_2.png",
+            "annotation": ""
+        },
+        "ImportSkinCluster": {
+            "command": "from rt_tools.maya.lib import deformLib\nreload(skincluster)\ndeformLib.importSkinFromDesktop()",
+            "icon": "import_2.png",
+            "annotation": ""
+        },
+        "Shape UI": {
+            "command": "from rt_tools.maya.lib import shapeLibUI\nreload(shapeLibUI)\nshapeLibUI.launch()",
+            "icon": "shapes.png",
+            "annotation": ""
+        },
+        "OrientUsingAim": {
+            "command": "import maya.cmds as mc\nfrom rt_tools.maya.lib import jntLib\nreload(jntLib)\nsels=mc.ls(sl=1)\njntLib.orientUsingAim(jnts=sels[:-1] , upAim=sels[-1], aimAxes='x')",
+            "icon": "joint_2.png",
+            "annotation": ""
+        }
+    },
+    "Control": {
+        "Control UI": {
+            "command": "from rt_tools.maya.lib import controlUI\nreload(controlUI)\ncontrolUI.launch()",
+            "icon": "control_3.png",
+            "annotation": ""
+        }
+    },
+    "Pose": {
+        "resetAsset": {
+            "command": "from rt_tools.maya.lib import pose\nreload(pose)\npose.resetAsset()",
+            "icon": "resetAsset.png"
+        },
+        "bipedArmGoToTPose": {
+            "command": "from rt_tools.maya.lib import pose\nreload(pose)\npose.bipedArmGoToTPose()",
+            "icon": "bipedArmGoToTPose.png"
+        },
+        "bipedArmGoToTPoseSelected": {
+            "command": "import maya.cmds as mc\nfrom rt_tools.maya.lib import pose\nreload(pose)\npose.bipedArmGoToTPose(mc.ls(sl=True)[0])",
+            "icon": "bipedArmGoToTPoseSelected.png"
+        },
+        "bipedArmGoToAPose": {
+            "command": "from rt_tools.maya.lib import pose\nreload(pose)\npose.bipedArmGoToAPose()",
+            "icon": "bipedArmGoToAPose.png"
+        },
+        "bipedArmGoToAPoseSelected": {
+            "command": "import maya.cmds as mc\nfrom rt_tools.maya.lib import pose\nreload(pose)\npose.bipedArmGoToAPose(mc.ls(sl=True)[0])",
+            "icon": "bipedArmGoToAPoseSelected.png"
+        },
+        "resetTransforms": {
+            "command": "import maya.cmds as mc\nfrom rt_tools.maya.lib import trsLib\nreload(trsLib)\n[trsLib.resetTRS(x) for x in mc.ls(sl=1)]",
+            "icon": "resetTransforms.png"
+        },
+        "match": {
+            "command": "import maya.cmds as mc\nfrom rt_tools.maya.lib import trsLib\nreload(trsLib)\ntrsLib.match(*mc.ls(sl=True))",
+            "icon": "match.png"
+        },
+        "mirrorLikeJnt": {
+            "command": "from rt_tools.maya.lib import trsLib\nreload(trsLib)\ntrsLib.mirrorLikeJnt()",
+            "icon": "mirrorLikeJnt.png"
+        },
+        "createOffsetGroup": {
+            "command": "from rt_tools.maya.lib import trsLib\nreload(trsLib)\ntrsLib.insert(mode='allChilds', search='_GRP', replace='_OFS')",
+            "icon": "createOffsetGroup.png"
+        },
+        "lock": {
+            "command": "import maya.cmds as mc\nfrom rt_tools.maya.lib import attrLib\nreload(attrLib)\nfor node in mc.ls(sl=1):\n\tattrLib.lockHideAttrs(node=node, attrs=['t', 'r', 's', 'v'], lock=True, hide=True)",
+            "icon": "lock.png"
+        },
+        "unlock": {
+            "command": "import maya.cmds as mc\nfrom rt_tools.maya.lib import attrLib\nreload(attrLib)\nfor node in mc.ls(sl=1):\n\tattrLib.unlock(nodes=node, attrs=['t', 'r', 's', 'v'])",
+            "icon": "unlock.png"
+        }
+    }
 }
