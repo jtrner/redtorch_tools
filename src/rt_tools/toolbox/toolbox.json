@@ -112,15 +112,10 @@
             "icon": "copy_skin.png",
             "annotation": ""
         },
-        "ExportSkinCluster": {
-            "command": "from rt_tools.maya.lib import deformLib\nreload(skincluster)\ndeformLib.exportSkinToDesktop()",
-            "icon": "export_2.png",
-            "annotation": ""
-        },
-        "ImportSkinCluster": {
-            "command": "from rt_tools.maya.lib import deformLib\nreload(skincluster)\ndeformLib.importSkinFromDesktop()",
-            "icon": "import_2.png",
-            "annotation": ""
+        "Export Import SkinCluster": {
+            "command": "from rt_tools.maya.lib import deformUI\nreload(deformUI)\ndeformUI.launch()",
+            "icon": "deformer_import_export.png",
+            "annotation": "Export Import skincluster UI"
         },
         "Shape UI": {
             "command": "from rt_tools.maya.lib import shapeLibUI\nreload(shapeLibUI)\nshapeLibUI.launch()",

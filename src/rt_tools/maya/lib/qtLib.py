@@ -1138,7 +1138,4 @@ class DockingUI(QtWidgets.QWidget):
 @decoratorLib.repeatable_cmd
 @decoratorLib.undoChunk
 def run_command(commandString):
-    print('-' * 80)
-    print(commandString)
-    print('-' * 80)
     exec (commandString, globals(), globals())

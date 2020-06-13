@@ -7,7 +7,7 @@ import maya.cmds as mc
 import maya.OpenMaya as om
 import maya.OpenMayaAnim as oma
 
-from . import deformLiber
+from . import deformLib
 from . import fileLib
 from . import trsLib
 from . import attrLib

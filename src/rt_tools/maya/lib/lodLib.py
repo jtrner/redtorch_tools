@@ -10,7 +10,7 @@ History:
 """
 import maya.cmds as mc
 
-from . import deformLiber
+from . import deformLib
 from . import trsLib
 
 

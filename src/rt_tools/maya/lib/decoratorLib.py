@@ -79,6 +79,11 @@ def repeatable_cmd(function):
     special repeat which works with exec("YOUR_PYTHON_COMMAND")
     """
     def wrapper(cmd_string):
+        # print executed code
+        print('-' * 80)
+        print(cmd_string)
+        print('-' * 80)
+
         # make it repeatable for later
         cmd_string_flatten = json_dumps(cmd_string)
         if cmd_string_flatten is not None:
@@ -96,11 +101,6 @@ def repeatable_cmd(function):
         # if given cmd is a callable function instead of a string
         else:
             cmd_string()
-
-        # print executed code
-        print('-' * 80)
-        print(cmd_string)
-        print('-' * 80)
 
     return wrapper
 

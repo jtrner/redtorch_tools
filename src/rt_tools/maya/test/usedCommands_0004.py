@@ -30,11 +30,11 @@ print mc.getAttr(scatter + '.outPoints')
 #mc.connectAttr(scatter + '.outPoints', locator + '.inPoints')
 
 
+from rt_tools.maya.lib import deformLib
+from rt_tools.maya.lib import meshLib
 
-from rt_tools.maya.lib import deformLiber
 deformLib.copySkin(useSelection=True)
 
-from rt_tools.maya.lib import meshLib
 meshLib.blendShapeGeosUnderTwoGroups(originalGroup='model_GRP', editedGroup='output_model_GRP', deleteHistory=True)
 
 # twist joints display local axis
@@ -65,7 +65,7 @@ display.setColor(color='yellow')
 display.setColor(color='maroon')
 display.setColor(obj=mc.ls(sl=True)[0], color='yellow')
 
-from rt_tools.maya.lib import deformLiber
+from rt_tools.maya.lib import deformLib
 deformLib.copySkin(useSelection=True)
 
 planarizeJnts.adjustFingers()
