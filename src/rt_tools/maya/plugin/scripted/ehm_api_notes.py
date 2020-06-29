@@ -20,6 +20,16 @@ crv_fn = om2.MFnNurbsCurve()
 crv_fn.create(cvs, knots, degree, crv_fn.kOpen, True, True)
 
 # ======================================================================================
+# create matrix attribute
+import maya.OpenMaya as omp
+
+matAttr = om.MFnMatrixAttribute()
+YOUR_NODE.matrix = matAttr.create('matrix', 'matrix', 1)
+matAttr.default = om.MMatrix()
+matAttr.setStorable(True)
+matAttr.setWritable(True)
+
+# ======================================================================================
 # get type of selected
 import maya.api.OpenMaya as om2
 

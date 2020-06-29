@@ -8,62 +8,56 @@ nodeID = OpenMaya.MTypeId(0x0011E18E)
 
 
 class Auto_rotate(OpenMayaMPx.MPxNode):
-    matrix = OpenMaya.MObject()
+    """
+    calculates rotation based on diameter, distance and direction a ball has travelled
+    Only works in DG (probably doesn't like things to be cached?)
+    """
+    position = OpenMaya.MObject()
     rotate = OpenMaya.MObject()
 
     def __init__(self):
         OpenMayaMPx.MPxNode.__init__(self)
-        self.prev_pos = OpenMaya.MVector()
+        self.prev_mVec = OpenMaya.MVector()
+        self.trs_mat = OpenMaya.MTransformationMatrix()
 
     def compute(self, plug, dataBlock):
         if plug == Auto_rotate.rotate or plug.parent() == Auto_rotate.rotate:
+
             diameter_ih = dataBlock.inputValue(Auto_rotate.diameter)
             diameter = diameter_ih.asFloat()
 
-            matrix_ih = dataBlock.inputValue(Auto_rotate.matrix)
-            matrix_val = matrix_ih.asMatrix()
+            circumference = diameter * math.pi
 
-            trs_mat = OpenMaya.MTransformationMatrix(matrix_val)
-            pos = trs_mat.getTranslation(OpenMaya.MSpace.kWorld)
+            position_ih = dataBlock.inputValue(Auto_rotate.position)
+            position = position_ih.asFloatVector()
 
-            # move vectors
-            x = pos.x - self.prev_pos.x
-            z = pos.z - self.prev_pos.z
+            position_mVec = OpenMaya.MVector(position)
 
-            # distance moved
-            dist = math.sqrt(x * x + z * z)
-            
-            # skip if movement is too small
-            if dist < 0.0001:
+            delta_mVec = position_mVec - self.prev_mVec
+
+            if delta_mVec.length() < 0.001:
                 dataBlock.setClean(plug)
                 return
-            
-            # calculate rotations
-            rot_x_rad = (360 * dist) / (math.pi * diameter)
-            rot_x = rot_x_rad / 57.2958
-            rot_y = math.atan2(x / dist, z / dist)
 
-            # rotate in world space
-            trs_mat.rotateBy(
-                OpenMaya.MEulerRotation(0, -rot_y, 0),
-                OpenMaya.MSpace.kWorld
-            )
-            trs_mat.rotateBy(
-                OpenMaya.MEulerRotation(rot_x, 0, 0),
-                OpenMaya.MSpace.kWorld
-            )
-            trs_mat.rotateBy(
-                OpenMaya.MEulerRotation(0, rot_y, 0),
-                OpenMaya.MSpace.kWorld
-            )
+            num_revolution_x = delta_mVec.x / circumference
+            num_revolution_z = delta_mVec.z / circumference
+
+            euler_x = math.pi * 2 * num_revolution_z
+            euler_z = math.pi * 2 * num_revolution_x
+
+            quat_x = OpenMaya.MQuaternion(euler_x, OpenMaya.MVector(1, 0, 0))
+            quat_z = OpenMaya.MQuaternion(euler_z, OpenMaya.MVector(0, 0, -1))
+
+            self.trs_mat.rotateBy(quat_x, OpenMaya.MSpace.kWorld)
+            self.trs_mat.rotateBy(quat_z, OpenMaya.MSpace.kWorld)
 
             #
-            final_rot = trs_mat.eulerRotation()
+            final_rot = self.trs_mat.eulerRotation()
             rotate_oh = dataBlock.outputValue(Auto_rotate.rotate)
             rotate_oh.set3Double(final_rot.x, final_rot.y, final_rot.z)
 
             # use current position as last position for next iteration
-            self.prev_pos = pos
+            self.prev_mVec = position_mVec
             dataBlock.setClean(plug)
 
 
@@ -72,15 +66,14 @@ def nodeCreator():
 
 
 def nodeInitializer():
-    matAttr = OpenMaya.MFnMatrixAttribute()
     uAttr = OpenMaya.MFnUnitAttribute()
     nAttr = OpenMaya.MFnNumericAttribute()
 
-    # input matrix
-    Auto_rotate.matrix = matAttr.create('matrix', 'matrix', 1)
-    matAttr.default = OpenMaya.MMatrix()
-    matAttr.setStorable(True)
-    matAttr.setWritable(True)
+    # input position
+    Auto_rotate.position = nAttr.createPoint('position', 'p')
+    nAttr.setStorable(True)
+    nAttr.setWritable(True)
+    nAttr.setKeyable(True)
 
     # input diameter
     Auto_rotate.diameter = nAttr.create(
@@ -131,13 +124,13 @@ def nodeInitializer():
     nAttr.setStorable(False)
 
     # add attributes
-    Auto_rotate.addAttribute(Auto_rotate.matrix)
-    Auto_rotate.addAttribute(Auto_rotate.rotate)
+    Auto_rotate.addAttribute(Auto_rotate.position)
     Auto_rotate.addAttribute(Auto_rotate.diameter)
+    Auto_rotate.addAttribute(Auto_rotate.rotate)
 
     #
     Auto_rotate.attributeAffects(Auto_rotate.diameter, Auto_rotate.rotate)
-    Auto_rotate.attributeAffects(Auto_rotate.matrix, Auto_rotate.rotate)
+    Auto_rotate.attributeAffects(Auto_rotate.position, Auto_rotate.rotate)
 
 
 # init plugin
@@ -174,8 +167,9 @@ def main():
     # sphere2 = mc.polySphere()[0]
     box = mc.polyCube()[0]
     node = mc.createNode('auto_rotate')
-    mc.connectAttr(box+'.worldMatrix[0]', node + '.matrix')
-    mc.connectAttr(node + '.rotate', box+'.rotate', )
+    mc.connectAttr(box+'.t', node + '.position')
+
+    mc.connectAttr(node + '.rotate', box+'.rotate')
     # mc.connectAttr(node + '.spin', box+'.rotateY', )
     # mc.select(node)
     """
