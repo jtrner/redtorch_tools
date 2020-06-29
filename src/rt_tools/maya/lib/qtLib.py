@@ -398,17 +398,16 @@ def selectItemByText(tw, text, parentText=None):
     :return: n/a
     """
     numItems = tw.topLevelItemCount()
+    item_found = False
 
     for i in range(numItems):
         item = tw.topLevelItem(i)
-
         # item is a top level item
         if not parentText:
             if text == item.text(0):
                 tw.setCurrentItem(item)
-            else:
-                tw.clearSelection()
-            return
+                item_found = True
+                break
 
         # item is a child of a top level item
         else:
@@ -418,7 +417,11 @@ def selectItemByText(tw, text, parentText=None):
                     child_item = item.child(j)
                     if text == child_item.text(0):
                         tw.setCurrentItem(child_item)
-                        return
+                        item_found = True
+                        break
+
+    if not item_found:
+        tw.clearSelection()
 
 
 def printMessage(infoLE, message, mode='info'):
@@ -898,21 +901,29 @@ def fillWidgetsWithBtns(widget, btnNames, btnSize=None):
 def btnsFromJson(layout, config, btnSize=None):
     categoriesAndBtns_data = fileLib.loadJson(config)
 
+    # add an extra widget and layout so we can minimize empty spaces
+    ww = QtWidgets.QWidget()
+    layout.addWidget(ww)
+    vl = QtWidgets.QVBoxLayout()
+    ww.setLayout(vl)
+    ww.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Maximum)
+    vl.setContentsMargins(0, 0, 0, 0)
+    vl.setSpacing(5)
+
     for cat, btns_data in categoriesAndBtns_data.items():
         # group by category
-        gb, lay = createGroupBox(parentLayout=layout, label=cat)
-
-        lay.layout().setContentsMargins(1, 1, 1, 1)
-        lay.layout().setSpacing(1)
+        gb, lay = createGroupBox(
+            parentLayout=vl,
+            label=cat
+        )
 
         w = QtWidgets.QWidget()
         lay.addWidget(w)
 
-        gb.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         w.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
         w.setMinimumWidth(10)
-        flowLayout = FlowLayout(w)
+        flowLayout = FlowLayout(w, margin=4, hspacing=8, vspacing=8)
 
         for btnName, btn_data in btns_data.items():
             # button

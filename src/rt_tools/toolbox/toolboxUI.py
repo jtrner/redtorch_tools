@@ -83,7 +83,6 @@ class DockingUI(QtWidgets.QWidget):
         # here we can start coding our UI
 
         self.edit_btns_ui = None
-        self.edit_btns_ui_is_closed = True
         self.user_btn_json = None
         self.can_edit = True
 
@@ -106,18 +105,21 @@ class DockingUI(QtWidgets.QWidget):
         self.rig_and_cfx_lay = QtWidgets.QVBoxLayout(self.rig_and_cfx_w)
         self.tabs.addTab(self.rig_and_cfx_w, "Rig && CFX")
         self.populateMainTab()
+        self.rig_and_cfx_lay.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignLeft)
 
         # shows tab
         self.shows_w = QtWidgets.QWidget()
         self.shows_lay = QtWidgets.QVBoxLayout(self.shows_w)
         self.tabs.addTab(self.shows_w, SHOW_NAME)
         self.populateShowsTab()
+        self.shows_lay.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignLeft)
 
         # users tab
         self.users_w = QtWidgets.QWidget()
         self.users_lay = QtWidgets.QVBoxLayout(self.users_w)
         self.tabs.addTab(self.users_w, "Users")
         self.populateUsersTab()
+        self.users_lay.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignLeft)
 
     @staticmethod
     def delete_instances():
@@ -179,6 +181,8 @@ class DockingUI(QtWidgets.QWidget):
         #
         self.user_lay = qtLib.createVLayout(self.users_lay)
         self.populate_user_buttons()
+        self.user_lay.setContentsMargins(0, 0, 0, 0)
+        self.user_lay.setSpacing(0)
 
         # right click menu
         rightClickOptions = OrderedDict()
@@ -217,11 +221,14 @@ class DockingUI(QtWidgets.QWidget):
         else:
             self.can_edit = True
 
-        if not self.edit_btns_ui_is_closed:
-            self.edit_btns_ui.close()
-            self.edit_btns_ui.deleteLater()
-        self.edit_btns_ui = EditBtnsUI(parent=self)
-        self.edit_btns_ui.show()
+        global EditBtnsUI_instance
+        if 'EditBtnsUI_instance' in globals():
+            if not EditBtnsUI_instance.closed:
+                EditBtnsUI_instance.close()
+            EditBtnsUI_instance.deleteLater()
+            del globals()['EditBtnsUI_instance']
+        EditBtnsUI_instance = EditBtnsUI(parent=self)
+        EditBtnsUI_instance.show()
 
     def populate_user_buttons(self):
         qtLib.clearLayout(self.user_lay)
@@ -267,6 +274,7 @@ class DockingUI(QtWidgets.QWidget):
 class EditBtnsUI(MayaQWidgetDockableMixin, QtWidgets.QDialog):
 
     def __init__(self, title='Edit Toolbox buttons UI', parent=qtLib.getMayaWindow()):
+        self.closed = False
 
         # create window
         super(EditBtnsUI, self).__init__(parent=parent)
@@ -297,7 +305,7 @@ class EditBtnsUI(MayaQWidgetDockableMixin, QtWidgets.QDialog):
         :return: n/a
         """
         self.parent().populate_user_buttons()
-        self.parent().edit_btns_ui_is_closed = True
+        self.closed = True
 
         # settings path
         settings = QtCore.QSettings(BUTTON_EDIT_SETTINGS_PATH, QtCore.QSettings.IniFormat)
@@ -310,7 +318,7 @@ class EditBtnsUI(MayaQWidgetDockableMixin, QtWidgets.QDialog):
         Restore UI size and position that if was last used
         :return: n/a
         """
-        self.parent().edit_btns_ui_is_closed = False
+        self.closed = False
         if os.path.exists(BUTTON_EDIT_SETTINGS_PATH):
             settings = QtCore.QSettings(BUTTON_EDIT_SETTINGS_PATH, QtCore.QSettings.IniFormat)
 
