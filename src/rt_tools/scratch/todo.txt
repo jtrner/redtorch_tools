@@ -1,19 +1,60 @@
 
+---------------------------------------------------------------------------------------------------------------------------------------
+
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+rig UI
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+change other people's buttons
+i think i got it
+so 
+i opened someone else's panel and open the Edit Buttons UI
+then i switched to my own panel
+and do the same there
+make some changes to someone else's panel
+and close it
+and the changes get saved
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+check face io script from samaneh
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+
+Mary eyelashes using framework
+- face vis attr hidden!
+- eyelashes must be parented under right lid joint
+
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+bill eye stalk base skin - shoulder skin - right eye ball popping out?!
+
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+EgonB Head Fin
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+framework naming convention
 
 ---------------------------------------------------------------------------------------------------------------------------------------
 
 global scale of cartoony eye
 
 ---------------------------------------------------------------------------------------------------------------------------------------
-
-Hey Ehsan, hope you are doing well
-I am trying to bake the face with the iRig Face button for a while, and even though it works great for most of the baking, I realized at certain/most of the time, it does not mirror the Face_C*Ctrls left/right movements. 
-
-Forexample, when I am baking the C_Jaw to translateX 1,  it is not baking for translateX -1 as it used to do for the original face Baking 
-I'm not sure if I am doing something wrong in this version, but I just thought if you could test and see if that is working fine for you
-
----------------------------------------------------------------------------------------------------------------------------------------
-
 
 import sys
 import copy
