@@ -1,6 +1,6 @@
 import os
 
 
-__version__ = "2.33.4"
+__version__ = "2.33.5"
 __author__ = "Ehsan Hassani Moghaddam"
 os.environ["REDTORCH_TOOLS_VERSION"] = __version__
