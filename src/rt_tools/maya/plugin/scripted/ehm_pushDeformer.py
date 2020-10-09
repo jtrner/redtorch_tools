@@ -23,7 +23,6 @@ else:
 
 
 class ehm_pushDeformer(mpx.MPxDeformerNode):
-    colliderMatrix = om.MObject()
 
     def __init__(self):
         mpx.MPxDeformerNode.__init__(self)
@@ -31,8 +30,8 @@ class ehm_pushDeformer(mpx.MPxDeformerNode):
     def deform(self, dataBlock, geoItr, matrix, index):
 
         # get envelope
-        envelopeA = kEnvelope
-        envelopeValue = dataBlock.inputValue(envelopeA).asFloat()
+        envelopeHandle = dataBlock.inputValue(kEnvelope)
+        envelopeValue = envelopeHandle.asFloat()
         if not envelopeValue:
             return
 
@@ -154,7 +153,7 @@ def main():
 
     """
     import sys
-    path = 'D:/all_works/redtorch_tools/dev/maya/plugin/ehm_plugins/scriptedPlugin/'
+    path = 'D:/all_works/redtorch_tools/src/rt_tools/maya/plugin/scripted'
     if path not in sys.path:
         sys.path.insert(0, path)
     

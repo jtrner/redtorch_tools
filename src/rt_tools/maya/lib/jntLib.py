@@ -30,7 +30,7 @@ AXES_TO_VEC = {
 }
 
 thisDir = os.path.dirname(__file__)
-pluginPath = os.path.join(thisDir, '../plugin/ehm_plugins/scriptedPlugin/replaceInfluence')
+pluginPath = os.path.join(thisDir, '../plugin/scripted/replaceInfluence')
 pluginPath = os.path.abspath(pluginPath)
 mc.loadPlugin(pluginPath, qt=True)
 

@@ -55,8 +55,6 @@ reload(package)
 reload(component)
 
 
-# rigLib.importBlueprints()
-
 # CONSTANTS
 DIRNAME = __file__.split('maya')[0]
 ICON_DIR = os.path.abspath(os.path.join(DIRNAME, 'icon'))

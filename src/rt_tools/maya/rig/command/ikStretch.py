@@ -12,7 +12,7 @@ import maya.cmds as mc
 
 from ...lib import attrLib
 from ...lib import trsLib
-from ...lib import key
+from ...lib import keyLib
 
 
 def run(startCtl, pvCtl, ctl, ikh, globalScaleAttr, name, stretchMode='scale'):

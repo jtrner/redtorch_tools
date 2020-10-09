@@ -56,7 +56,7 @@ from ..lib import fileLib
 from ..lib import container
 from ..lib import shapeLib
 from ..lib import trsLib
-from ..lib import key
+from ..lib import keyLib
 
 from ..general import workspace
 
