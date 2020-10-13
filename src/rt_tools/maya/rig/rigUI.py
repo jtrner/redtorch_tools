@@ -736,7 +736,6 @@ class UI(QtWidgets.QDialog):
     def addBlueprint(self):
         cmp = qtLib.getSelectedItemAsText(self.availableBlueprints_tw)
         cmpModule = globals()[cmp]
-        # cmpModule = getattr(python_rig_component, cmp)
         cmpClass = getattr(cmpModule, cmp[0].upper() + cmp[1:])
         cmpInstance = cmpClass()
         self.cmpInstances[cmpInstance.name] = cmpInstance
@@ -750,8 +749,7 @@ class UI(QtWidgets.QDialog):
         selectedBlu = qtLib.getSelectedItemAsText(self.blueprints_tw)
         className = selectedBlu.split('[')[-1][:-1]
         componentName = className[0].lower() + className[1:]
-        python_rig_component = globals()['component']
-        cmpModule = getattr(python_rig_component, componentName)
+        cmpModule = globals()[componentName]
         cmpClass = getattr(cmpModule, className)
         attrsAndValues = self.getAttrsAndValuesForSelectedBluGrp()
         cmpInstance = cmpClass(**attrsAndValues)
