@@ -42,7 +42,8 @@ from . import rigLib
 from ..general import workspace
 from ..general import utils as generalUtils
 from rt_tools import package
-from . import component
+from .component import arm, chain, eye, eyes, finger, leg, \
+    legQuad, lid, neck, piston, root, spine, spineB, tail, template
 
 reload(qtLib)
 reload(control)
@@ -52,7 +53,21 @@ reload(rigLib)
 reload(workspace)
 reload(generalUtils)
 reload(package)
-reload(component)
+reload(arm)
+reload(chain)
+reload(eye)
+reload(eyes)
+reload(finger)
+reload(leg)
+reload(legQuad)
+reload(lid)
+reload(neck)
+reload(piston)
+reload(root)
+reload(spine)
+reload(spineB)
+reload(tail)
+reload(template)
 
 
 # CONSTANTS
@@ -720,8 +735,8 @@ class UI(QtWidgets.QDialog):
 
     def addBlueprint(self):
         cmp = qtLib.getSelectedItemAsText(self.availableBlueprints_tw)
-        python_rig_component = globals()['component']
-        cmpModule = getattr(python_rig_component, cmp)
+        cmpModule = globals()[cmp]
+        # cmpModule = getattr(python_rig_component, cmp)
         cmpClass = getattr(cmpModule, cmp[0].upper() + cmp[1:])
         cmpInstance = cmpClass()
         self.cmpInstances[cmpInstance.name] = cmpInstance
