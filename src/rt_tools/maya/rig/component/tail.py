@@ -112,7 +112,7 @@ class Tail(template.Template):
             description=self.prefix,
             matchOrientation=True,
             addTweaks=True,
-            fkMode=True)
+            fkMode=True,aim = 'y')
 
         self.lastCtl = ctls[-1]
         self.setOut('lastCtl', self.lastCtl)

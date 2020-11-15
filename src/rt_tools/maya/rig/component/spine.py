@@ -95,7 +95,7 @@ class Spine(template.Template):
 
         self.baseCtl, crvGrp, rsltGrp, ctls, tweakCtls, jnts = rope.run(
             jnts=self.joints['spineJnts'], numCtls=5, guides=None, numJnts=None,
-            description=self.prefix)
+            description=self.prefix, aim = 'x')
 
         iconSize = trsLib.getDistance(self.joints['spineJnts'][0], self.joints['spineJnts'][-1])
 
