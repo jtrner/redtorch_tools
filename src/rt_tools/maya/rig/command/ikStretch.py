@@ -262,7 +262,7 @@ def connectStretch(stretchResultAttr, nodes, axes='x', mode='scale'):
         for node in nodes:
             defaultDrivenVal = mc.getAttr('{}.t{}'.format(node, axes))
             attrLib.disconnectAttr('{}.t{}'.format(node, axes))
-            key.setDriven(drvr=stretchResultAttr,
+            keyLib.setDriven(drvr=stretchResultAttr,
                           drvn='{}.t{}'.format(node, axes),
                           drvrValues=(1.0, 100),
                           drvnValues=(defaultDrivenVal, defaultDrivenVal*100))

@@ -11,7 +11,9 @@ import maya.cmds as mc
 
 from ..lib import attrLib
 from ..lib import trsLib
+from .component import template
 
+reload(template)
 reload(trsLib)
 
 
@@ -47,6 +49,12 @@ def duplicateBlueprint(bluGrp):
     return dup
 
 def mirrorBlueprint(bluGrp):
+    attr = mc.listAttr(bluGrp)
+    attrs = []
+    for i in attr:
+        if i.startswith('blu'):
+            attrs.append(i)
+
     bluSide = mc.getAttr(bluGrp + '.blu_side')
     bluPrefix = mc.getAttr(bluGrp + '.blu_prefix')
 
@@ -72,4 +80,18 @@ def mirrorBlueprint(bluGrp):
         mc.rename(child, newName)
 
     attrLib.setAttr(dup + '.blu_side', otherSide)
+    for i in attrs:
+        if i.startswith('blu'):
+            at = mc.getAttr(dup + '.' + i)
+            isString = isinstance(at, basestring)
+            if isString:
+                if 'L' in at:
+                    niceName = at.replace('L', 'R')
+                    isLock = mc.getAttr(dup + '.' + i, lock = True)
+                    if isLock:
+                        mc.setAttr(dup + '.' + i, lock = False)
+                    mc.setAttr(dup + '.' + i, niceName, type = 'string')
+                    if isLock:
+                        mc.setAttr(dup + '.' + i, lock = True)
+
     return dup

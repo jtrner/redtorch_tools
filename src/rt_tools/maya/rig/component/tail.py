@@ -90,6 +90,7 @@ class Tail(template.Template):
                 self.joints['chainJnts'].append(jnt)
             mc.delete(crv)
 
+
         # orient joints
         if self.autoOrient:
             self.orientJnts(self.joints['chainJnts'])
@@ -112,6 +113,9 @@ class Tail(template.Template):
             matchOrientation=True,
             addTweaks=True,
             fkMode=True)
+
+        self.lastCtl = ctls[-1]
+        self.setOut('lastCtl', self.lastCtl)
         self.baseCtlZro = mc.listRelatives(self.baseCtl, p=1)[0]
         mc.parent(self.baseCtlZro, self.ctlGrp)
         mc.parent(crvGrp, rsltGrp, self.originGrp)

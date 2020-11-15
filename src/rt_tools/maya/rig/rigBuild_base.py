@@ -20,17 +20,29 @@ from .component import finger
 from .component import leg
 from .component import legQuad
 from .component import lid
+from .component import lid2
 from .component import neck
 from .component import piston
 from .component import root
 from .component import spine
 from .component import tail
+from .component import jaw
+from .component import birdArm
+from .component import wingFeather
+from .component import wingTail
+
 
 reload(workspace)
 reload(attrLib)
 reload(connect)
 reload(deformLib)
 
+
+reload(wingTail)
+reload(jaw)
+reload(wingFeather)
+reload(birdArm)
+reload(lid2)
 reload(arm)
 reload(chain)
 reload(eye)

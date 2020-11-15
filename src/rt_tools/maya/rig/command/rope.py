@@ -99,7 +99,7 @@ def run(jnts=None, numCtls=None, guides=None, numJnts=None, addTweaks=False,
                                       parent=True, description=name)
         upLoc = mc.createNode('transform')
         trsLib.match(upLoc, jnts[0])
-        mc.move(0, 100000, 0, upLoc, r=True, ws=True)
+        mc.move(100000, 0, 0, upLoc, r=True, ws=True)
         jntLib.orientUsingAim(jnts=jnts, upAim=upLoc,
                               aimAxes='x', upAxes='y')
         mc.delete(upLoc)
@@ -161,7 +161,7 @@ def run(jnts=None, numCtls=None, guides=None, numJnts=None, addTweaks=False,
     # other cvs
     for i in range(len(ctls)):
         CV = '{}.cv[{}]'.format(upCrv, i)
-        mathLib.moveAlongTransform(CV, ctls[i], [0, size, 0])
+        mathLib.moveAlongTransform(CV, ctls[i], [size, 0, 0])
 
     # drive upCrv points with crv clusters
     for i in range(len(clss)):

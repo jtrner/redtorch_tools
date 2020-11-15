@@ -29,7 +29,7 @@ for name, val in globals().items():
 
 def Fk(joints=[], parent="", shape="circle", scale=None, search='', replace='',
        hideLastCtl=True, connectGlobalScale=True, movable=True,
-       lockHideAttrs=['s', 'v'], stretch=True, variableIconSize=True):
+       lockHideAttrs=['s', 'v'], stretch=True, variableIconSize=True,upVector = [0,0,1], worldUp  = [0,0,1], aimVec = 'x'):
     """
     def for creating fk
 
@@ -92,7 +92,7 @@ def Fk(joints=[], parent="", shape="circle", scale=None, search='', replace='',
                 # translate connections
                 mc.pointConstraint(ctl.fullName, joint, name=strLib.mergeSuffix(joint) + "_PTC")
                 # rotation connections
-                connect_rotate(ctl, next_ctl, joint)
+                connect_rotate(ctl, next_ctl, joint, upVector,worldUp, aimVec)
                 # scale connections
                 if stretch:
                     if connectGlobalScale:
@@ -115,22 +115,37 @@ def Fk(joints=[], parent="", shape="circle", scale=None, search='', replace='',
     return fk_ctl_list
 
 
-def connect_rotate(ctl, next_ctl, joint):
+def connect_rotate(ctl, next_ctl, joint,upVector,worldUp,aimVec):
     """
     rotate joint to match next controls direction
     """
     side = strLib.getPrefix(ctl.name)  # joint on right side's X direction is reversed
-    if side == "R":
-        aimVector = [-1, 0, 0]
+    if aimVec == 'x':
+        if side == "R":
+            aimVector = [-1, 0, 0]
+        else:
+            aimVector = [1, 0, 0]
+    elif aimVec == 'y':
+        if side == 'R':
+            aimVector = [0, -1, 0]
+        else:
+            aimVector = [0, 1, 0]
+    elif aimVec == 'z':
+        if side == 'R':
+            aimVector = [0, 0, -1]
+        else:
+            aimVector = [0, 0, 1]
+
     else:
-        aimVector = [1, 0, 0]
+        return
+
 
     mc.aimConstraint(next_ctl.fullName,
                      joint,
                      aimVector=aimVector,
                      worldUpType="objectrotation",
-                     upVector=[0, 0, 1],
-                     worldUpVector=[0, 0, 1],
+                     upVector=upVector,
+                     worldUpVector=worldUp,
                      worldUpObject=ctl.fullName,
                      name=strLib.mergeSuffix(joint) + "_AMC")
 

@@ -43,8 +43,12 @@ from ..general import workspace
 from ..general import utils as generalUtils
 from rt_tools import package
 from .component import arm, chain, eye, eyes, finger, leg, \
-    legQuad, lid, neck, piston, root, spine, spineB, tail, template
+    legQuad, lid, neck, piston, root, spine, spineB, tail,jaw, lid2, lips,birdArm,wingFeather,wingTail,template
 
+reload(wingTail)
+reload(wingFeather)
+reload(birdArm)
+reload(jaw)
 reload(qtLib)
 reload(control)
 reload(fileLib)
@@ -61,6 +65,7 @@ reload(finger)
 reload(leg)
 reload(legQuad)
 reload(lid)
+reload(lid2)
 reload(neck)
 reload(piston)
 reload(root)
@@ -319,7 +324,11 @@ class UI(QtWidgets.QDialog):
             lambda: self.openSkeletonFile(importFile=True, fileName='blueprint')
         blueprintBtnOptions['Save Blueprint'] = \
             lambda: self.saveSkeletonFile('blueprint')
-        # blueprintBtnOptions['Export Selected As Blueprint'] = self.exportAsSkeletonFile
+
+        # blueprintBtnOptions['export selected as Blueprint'] = \
+        #     lambda: self.exportAsSkeletonFile('blueprint')
+
+        blueprintBtnOptions['Export Selected As Blueprint'] = partial(self.exportAsSkeletonFile,blue = True)
         self.addRightClickMenu(self.openBlueprint_btn, rmb_data=blueprintBtnOptions)
 
         #
@@ -1097,7 +1106,7 @@ class UI(QtWidgets.QDialog):
             mc.file(rename=skelFile)
             mc.file(save=True, f=True)
 
-    def exportAsSkeletonFile(self):
+    def exportAsSkeletonFile(self,blue = False ):
         # get input from UI
         self.job = qtLib.getSelectedItemAsText(self.jobs_tw) or ''
         self.seq = qtLib.getSelectedItemAsText(self.seqs_tw) or ''
@@ -1113,7 +1122,20 @@ class UI(QtWidgets.QDialog):
         skelFile = os.path.join(self.mainJobsDir, self.job, self.seq, self.shot,
                                 'task', 'rig', 'users', self.user, self.version,
                                 'data', 'skeleton.ma')
-        answer = qtLib.confirmDialog(self, msg='Export selected as "{}"?'.format(skelFile))
+
+        blueprintFile = os.path.join(self.mainJobsDir, self.job, self.seq, self.shot,
+                                'task', 'rig', 'users', self.user, self.version,
+                                'data', 'blueprint.ma')
+
+        if blue:
+            answer = qtLib.confirmDialog(self, msg='Export selected as "{}"?'.format(blueprintFile))
+
+        if answer:
+            mc.file(blueprintFile, force=True, es=True, typ="mayaAscii")
+
+        else:
+            answer = qtLib.confirmDialog(self, msg='Export selected as "{}"?'.format(skelFile))
+
         if answer:
             mc.file(skelFile, force=True, es=True, typ="mayaAscii")
 
@@ -1136,6 +1158,8 @@ class UI(QtWidgets.QDialog):
         bluGrp = selectedBlu.split(' ')[0] + '_blueprint_GRP'
         rigLib.mirrorBlueprint(bluGrp)
         self.bluRefresh()
+
+
 
     def importControls(self):
         # get input from UI

@@ -35,10 +35,15 @@ class Finger(template.Template):
         self.lockHideAttrs = lockHideAttrs
         self.numOfJnts = numOfJnts
         self.movable = movable
+        mult = ['R','L'][kwargs['side'] == 'L']
+
+        self.aliases = {'parent':'{}'.format(mult) + '_arm.handJnt'}
+
         super(Finger, self).__init__(**kwargs)
 
     def createBlueprint(self):
         super(Finger, self).createBlueprint()
+
 
         name = self.getName()
 
@@ -127,7 +132,10 @@ class Finger(template.Template):
         """
         super(Finger, self).createSettings()
 
+        parent = self.aliases['parent'].replace('[side]', self.side)
+        print parent
+
         attrLib.addString(self.blueprintGrp, 'blu_globalScale', v='C_root.mainCtl')
-        attrLib.addString(self.blueprintGrp, 'blu_ctlParent', v=self.side + '_arm.handJnt')
+        attrLib.addString(self.blueprintGrp, 'blu_ctlParent', v=parent)
         attrLib.addInt(self.blueprintGrp, 'blu_numOfJnts', v=self.numOfJnts)
         attrLib.addBool(self.blueprintGrp, 'blu_movable', v=self.movable)

@@ -118,11 +118,13 @@ class Lid2(template.Template):
         mc.delete(mc.pointConstraint(self.upLidJnts['upLid'][0], tempLoc))
         mc.setAttr(upLoc + '.ty', 10000)
 
-        mc.delete(mc.aimConstraint(upLoc,
+        mc.delete(mc.aimConstraint(self.upLidJnts['upLid'][-1],
                                    self.upLidJnts['upLid'][0],
-                                   aimVector=[0,1,0],
-                                   upVector=[1,0,0],
-                                   worldUpType="none"))
+                                   aimVector=[0,0,1],
+                                   upVector=[0,1,0],
+                                   worldUpType="objectrotation",
+                                   wu=[0, 1, 0],
+                                   wuo=upLoc))
 
         mc.makeIdentity(self.upLidJnts['upLid'][0], apply = True, s = 1, r = 1, t = 1)
 
@@ -135,11 +137,13 @@ class Lid2(template.Template):
         trsLib.match(tempLoc,self.buttomLidJnts['buttomLid'][-1] )
         mc.delete(mc.pointConstraint(self.buttomLidJnts['buttomLid'][0], tempLoc))
 
-        mc.delete(mc.aimConstraint(upLoc,
+        mc.delete(mc.aimConstraint(self.buttomLidJnts['buttomLid'][-1],
                                    self.buttomLidJnts['buttomLid'][0],
-                                   aimVector=[0,1,0],
-                                   upVector=[1,0,0],
-                                   worldUpType="none"))
+                                   aimVector=[0,0,1],
+                                   upVector=[0,1,0],
+                                   worldUpType="objectrotation",
+                                   wu=[0, 1, 0],
+                                   wuo= upLoc))
 
         mc.makeIdentity(self.buttomLidJnts['buttomLid'][0], apply = True, s = 1, r = 1, t = 1)
 
@@ -182,6 +186,8 @@ class Lid2(template.Template):
 
         self.ctlZros['ctlZros'].append(buttomCtl.zro)
         self.ctls['ctls'].append(buttomCtl.name)
+
+        self.setOut('lidCtl', self.ctls)
         mc.delete(mc.parentConstraint(self.buttomLidJnts['buttomLid'][-1], self.ctlZros['ctlZros'][-1]))
 
         # connect upControl(temporary)

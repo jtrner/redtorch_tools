@@ -115,6 +115,7 @@ class Leg(template.Template):
         """
         # create joints
         par = self.moduleGrp
+        legJnts = []
         for alias, blu in self.blueprints.items():
             if alias in ('heel', 'footInside', 'footOutside'):
                 continue
@@ -123,8 +124,14 @@ class Leg(template.Template):
             trsLib.setTRS(jnt, self.blueprintPoses[alias], space='world')
             self.joints[alias] = jnt
             par = jnt
+            legJnts.append(jnt)
+            print jnt
+
+        self.ballJnt = legJnts[3]
 
         self.orientJnts(self.joints)
+        self.setOut('ballJnt', self.ballJnt)
+
 
         self.setOut('joints', str(self.joints))
 
@@ -387,3 +394,6 @@ class Leg(template.Template):
                              'dv': 0})
         attrLib.addString(self.blueprintGrp, 'blu_globalScale', v='C_root.mainCtl')
         attrLib.addString(self.blueprintGrp, 'blu_jntParent', v='C_spine.hipCtl')
+
+
+
