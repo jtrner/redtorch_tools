@@ -259,11 +259,16 @@ class UI(QtWidgets.QDialog):
         # blueprint frame
         self.mainWidget = QtWidgets.QWidget()
         self.blu_gb, blu_frame = qtLib.createGroupBox(self.builds_lay, 'Create Blueprint')
+
         blu_lay = qtLib.createHLayout(blu_frame)
+
         self.mainWidget.setLayout(blu_lay.layout())
+
         blu_frame.addWidget(self.mainWidget)
 
         scroll_area = QtWidgets.QScrollArea()
+        scroll_area.setStyleSheet("border: 0px;");
+
         scroll_area.setWidgetResizable(True)
         scroll_area.setFocusPolicy(QtCore.Qt.NoFocus)
         scroll_area.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -307,7 +312,7 @@ class UI(QtWidgets.QDialog):
 
 
         # all buttons layout
-        comp_buttons_vl = qtLib.createVLayout(blu_lay.layout(), margins=1, spacing=4)
+        comp_buttons_vl = qtLib.createVLayout(blu_frame, margins=1, spacing=4)
         #blu_lay.layout().addLayout(comp_buttons_vl)
 
 
@@ -315,6 +320,7 @@ class UI(QtWidgets.QDialog):
         bluRefreshIconPath = os.path.join(ICON_DIR, 'refresh.png')
         bluRefreshIcon = QtGui.QIcon(bluRefreshIconPath)
         self.bluRefresh_btn = QtWidgets.QPushButton(bluRefreshIcon, '')
+
         comp_buttons_vl.layout().addWidget(self.bluRefresh_btn)
         self.bluRefresh_btn.clicked.connect(self.bluRefresh)
 
