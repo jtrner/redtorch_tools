@@ -130,6 +130,7 @@ class UI(QtWidgets.QDialog):
         self.layout().setSpacing(2)
         self.layout().setAlignment(QtCore.Qt.AlignTop)
 
+
         # tabs
         tab = QtWidgets.QTabWidget()
         self.mainWidget.addWidget(tab)
@@ -256,8 +257,20 @@ class UI(QtWidgets.QDialog):
 
         # ======================================================================
         # blueprint frame
+        self.mainWidget = QtWidgets.QWidget()
         self.blu_gb, blu_frame = qtLib.createGroupBox(self.builds_lay, 'Create Blueprint')
         blu_lay = qtLib.createHLayout(blu_frame)
+        self.mainWidget.setLayout(blu_lay.layout())
+        blu_frame.addWidget(self.mainWidget)
+
+        scroll_area = QtWidgets.QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setFocusPolicy(QtCore.Qt.NoFocus)
+        scroll_area.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        blu_frame.addWidget(scroll_area)
+        scroll_area.setWidget(self.mainWidget)
+
+
 
         # Available Blueprints
         self.availableBlueprints_tw = DeselectableTreeWidget()
@@ -282,11 +295,21 @@ class UI(QtWidgets.QDialog):
 
         # arguments widget
         self.args_w = qtLib.createVLayout(blu_lay, margins=1, spacing=1)
-        # argW = self.args_w.parentWidget()
-        # argW.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        argW = self.args_w.parentWidget()
+        argW.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+
+
+
+
+
+
+        ###################################################################################################
+
 
         # all buttons layout
-        comp_buttons_vl = qtLib.createVLayout(blu_frame, margins=1, spacing=4)
+        comp_buttons_vl = qtLib.createVLayout(blu_lay.layout(), margins=1, spacing=4)
+        #blu_lay.layout().addLayout(comp_buttons_vl)
+
 
         # bluprint refresh button
         bluRefreshIconPath = os.path.join(ICON_DIR, 'refresh.png')
@@ -445,6 +468,7 @@ class UI(QtWidgets.QDialog):
         mc.select(bluGrp)
 
         widgets = self.convertAttrsToQtWidgets(bluGrp)
+
         for label, widget in widgets.items():
             self.args_w.addWidget(widget)
 
