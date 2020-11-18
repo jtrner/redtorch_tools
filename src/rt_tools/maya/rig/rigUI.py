@@ -266,20 +266,13 @@ class UI(QtWidgets.QDialog):
 
         blu_frame.addWidget(self.mainWidget)
 
-        scroll_area = QtWidgets.QScrollArea()
-        scroll_area.setStyleSheet("border: 0px;");
 
-        scroll_area.setWidgetResizable(True)
-        scroll_area.setFocusPolicy(QtCore.Qt.NoFocus)
-        scroll_area.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        blu_frame.addWidget(scroll_area)
-        scroll_area.setWidget(self.mainWidget)
 
 
 
         # Available Blueprints
         self.availableBlueprints_tw = DeselectableTreeWidget()
-        blu_lay.layout().addWidget(self.availableBlueprints_tw)
+        blu_frame.layout().addWidget(self.availableBlueprints_tw)
         self.availableBlueprints_tw.setAlternatingRowColors(True)
         self.availableBlueprints_tw.setColumnWidth(0, 80)
         self.availableBlueprints_tw.setMaximumWidth(100)
@@ -290,7 +283,7 @@ class UI(QtWidgets.QDialog):
 
         # Blueprints in Scene
         self.blueprints_tw = DeselectableTreeWidget()
-        blu_lay.layout().addWidget(self.blueprints_tw)
+        blu_frame.layout().addWidget(self.blueprints_tw)
         self.blueprints_tw.setAlternatingRowColors(True)
         self.blueprints_tw.setColumnWidth(0, 220)
         self.blueprints_tw.setMinimumWidth(150)
@@ -302,6 +295,15 @@ class UI(QtWidgets.QDialog):
         self.args_w = qtLib.createVLayout(blu_lay, margins=1, spacing=1)
         argW = self.args_w.parentWidget()
         argW.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+
+        scroll_area = QtWidgets.QScrollArea()
+        scroll_area.setStyleSheet("border: 0px;");
+
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setFocusPolicy(QtCore.Qt.NoFocus)
+        scroll_area.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        blu_frame.addWidget(scroll_area)
+        scroll_area.setWidget(self.mainWidget)
 
 
 
