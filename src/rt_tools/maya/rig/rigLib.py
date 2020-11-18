@@ -52,7 +52,7 @@ def mirrorBlueprint(bluGrp):
     attr = mc.listAttr(bluGrp)
     attrs = []
     for i in attr:
-        if i.startswith('blu'):
+        if i.startswith('blu') or i.startswith('out'):
             attrs.append(i)
 
     bluSide = mc.getAttr(bluGrp + '.blu_side')
@@ -81,17 +81,18 @@ def mirrorBlueprint(bluGrp):
 
     attrLib.setAttr(dup + '.blu_side', otherSide)
     for i in attrs:
-        if i.startswith('blu'):
-            at = mc.getAttr(dup + '.' + i)
-            isString = isinstance(at, basestring)
-            if isString:
-                if 'L' in at:
-                    niceName = at.replace('L', 'R')
-                    isLock = mc.getAttr(dup + '.' + i, lock = True)
-                    if isLock:
-                        mc.setAttr(dup + '.' + i, lock = False)
-                    mc.setAttr(dup + '.' + i, niceName, type = 'string')
-                    if isLock:
-                        mc.setAttr(dup + '.' + i, lock = True)
+        if i.startswith('blu') or i.startswith('out'):
+            if i not in ('blu_type'):
+                at = mc.getAttr(dup + '.' + i)
+                isString = isinstance(at, basestring)
+                if isString:
+                    if 'L' in at:
+                        niceName = at.replace('L', 'R')
+                        isLock = mc.getAttr(dup + '.' + i, lock = True)
+                        if isLock:
+                            mc.setAttr(dup + '.' + i, lock = False)
+                        mc.setAttr(dup + '.' + i, niceName, type = 'string')
+                        if isLock:
+                            mc.setAttr(dup + '.' + i, lock = True)
 
     return dup

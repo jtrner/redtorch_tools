@@ -331,4 +331,3 @@ class Lid2(template.Template):
         attrLib.addString(self.blueprintGrp, 'out_fkCtl', v=self.side + '_eye.eyeCtl')
         attrLib.addString(self.blueprintGrp, 'blu_globalScale', v='C_neck.headCtl')
 
-        attrLib.addString(self.blueprintGrp, 'lidCtls', v='', lock=True)

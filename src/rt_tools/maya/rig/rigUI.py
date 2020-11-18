@@ -1160,14 +1160,14 @@ class UI(QtWidgets.QDialog):
         if blue:
             answer = qtLib.confirmDialog(self, msg='Export selected as "{}"?'.format(blueprintFile))
 
-        if answer:
-            mc.file(blueprintFile, force=True, es=True, typ="mayaAscii")
+            if answer:
+                mc.file(blueprintFile, force=True, es=True, type="mayaAscii")
 
         else:
             answer = qtLib.confirmDialog(self, msg='Export selected as "{}"?'.format(skelFile))
 
-        if answer:
-            mc.file(skelFile, force=True, es=True, typ="mayaAscii")
+            if answer:
+                mc.file(skelFile, force=True, es=True, type="mayaAscii")
 
     def duplicateBlueprint(self):
         selectedBlu = qtLib.getSelectedItemAsText(self.blueprints_tw)
