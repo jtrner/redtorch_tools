@@ -40,7 +40,6 @@ class SpineB(template.Template):
     def createBlueprint(self):
         super(SpineB, self).createBlueprint()
 
-
         self.blueprints['start'] = '{}_start_BLU'.format(self.name)
         self.blueprints['mid'] = '{}_mid'.format(self.name)
         self.blueprints['end'] = '{}_end_BLU'.format(self.name)

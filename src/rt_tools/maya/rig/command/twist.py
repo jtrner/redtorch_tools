@@ -43,12 +43,12 @@ def run(start, end, name, side, nb=5, reverse=False, useRibbon=False):
         negate = True
 
     if useRibbon:
-        ctlGrp = createRibbonJnts(start=start, end=end, moduleGrp=moduleGrp,
-                                  nb=nb, name=name, side=side, reverse=reverse)
-        return ctlGrp, moduleGrp
+        ctlGrp,startJnt,midJnt,endJnt,startCtlzro,midCtlzro,endCtlzro,startCtlname,midCtlname,endCtlname = createRibbonJnts(start=start,
+                                                                  end=end, moduleGrp=moduleGrp,nb=nb, name=name, side=side, reverse=reverse)
+        return ctlGrp,moduleGrp,startJnt,midJnt,endJnt,startCtlzro,midCtlzro,endCtlzro,startCtlname,midCtlname,endCtlname
     else:
-        jnts = createSimpleTwistJnts(start=start, end=end, moduleGrp=moduleGrp,
-                                     nb=nb, name=name, side=side, reverse=reverse, negate=negate)
+        jnts = createSimpleTwistJnts(start=start, end=end, moduleGrp=moduleGrp, name =name,
+                                     side=side,nb=nb, reverse=reverse, negate=negate)
         return jnts, moduleGrp
 
 
@@ -140,7 +140,7 @@ def createRibbonJnts(start, end, moduleGrp, name, side, nb=5, reverse=False):
     mc.parent(flcs, flcGrp)
 
     # start controls
-    n = strLib.getDescriptor(name) or name
+    n = name.split('_', 1)[1]
     startCtl = control.Control(descriptor=n + '_start',
                                side=strLib.getPrefix(name) or 'c',
                                parent=ctlGrp,
@@ -224,7 +224,8 @@ def createRibbonJnts(start, end, moduleGrp, name, side, nb=5, reverse=False):
     mc.connectAttr(mdn + '.outputY', midCtl.zro + '.rx')
 
     # return
-    return ctlGrp
+    return ctlGrp,startJnt,midJnt,endJnt,startCtl.zro,midCtl.zro,endCtl.zro,startCtl.name,midCtl.name,endCtl.name
+
 
 
 def createTwistReader(start, end, side, moduleGrp, reverse, name, offset=0):

@@ -114,6 +114,25 @@ def negativeDirect(driver, driven, attrs=['t', 'r', 's']):
         mc.connectAttr(driver + '.' + a, mdn + '.input1' + axis)
         mc.connectAttr(mdn + '.output' + axis, driven + '.' + a)
 
+def remapVal(drvrAttr, drvnAttr, **kwargs):
+
+    inputMin = kwargs.pop('inputMin')
+    inputMax = kwargs.pop('inputMax')
+    outputMin = kwargs.pop('outputMin')
+    outputMax = kwargs.pop('outputMax')
+    name = kwargs.pop('name')
+
+    remapNode = mc.createNode('remapValue',n = name + "_RMV" )
+    #mc.setAttr(remapNode + '.inputValue', inputValue)
+    mc.setAttr(remapNode + '.inputMin', inputMin)
+    mc.setAttr(remapNode + '.inputMax', inputMax)
+    mc.setAttr(remapNode + '.outputMin', outputMin)
+    mc.setAttr(remapNode + '.outputMax', outputMax)
+
+    mc.connectAttr(drvrAttr , remapNode + '.inputValue')
+    mc.connectAttr(remapNode + '.outValue' , drvnAttr)
+    return remapNode
+
 
 def weightConstraint(*args, **kwargs):
     """
@@ -177,6 +196,7 @@ def blend(drvrAttrA, drvrAttrB, drvnAttr, blendAttr):
         mc.connectAttr(drvrAttrA + "." + blendAttr + i, bln + ".color1" + j)
         mc.connectAttr(drvrAttrB + "." + blendAttr + i, bln + ".color2" + j)
         mc.connectAttr(bln + ".output" + j, drvnAttr + "." + drvnAttr + i)
+
 
 
 def direct(driver, driven, attrs=['t', 'r', 's']):

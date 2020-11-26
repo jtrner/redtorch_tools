@@ -43,8 +43,12 @@ from ..general import workspace
 from ..general import utils as generalUtils
 from rt_tools import package
 from .component import arm, chain, eye, eyes, finger, leg, \
-    legQuad, lid, neck, piston, root, spine, spineB, tail, template
+    legQuad, lid, neck, piston, root, spine, spineB, tail,jaw, lid2, lips,birdArm,wingFeather,wingTail,template
 
+reload(wingTail)
+reload(wingFeather)
+reload(birdArm)
+reload(jaw)
 reload(qtLib)
 reload(control)
 reload(fileLib)
@@ -61,6 +65,7 @@ reload(finger)
 reload(leg)
 reload(legQuad)
 reload(lid)
+reload(lid2)
 reload(neck)
 reload(piston)
 reload(root)
@@ -124,6 +129,7 @@ class UI(QtWidgets.QDialog):
         self.layout().setContentsMargins(1, 1, 1, 1)
         self.layout().setSpacing(2)
         self.layout().setAlignment(QtCore.Qt.AlignTop)
+
 
         # tabs
         tab = QtWidgets.QTabWidget()
@@ -251,12 +257,22 @@ class UI(QtWidgets.QDialog):
 
         # ======================================================================
         # blueprint frame
+        self.mainWidget = QtWidgets.QWidget()
         self.blu_gb, blu_frame = qtLib.createGroupBox(self.builds_lay, 'Create Blueprint')
+
         blu_lay = qtLib.createHLayout(blu_frame)
+
+        self.mainWidget.setLayout(blu_lay.layout())
+
+        blu_frame.addWidget(self.mainWidget)
+
+
+
+
 
         # Available Blueprints
         self.availableBlueprints_tw = DeselectableTreeWidget()
-        blu_lay.layout().addWidget(self.availableBlueprints_tw)
+        blu_frame.layout().addWidget(self.availableBlueprints_tw)
         self.availableBlueprints_tw.setAlternatingRowColors(True)
         self.availableBlueprints_tw.setColumnWidth(0, 80)
         self.availableBlueprints_tw.setMaximumWidth(100)
@@ -267,7 +283,7 @@ class UI(QtWidgets.QDialog):
 
         # Blueprints in Scene
         self.blueprints_tw = DeselectableTreeWidget()
-        blu_lay.layout().addWidget(self.blueprints_tw)
+        blu_frame.layout().addWidget(self.blueprints_tw)
         self.blueprints_tw.setAlternatingRowColors(True)
         self.blueprints_tw.setColumnWidth(0, 220)
         self.blueprints_tw.setMinimumWidth(150)
@@ -277,16 +293,36 @@ class UI(QtWidgets.QDialog):
 
         # arguments widget
         self.args_w = qtLib.createVLayout(blu_lay, margins=1, spacing=1)
-        # argW = self.args_w.parentWidget()
-        # argW.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        argW = self.args_w.parentWidget()
+        argW.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+
+        scroll_area = QtWidgets.QScrollArea()
+        scroll_area.setStyleSheet("border: 0px;");
+
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setFocusPolicy(QtCore.Qt.NoFocus)
+        scroll_area.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        blu_frame.addWidget(scroll_area)
+        scroll_area.setWidget(self.mainWidget)
+
+
+
+
+
+
+        ###################################################################################################
+
 
         # all buttons layout
         comp_buttons_vl = qtLib.createVLayout(blu_frame, margins=1, spacing=4)
+        #blu_lay.layout().addLayout(comp_buttons_vl)
+
 
         # bluprint refresh button
         bluRefreshIconPath = os.path.join(ICON_DIR, 'refresh.png')
         bluRefreshIcon = QtGui.QIcon(bluRefreshIconPath)
         self.bluRefresh_btn = QtWidgets.QPushButton(bluRefreshIcon, '')
+
         comp_buttons_vl.layout().addWidget(self.bluRefresh_btn)
         self.bluRefresh_btn.clicked.connect(self.bluRefresh)
 
@@ -319,7 +355,11 @@ class UI(QtWidgets.QDialog):
             lambda: self.openSkeletonFile(importFile=True, fileName='blueprint')
         blueprintBtnOptions['Save Blueprint'] = \
             lambda: self.saveSkeletonFile('blueprint')
-        # blueprintBtnOptions['Export Selected As Blueprint'] = self.exportAsSkeletonFile
+
+        # blueprintBtnOptions['export selected as Blueprint'] = \
+        #     lambda: self.exportAsSkeletonFile('blueprint')
+
+        blueprintBtnOptions['Export Selected As Blueprint'] = partial(self.exportAsSkeletonFile,blue = True)
         self.addRightClickMenu(self.openBlueprint_btn, rmb_data=blueprintBtnOptions)
 
         #
@@ -436,6 +476,7 @@ class UI(QtWidgets.QDialog):
         mc.select(bluGrp)
 
         widgets = self.convertAttrsToQtWidgets(bluGrp)
+
         for label, widget in widgets.items():
             self.args_w.addWidget(widget)
 
@@ -1097,7 +1138,7 @@ class UI(QtWidgets.QDialog):
             mc.file(rename=skelFile)
             mc.file(save=True, f=True)
 
-    def exportAsSkeletonFile(self):
+    def exportAsSkeletonFile(self,blue = False ):
         # get input from UI
         self.job = qtLib.getSelectedItemAsText(self.jobs_tw) or ''
         self.seq = qtLib.getSelectedItemAsText(self.seqs_tw) or ''
@@ -1113,9 +1154,22 @@ class UI(QtWidgets.QDialog):
         skelFile = os.path.join(self.mainJobsDir, self.job, self.seq, self.shot,
                                 'task', 'rig', 'users', self.user, self.version,
                                 'data', 'skeleton.ma')
-        answer = qtLib.confirmDialog(self, msg='Export selected as "{}"?'.format(skelFile))
-        if answer:
-            mc.file(skelFile, force=True, es=True, typ="mayaAscii")
+
+        blueprintFile = os.path.join(self.mainJobsDir, self.job, self.seq, self.shot,
+                                'task', 'rig', 'users', self.user, self.version,
+                                'data', 'blueprint.ma')
+
+        if blue:
+            answer = qtLib.confirmDialog(self, msg='Export selected as "{}"?'.format(blueprintFile))
+
+            if answer:
+                mc.file(blueprintFile, force=True, es=True, type="mayaAscii")
+
+        else:
+            answer = qtLib.confirmDialog(self, msg='Export selected as "{}"?'.format(skelFile))
+
+            if answer:
+                mc.file(skelFile, force=True, es=True, type="mayaAscii")
 
     def duplicateBlueprint(self):
         selectedBlu = qtLib.getSelectedItemAsText(self.blueprints_tw)
@@ -1136,6 +1190,8 @@ class UI(QtWidgets.QDialog):
         bluGrp = selectedBlu.split(' ')[0] + '_blueprint_GRP'
         rigLib.mirrorBlueprint(bluGrp)
         self.bluRefresh()
+
+
 
     def importControls(self):
         # get input from UI
