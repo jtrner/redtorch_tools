@@ -131,6 +131,47 @@ def extract_joint(joint="", search="_JNT", replace="Rsl_JNT"):
     return name
 
 
+def createUnderObj(obj, nameBase=None, radius=1):
+    # determine Name
+    if nameBase == None:
+        jntName = obj.replace("ac_", "") + '_JNT'
+    else:
+        jntName = nameBase + '_JNT'
+    locName = jntName.replace("JNT", "LOC")
+    grpName = jntName + "_grp"
+
+    mc.joint(obj, n=jntName, rad=radius)
+    mc.spaceLocator(n=locName)
+    locatorShape = mc.listRelatives(locName, s=True)[0]
+    mc.setAttr(locatorShape + ".visibility", 0)
+    mc.group(n=grpName)
+
+    mc.matchTransform(grpName, obj)
+    mc.parent(grpName, obj)
+    mc.parent(jntName, locName)
+    return jntName, locName, grpName
+
+
+def groupJntHierachy(jnt, locSize=1.0):
+    jntFix = "_JNT"
+    ctlFix = "_CTL"
+    locFix = "_LOC"
+
+    nameBase = jnt.replace(jntFix, "").replace("_bind", "").replace("_drv", "")
+    locatorName = nameBase + locFix
+    groupName = nameBase + "_grp"
+
+    mc.spaceLocator(n=locatorName)
+    mc.setAttr(locatorName + ".localScaleX", locSize)
+    mc.setAttr(locatorName + ".localScaleY", locSize)
+    mc.setAttr(locatorName + ".localScaleZ", locSize)
+
+    mc.select(locatorName, r=True)
+    mc.group(n=groupName)
+    mc.parent(jnt, locatorName)
+    return groupName, locatorName
+
+
 def create_on_vertex(vtx=None):
     """
     creates joints for eath selected vertex
