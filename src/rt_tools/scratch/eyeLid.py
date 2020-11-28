@@ -1,14 +1,3 @@
-"""
-Credit to: Marco Giordano
-Based off of:
-    - https://www.youtube.com/watch?v=-rtys3vFmso
-    - https://www.youtube.com/watch?v=5X4GXHunqIY&t=1226s
-
-Written by: Stephanie Ng - stephanie@iconcreativestudio.com
-
-MAW Eye rig script (Requested by Sean Prosch)
-Creates an eye rig from the user's selection (selection is converted into vertices)
-"""
 import maya.cmds as mc
 
 eye_number_dialog = mc.promptDialog(
