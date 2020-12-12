@@ -69,31 +69,52 @@ os.environ['RIG_UI_VERSION'] = package.__version__
 
 class UI(QtWidgets.QDialog):
 
-    def __init__(self, title='Rig UI - v{}'.format(package.__version__), parent=qtLib.getMayaWindow()):
-
+    def __init__(self, title='face Rig UI - v{}'.format(package.__version__), parent=qtLib.getMayaWindow()):
         # create window
         super(UI, self).__init__(parent=parent)
+
+
         self.setWindowTitle(title)
-        self.resize(600, 400)
+        self.resize(600, 600)
 
-        self.min_width = 480
+        self.min_width = 650
         self.setFixedWidth(self.min_width)
-
-        self.min_Height = 730
-
-        self.setFixedHeight(self.min_Height)
+        #
+        # self.min_Height = 740
+        #
+        # self.setFixedHeight(self.min_Height)
 
         qtLib.setColor(self, qtLib.PURPLE_PALE, affectChildren=True)
         self.closed = False
 
         self.cmpInstances = {}
 
-        # main layout
-        self.mainWidget = QtWidgets.QVBoxLayout()
-        self.setLayout(self.mainWidget)
+        self.theLayout = QtWidgets.QVBoxLayout()
+        self.setLayout(self.theLayout)
         self.layout().setContentsMargins(1, 1, 1, 1)
         self.layout().setSpacing(2)
         self.layout().setAlignment(QtCore.Qt.AlignTop)
+
+
+        # main layout
+        self.mainWidget = QtWidgets.QVBoxLayout()
+        # self.setLayout(self.mainWidget)
+        # self.layout().setContentsMargins(1, 1, 1, 1)
+        # self.layout().setSpacing(2)
+        # self.layout().setAlignment(QtCore.Qt.AlignTop)
+
+        self.mainWid = QtWidgets.QWidget()
+
+        self.theLayout.addWidget(self.mainWid)
+        self.mainWid.setLayout(self.mainWidget)
+
+        scroll_area = QtWidgets.QScrollArea()
+        #scroll_area.setStyleSheet("border: 0px;");
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setFocusPolicy(QtCore.Qt.NoFocus)
+        scroll_area.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.theLayout.addWidget(scroll_area)
+        scroll_area.setWidget(self.mainWid)
 
 
         self.populateCtlWin()
@@ -137,7 +158,7 @@ class UI(QtWidgets.QDialog):
         qtLib.setColor(lb, qtLib.SILVER_LIGHT)
 
         mode_h1.addWidget(lb)
-        lb.setMinimumSize(200,0)
+        lb.setMinimumSize(100,0)
 
         self.mode_grp = QtWidgets.QButtonGroup(mode_h1)
 
@@ -152,7 +173,7 @@ class UI(QtWidgets.QDialog):
 
 
         self.mode_grp.addButton(self.ctlCricle_rb, 2)
-        self.ctlCricle_rb.setMinimumSize(200,40)
+        self.ctlCricle_rb.setMinimumSize(100,40)
 
         mode_h1.addWidget(self.ctlSphere_rb)
         mode_h1.addWidget(self.ctlCricle_rb)
@@ -167,7 +188,7 @@ class UI(QtWidgets.QDialog):
         qtLib.setColor(lb, qtLib.SILVER_LIGHT)
 
         mode_h1.addWidget(lb)
-        lb.setMinimumSize(200,0)
+        lb.setMinimumSize(100,0)
 
 
 
@@ -177,7 +198,7 @@ class UI(QtWidgets.QDialog):
         qtLib.setColor(connectLb, qtLib.SILVER_LIGHT)
 
         mode_h2.addWidget(connectLb)
-        connectLb.setMinimumSize(300,0)
+        connectLb.setMinimumSize(100,0)
 
 
         self.connnect_grp = QtWidgets.QButtonGroup(mode_h2)
@@ -187,16 +208,16 @@ class UI(QtWidgets.QDialog):
         self.mode_parent.toggled.connect(self.checkParent)
 
         self.connnect_grp.addButton(self.mode_parent, 1)
-        self.mode_parent.setMinimumSize(70,31)
+        self.mode_parent.setMinimumSize(50,31)
 
         self.mode_connect = QtWidgets.QRadioButton("connect")
         self.connnect_grp.addButton(self.mode_connect, 2)
-        self.mode_connect.setMinimumSize(70,20)
+        self.mode_connect.setMinimumSize(50,20)
         self.mode_connect.toggled.connect(self.checkConnect)
 
         self.mode_constraint = QtWidgets.QRadioButton("constraint")
         self.connnect_grp.addButton(self.mode_constraint, 3)
-        self.mode_constraint.setMinimumSize(70,34)
+        self.mode_constraint.setMinimumSize(50,34)
         self.mode_constraint.toggled.connect(self.checkConstraint)
 
 
@@ -213,28 +234,26 @@ class UI(QtWidgets.QDialog):
         self.cons_parent.toggled.connect(lambda : self.consPaCheck())
 
         self.consType_grp.addButton(self.cons_parent, 1)
-        self.cons_parent.setMinimumSize(50,45)
+        self.cons_parent.setMinimumSize(20,45)
 
         self.cons_point = QtWidgets.QRadioButton("POC")
         self.consType_grp.addButton(self.cons_point, 2)
-        self.cons_point.setMinimumSize(50,30)
+        self.cons_point.setMinimumSize(20,30)
         self.cons_point.toggled.connect(lambda : self.consPoCheck())
 
         self.cons_orient = QtWidgets.QRadioButton("ORC")
         self.consType_grp.addButton(self.cons_orient, 3)
-        self.cons_orient.setMinimumSize(50,45)
+        self.cons_orient.setMinimumSize(20,45)
         self.cons_orient.toggled.connect(lambda : self.consOrCheck())
-
 
         mode_h4.addWidget(self.cons_parent)
         mode_h4.addWidget(self.cons_point)
         mode_h4.addWidget(self.cons_orient)
 
-
         self.ctlFollowSkinBtn = QtWidgets.QPushButton('control follow skin')
         qtLib.setColor(self.ctlFollowSkinBtn, qtLib.GREEN_PALE)
         mode_h2.addWidget(self.ctlFollowSkinBtn)
-        self.ctlFollowSkinBtn.setMinimumSize(90,22)
+        self.ctlFollowSkinBtn.setMinimumSize(90,25)
         mode_h3 = qtLib.createVLayout(info_hl)
         self.ctlFollowSkinBtn.clicked.connect(lambda : self.followSkin())
 
@@ -246,7 +265,7 @@ class UI(QtWidgets.QDialog):
         self.con_rad_le.setText('1')
 
         mode_h3.addWidget(self.con_rad_le)
-        self.con_rad_le.setMinimumSize(70,10)
+        self.con_rad_le.setMinimumSize(10,10)
         self.con_rad_le.textChanged.connect(lambda : self.radiusCheck())
 
 
@@ -337,6 +356,7 @@ class UI(QtWidgets.QDialog):
         createControls.run(isControllerCircle= self.ctlMode, controlMethod = self.modeParent,
                            radius = self.text, grpJntOnly = self.grpJnt, consType = self.consType)
 
+        qtLib.printMessage(self.info_lb, message='created successfully!')
 
 
     def populateRibbonWin(self):
@@ -348,7 +368,7 @@ class UI(QtWidgets.QDialog):
         self.info_lb = QtWidgets.QLabel('')
         self.info_lb.setWordWrap(True)
         info_hl.layout().addWidget(self.info_lb)
-        self.info_lb.setMinimumSize(0,100)
+        self.info_lb.setMinimumSize(0,80)
 
         rib_h1 = qtLib.createVLayout(info_hl)
 
@@ -387,7 +407,7 @@ class UI(QtWidgets.QDialog):
         self.parentToHir_parWidget, lb, self.widgetss = qtLib.createCheckBox('under hierarchy', labelWidthMin=80)
         rib_h2.addWidget(self.parentToHir_parWidget)
         self.widgetss.toggled.connect(lambda: self.parentToHierarchyCheck())
-        self.widgetss.setMinimumSize(0,30)
+        self.widgetss.setMinimumSize(0,20)
 
 
         self.ribName_ParWidget, lb, self.widgetttt  = qtLib.createLineEdit('name: ',labelWidthMin=80)
@@ -400,18 +420,16 @@ class UI(QtWidgets.QDialog):
         rib_h2.addWidget(self.followCtlParWidget)
         self.ctlsFallowWidget.setChecked(True)
         self.ctlsFallowWidget.toggled.connect(lambda: self.followCtlCheck())
-        self.ctlsFallowWidget.setMinimumSize(0,30)
-        self.ctlsFallow_Lb.setMinimumSize(80,30)
+        self.ctlsFallowWidget.setMinimumSize(0,20)
+        self.ctlsFallow_Lb.setMinimumSize(80,20)
 
         self.orientFollowPar, self.orientFollow_Lb, self.orientFollowWidget = qtLib.createCheckBox('orient follow', labelWidthMin=80)
         rib_h2.addWidget(self.orientFollowPar)
         self.orientFollowWidget.toggled.connect(lambda: self.orientFollowsCheck())
-        self.orientFollowWidget.setMinimumSize(0,40)
-        self.orientFollow_Lb.setMinimumSize(80,40)
+        self.orientFollowWidget.setMinimumSize(0,30)
+        self.orientFollow_Lb.setMinimumSize(80,30)
         self.orientFollowWidget.setHidden(False)
         self.orientFollow_Lb.setHidden(False)
-
-
 
 
         rib_h3 = qtLib.createVLayout(info_hl)
@@ -450,14 +468,14 @@ class UI(QtWidgets.QDialog):
         self.parentJntPar, self.parentJntLb, self.parentJntWid  = qtLib.createLineEdit('parent jnt: ',labelWidthMin=80)
         rib_h4.addWidget(self.parentJntPar)
         self.parentJntWid.textChanged.connect(lambda : self.checkParentJnt())
-        self.parentJntPar.setMinimumSize(0,10)
-        self.parentJntWid.setMinimumSize(0,10)
+        self.parentJntPar.setMinimumSize(0,0)
+        self.parentJntWid.setMinimumSize(0,0)
 
         self.conRad_par, self.conRad_lb, self.conRad_wid  = qtLib.createLineEdit('ctl radius ',labelWidthMin=80)
         self.conRad_wid.setText('1')
         rib_h4.addWidget(self.conRad_par)
         self.conRad_wid.textChanged.connect(lambda : self.checkRadiusCtl())
-        self.conRad_wid.setMinimumSize(0,10)
+        self.conRad_wid.setMinimumSize(0,0)
 
         self.keepCurve_parWidget, lb, self.widgss = qtLib.createCheckBox('keep curve', labelWidthMin=80)
         rib_h4.addWidget(self.keepCurve_parWidget)
@@ -580,6 +598,8 @@ class UI(QtWidgets.QDialog):
                          parentJnt = self.parentJnt, CreateCtrollers = self.createCtl, ParentToHierachy = self.parentToHir,
                          ribbonWidth = self.width, followCtls = self.ctlFollow , orientFollow = self.orientFollow)
 
+        qtLib.printMessage(self.info_lb, message='Ribbon created successfully!')
+
     def populateJointsWin(self):
         # info frame
         info_gb, info_frame = qtLib.createGroupBox(self.mainWidget, 'create Joints on curve')
@@ -620,6 +640,11 @@ class UI(QtWidgets.QDialog):
 
         jnt_h3 = qtLib.createVLayout(info_hl)
 
+        self.rotateFollowParWidget, self.rotateFollow_lb, self.rotateFollowWidget = qtLib.createCheckBox('rotation follow', labelWidthMin=80)
+        qtLib.setColor(self.rotateFollow_lb, qtLib.SILVER_LIGHT)
+        jnt_h3.addWidget(self.rotateFollowParWidget)
+        self.rotateFollowWidget.setMinimumSize(0,25)
+        self.rotateFollowWidget.toggled.connect(lambda: self.rotatationFollowCheck())
 
         self.createJntOnCrvBtn = QtWidgets.QPushButton('create joints')
         qtLib.setColor(self.createJntOnCrvBtn, qtLib.GREEN_PALE)
@@ -632,6 +657,13 @@ class UI(QtWidgets.QDialog):
         self.jntCount = '3'
         self.radJnt = '0.5'
         self.locSize = '1.000'
+        self.rotateFollow = False
+
+    def rotatationFollowCheck(self):
+        if self.rotateFollowWidget.isChecked():
+            self.rotateFollow = True
+        else:
+            self.rotateFollow = False
 
     def checkLocSize(self):
         self.locSize = self.widt.text()
@@ -647,7 +679,9 @@ class UI(QtWidgets.QDialog):
 
     def createJointsOnCrv(self):
         createJntOnCrv.run(jntBaseName = self.jntName , jntAmount = self.jntCount,
-                           jntRadius =  self.radJnt, locSize = self.locSize)
+                           jntRadius =  self.radJnt, locSize = self.locSize, rotationFollow = self.rotateFollow)
+
+        qtLib.printMessage(self.info_lb, message='created successfully!')
 
     def populateMirrorsWin(self):
         # info frame
@@ -778,6 +812,8 @@ class UI(QtWidgets.QDialog):
     def mirrorFacial(self):
         mirrorFacialRig.run(ctrl = self.ctl, mirrorInverse = self.posToNeg, direction = self.mirrorMode, skin = self.skin)
 
+        qtLib.printMessage(self.info_lb, message='mirrored successfully!')
+
 
     def restoreUI(self):
         """
@@ -805,4 +841,5 @@ def launch():
     global faceRigUI_obj
     faceRigUI_obj = UI()
     faceRigUI_obj.show()
+
 

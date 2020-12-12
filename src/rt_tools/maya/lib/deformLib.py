@@ -34,15 +34,17 @@ logger = logging.getLogger(__name__)
 skin_suffix = 'Skn'
 
 
-def bind_geo(components):
+def bind_geo(*args, **kwargs):
     """
     Binds the geo with these items in list
     :param components: <list> list of items to bind.
     :return: <bool> for success.
     """
     # grabs geo selection // nurbsSurface selection // nurbsCurve selection
-    geos = mc.filterExpand(components, sm=(12, 10, 9), fp=True)
-    joints = mc.ls(components, type='joint')
+    geos = kwargs.pop('geos')
+    geos = mc.filterExpand(geos, sm=(12, 10, 9), fp=True)
+    joints = kwargs.pop('joints')
+    joints = mc.ls(joints)
 
     if not joints or not geos:
         mc.error("[Bind Selection] :: Incorrect components selected for skinning.")
@@ -50,8 +52,8 @@ def bind_geo(components):
 
     # binds the skin with weight blended method.
     for geo in geos:
-        mc.skinCluster(joints, geo, normalizeWeights=1, bindMethod=0, skinMethod=2,
-                       dropoffRate=0.5, obeyMaxInfluences=1, maximumInfluences=3, tsb=1)
+        mc.skinCluster(joints, geo, normalizeWeights=1, bindMethod=0, skinMethod=0,
+                       dropoffRate=4, obeyMaxInfluences=1, maximumInfluences=5, tsb=1)
     return True
 
 

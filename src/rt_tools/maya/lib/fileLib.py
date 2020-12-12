@@ -53,8 +53,47 @@ def saveJson(path, data):
     """
     if not os.path.lexists(os.path.dirname(path)):
         os.makedirs(os.path.dirname(path))
-    with open(path, 'w') as f:
+    with open(path, "w") as f:
         json.dump(data, f, sort_keys=False, indent=4)
+
+
+def append_to_json(data,path, key = ""):
+
+    with open(path, 'ab+') as f:
+        f.seek(0, 2)  # Go to the end of file
+        if f.tell() == 0:  # Check if file is empty
+            f.write(json.dumps(data, indent=4).encode())  # If empty, write an array
+
+    if checkJsonExists(path, key):
+        a_file = open(path, "r")
+        json_object = json.load(a_file)
+        a_file.close()
+        json_object[key] = data
+        a_file = open(path, "w")
+        json.dump(json_object[key], a_file, indent = 4)
+        a_file.close()
+
+    # else:
+    #     with open(path, 'a') as f:
+    #         str = json.dumps(data, indent = 4).replace('{', ',', 1)
+    #         f.seek(-2, 2)
+    #         f.write(str)
+        # with open(path, 'a') as f:
+        #     f.seek(0, 2)  # Go to the end of file
+        #     if f.tell() == 0:  # Check if file is empty
+        #         f.write(json.dumps(data, indent=4).encode())  # If empty, write an array
+        #     else:
+        #         f.seek(-1, 2)
+        #         f.write(' , '.encode())  # Write the separator
+        #         f.write(json.dumps(data , indent = 4).encode())  # Dump the dictionary
+
+def checkJsonExists(path, key):
+    a_file = open(path, "r")
+    data = json.load(a_file)
+    if not key in data.values()[:]:
+        print('ueeeeeee')
+        return True
+
 
 
 def copy(src, dest, ignore=None):
@@ -81,7 +120,6 @@ def appendToJson(path, data, ordered=True):
             data[k] = v
 
     saveJson(path, data)
-
 
 def dictToStr(data):
     data_as_str = ''

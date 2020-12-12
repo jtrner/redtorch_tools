@@ -23,6 +23,11 @@ from . import display
 reload(trsLib)
 reload(attrLib)
 
+# def nodeOnCrv(crv = '', numOfNodes = 3):
+#
+#
+#
+
 
 def fromPoses(poses, degree=1, fit=False, name='newCurve'):
     """
@@ -766,7 +771,7 @@ def attachToCurve(node=None, crv=None, uParam=None, upObj=None):
     [mc.connectAttr("{}.rotate{}".format(mop, x.title()), "{}.r{}".format(node, x)) for x in 'xyz']
 
 
-def attach(node=None, curve=None, upCurve=None, upAxis='y', aimUparam=None):
+def attach(node=None, curve=None, upCurve=None, upAxis='y',param = 1, aimUparam=None):
     """
     attaches given object to curve using pointOnCurveInfo node
 
@@ -788,6 +793,7 @@ def attach(node=None, curve=None, upCurve=None, upAxis='y', aimUparam=None):
     # get closest u param
     pos = mc.xform(node, q=1, ws=1, t=1)
     u = getUParam(pos, crvS)
+    u = u * param
 
     # closest point on crvS
     pci_1 = mc.createNode('pointOnCurveInfo', n=node + crvS + '_PCI')
