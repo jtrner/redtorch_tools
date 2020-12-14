@@ -25,10 +25,10 @@ reload(strLib)
 reload(deformLib)
 
 
-class Lips(lipsTemplate.LipsTemplate):
+class BuildLip(lipsTemplate.LipsTemplate):
     """Class for creating lip"""
     def __init__(self,  **kwargs ):
-        super(Lips, self).__init__(**kwargs)
+        super(BuildLip, self).__init__(**kwargs)
 
         self.aliases = {'mouthFlood': 'mouthFlood',
                         'jawMain':'jawMain',
@@ -44,9 +44,8 @@ class Lips(lipsTemplate.LipsTemplate):
                         'rightnostrilFlare': 'rightnostrilFlare'
                         }
 
-
     def createBlueprint(self):
-        super(Lips, self).createBlueprint()
+        super(BuildLip, self).createBlueprint()
         par = self.blueprintGrp
         self.noseSide = 'R'
         mult = [-1, 1][self.noseSide == 'R']
@@ -160,16 +159,13 @@ class Lips(lipsTemplate.LipsTemplate):
 
 
     def build(self):
-        super(Lips, self).build()
-
-    def runLip(self):
-        super(Lips,self).runLip()
+        super(BuildLip, self).build()
         self.tempCurve = mc.duplicate(self.upLipLowRezcrv)[0]
         [mc.setAttr(self.tempCurve + '.{}{}'.format(a,v), lock = False) for a in 'trs' for v in 'xyz']
         mc.setAttr(self.tempCurve + '.ty', 2)
 
         # create mouth control pivot
-        mc.joint(self.mouthPiv, name = 'MouthCtrlPivot_JNT', rad = 1.2)
+        #mc.joint(self.mouthPiv, name = 'MouthCtrlPivot_JNT', rad = 1.2)
 
         #****************************************************upPart******************************************
 
@@ -189,9 +185,15 @@ class Lips(lipsTemplate.LipsTemplate):
         self.upLipLowRezBindJnts[2] = mc.rename(self.upLipLowRezBindJnts[2],'L_localUpLipcorner_JNT')
         mc.setAttr(self.upLipLowRezBindJnts[2] + '.ry', 50)
 
+        # matches nodes from lips template to the side joints
         trsLib.match(self.leftUpMainJnt, self.upLipLowRezBindJnts[2])
         trsLib.match(self.rightUpMainJnt, self.upLipLowRezBindJnts[0])
         trsLib.match(self.middleUpMainJnt, self.upLipLowRezBindJnts[1])
+
+        trsLib.match(self.r_lipCornerMakroDrvr , self.upLipLowRezBindJnts[0])
+        mc.move(10,0,0,self.r_lipCornerMakroDrvr , r = True, ws = True)
+        trsLib.match(self.l_lipCornerMakroDrvr , self.upLipLowRezBindJnts[2])
+        mc.move(10,0,0,self.l_lipCornerMakroDrvr , r = True, ws = True)
 
 
         #bind joints to low curves
@@ -294,12 +296,23 @@ class Lips(lipsTemplate.LipsTemplate):
         mc.parent(self.upLipLowRezBindJnts[1],m_upLipCornerMod_loc)
         self.upLipLowRezBindJnts[1] = self.upLipLowRezBindJnts[1].split('|')[-1]
 
-        uplipctl, uplipctlgrp = funcs.createMiddleMainCtl(name = 'localUpLip', parent = self.upLipCtlGrp,
+        self.mouthCtlOr = mc.createNode('transform', name = 'mouthCtlOri_GRP',p = self.facialCtrlGrp)
+        trsLib.match( self.mouthCtlOr, self.mouthPiv)
+        mc.setAttr(self.mouthCtlOr + '.tz', 6.5)
+        mc.setAttr(self.mouthCtlOr + '.ty', 240.8)
+        self.mouthCtl, self.mouthCtlGrp = funcs.createMouthCtl(name = 'mouthCtl', parent = self.mouthCtlOr,
+                                                    snapJnt=self.mouthPiv, side = 'C')
+
+        self.ctlupPlacement = mc.createNode('transform', name='localUpLipCtrlPlacement_GRP', p=self.upLipCtlGrp)
+        trsLib.match(self.ctlupPlacement, self.upLipLowRezBindJnts[1])
+        uplipctl, uplipctlgrp = funcs.createMiddleMainCtl(name = 'localUpLip', parent = self.ctlupPlacement ,
                                                     snapJnt=self.upLipLowRezBindJnts[1], side = 'C',up = True)
         uplipctlgrp = mc.rename(uplipctlgrp, 'localUpLipCtrlModify_GRP')
 
         # create left low main ctl
-        leftUpmainCtls,leftUpMainCtlGrp = funcs.createSideMainCtl(name = 'localUpLip', parent = self.upLipCtlGrp,
+        self.leftUpLipCtlGrp = mc.createNode('transform', name= 'L_localUpLipCornerCtrlOrient_GRP', p=self.upLipCtlGrp)
+        trsLib.match(self.leftUpLipCtlGrp, self.upLipLowRezBindJnts[2])
+        leftUpmainCtls,leftUpMainCtlGrp = funcs.createSideMainCtl(name = 'localUpLip', parent = self.leftUpLipCtlGrp ,
                                                               snapJnt = self.upLipLowRezBindJnts[2], side = 'L')
         leftUpCornerCtl = mc.rename(leftUpmainCtls[0], 'L_localUpLipCorner_CTL' )
         leftUpMinorCornerCtl = mc.rename(leftUpmainCtls[1], 'L_localUpLipCornerMinor_CTL' )
@@ -307,7 +320,9 @@ class Lips(lipsTemplate.LipsTemplate):
         leftMinorCornerUpCtlGrp = mc.rename(leftUpMainCtlGrp[1], 'L_localUpLipCornerMinorModify_GRP' )
 
         # create right up main ctl
-        rightUpmainCtls,rightUpMainCtlGrp = funcs.createSideMainCtl(name = 'localUpLip', parent = self.upLipCtlGrp,
+        self.rightUpLipCtlGrp = mc.createNode('transform', name='R_localUpLipCornerCtrlOrient_GRP', p=self.upLipCtlGrp)
+        trsLib.match(self.rightUpLipCtlGrp, self.upLipLowRezBindJnts[0])
+        rightUpmainCtls,rightUpMainCtlGrp = funcs.createSideMainCtl(name = 'localUpLip', parent = self.rightUpLipCtlGrp,
                                                               snapJnt = self.upLipLowRezBindJnts[0], side = 'R')
         rightCornerCtl = mc.rename(rightUpmainCtls[0], 'R_localUpLipCorner_CTL' )
         rightMinorCornerCtl = mc.rename(rightUpmainCtls[1], 'R_localUpLipCornerMinor_CTL' )
@@ -315,7 +330,7 @@ class Lips(lipsTemplate.LipsTemplate):
         rightMinorCornerLowCtlGrp = mc.rename(rightUpMainCtlGrp[1], 'R_localUpLipCornerMinorModify_GRP' )
 
         # create up roll
-        funcs.createRollHirarchy(name = 'localUpLip', parent = self.upLipCtlGrp, up = True)
+        self.upLipCtlRoll = funcs.createRollHirarchy(name = 'localUpLip', parent = self.upLipCtlGrp, up = True)
 
         # create secondary zip joints
         zipUpSecJnts = jntLib.create_on_curve(self.upLipZippercrv, numOfJoints = 9, parent = False, description='C_base', radius = 0.1)
@@ -449,12 +464,16 @@ class Lips(lipsTemplate.LipsTemplate):
         lowLipLowRezBindJnts[1] = lowLipLowRezBindJnts[1].split('|')[-1]
 
         # create middle low main ctl
-        lowlipctl, lowlipctlgrp = funcs.createMiddleMainCtl(name = 'localLowLip', parent = self.lowLipCtlGrp,
+        self.ctllowPlacement = mc.createNode('transform', name='localLowLipCtrlPlacement_GRP', p=self.upLipCtlGrp)
+        trsLib.match(self.ctllowPlacement,lowLipLowRezBindJnts[1])
+        lowlipctl, lowlipctlgrp = funcs.createMiddleMainCtl(name = 'localLowLip', parent = self.ctllowPlacement,
                                                       snapJnt=lowLipLowRezBindJnts[1], side = 'C', up = False)
         lowlipctlgrp = mc.rename(lowlipctlgrp, 'localLowLipCtrlModify_GRP')
 
         # create left low main ctl
-        leftLowmainCtls,leftLowMainCtlGrp = funcs.createSideMainCtl(name = 'localLowLip', parent = self.lowLipCtlGrp,
+        self.leftLowLipCtlGrp = mc.createNode('transform', name='L_localLowLipCornerCtrlOrient_GRP', p=self.lowLipCtlGrp)
+        trsLib.match(self.leftLowLipCtlGrp, lowLipLowRezBindJnts[2])
+        leftLowmainCtls,leftLowMainCtlGrp = funcs.createSideMainCtl(name = 'localLowLip', parent = self.leftLowLipCtlGrp ,
                                                               snapJnt = lowLipLowRezBindJnts[2], side = 'L')
         leftCornerCtl = mc.rename(leftLowmainCtls[0], 'L_localLowLipCorner_CTL' )
         leftMinorCornerCtl = mc.rename(leftLowmainCtls[1], 'L_localLowLipCornerMinor_CTL' )
@@ -462,7 +481,9 @@ class Lips(lipsTemplate.LipsTemplate):
         leftMinorCornerLowCtlGrp = mc.rename(leftLowMainCtlGrp[1], 'L_localLowLipCornerMinorModify_GRP' )
 
         # create right low main ctl
-        rightLowmainCtls,rightLowMainCtlGrp = funcs.createSideMainCtl(name = 'localLowLip', parent = self.lowLipCtlGrp,
+        self.rightLowLipCtlGrp = mc.createNode('transform', name='R_localLowLipCornerCtrlOrient_GRP', p=self.lowLipCtlGrp)
+        trsLib.match(self.rightLowLipCtlGrp, lowLipLowRezBindJnts[0])
+        rightLowmainCtls,rightLowMainCtlGrp = funcs.createSideMainCtl(name = 'localLowLip', parent = self.rightLowLipCtlGrp,
                                                                 snapJnt = lowLipLowRezBindJnts[0], side = 'R')
         rightCornerCtl = mc.rename(rightLowmainCtls[0], 'R_localLowLipCorner_CTL' )
         rightMinorCornerCtl = mc.rename(rightLowmainCtls[1], 'R_localLowLipCornerMinor_CTL' )
@@ -470,7 +491,7 @@ class Lips(lipsTemplate.LipsTemplate):
         rightMinorCornerLowCtlGrp = mc.rename(rightLowMainCtlGrp[1], 'R_localLowLipCornerMinorModify_GRP' )
 
         # create low roll
-        funcs.createRollHirarchy(name = 'localLowLip', parent = self.lowLipCtlGrp, up = False)
+        self.lowLipCtlRoll = funcs.createRollHirarchy(name = 'localLowLip', parent = self.lowLipCtlGrp, up = False)
 
         # create zipper joints
         zipLowSecJnts = jntLib.create_on_curve(self.upLipZippercrv, numOfJoints = 9, parent = False, description='C_base', radius = 0.1)
@@ -479,4 +500,13 @@ class Lips(lipsTemplate.LipsTemplate):
                          posJnts=zipLowSecJnts, parent = self.noTuchyLow, jntParent = self.lowMicroJntCtlGrp, up = False)
         # create locators under jntDriver
         funcs.createLocsJntDriver(name = 'R_localLowLip', parent =self.lowJntDrvr,  jntSnap = self.lowBindJnts[0])
+
+        # duplicate the local rig
+        output = trsLib.duplicate(self.upLipRibbon, search = 'local',replace = '', hierarchy= True )
+        mc.setAttr(output[0] + '.ty', -20)
+        mc.parent(output[0], self.facialCtrlGrp)
+        output = trsLib.duplicate(self.lowLipRibbon, search = 'local',replace = '', hierarchy= True )
+        mc.setAttr(output[0] + '.ty', -20)
+        mc.parent(output[0], self.facialCtrlGrp)
+
 

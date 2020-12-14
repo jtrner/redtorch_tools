@@ -194,11 +194,10 @@ def createRollHirarchy(name = '', parent = '', up = True ):
     flippedLoc= mc.createNode('transform',  name = name + 'MidFlipped_LOC', p = flippedMod)
     mc.setAttr(flippedMod + '.sx', -1)
     flippedLocShape = mc.createNode('locator',  name = name + 'MidFlippedShape_LOC', p = flippedLoc)
+    return  ctlRollMod
 
 
 def createSideMainCtl(name = '', parent = '', snapJnt = '', side = 'L'):
-    ctlOr = mc.createNode('transform', name = side + '_' + name + 'CornerCtrlOrient_GRP', p = parent)
-    trsLib.match(ctlOr, snapJnt)
 
     ctls = []
     ctlsGrp = []
@@ -210,7 +209,8 @@ def createSideMainCtl(name = '', parent = '', snapJnt = '', side = 'L'):
                               color=control.SECCOLORS[side],
                               scale=[0.1, 0.1, 0.1],
                               lockHideAttrs=['s'],
-                              matchTranslate=ctlOr)
+                              matchTranslate=parent,
+                              matchRotate = parent)
 
         ctls.append(ctl.name)
         ctlsGrp.append(ctl.zro)
@@ -218,12 +218,12 @@ def createSideMainCtl(name = '', parent = '', snapJnt = '', side = 'L'):
     crvLib.scaleShape(curve=ctls[0], scale=(0.8, 0.8, 0.8))
     crvLib.scaleShape(curve=ctls[1], scale=(0.3, 0.3, 0.3))
 
-    par = ctlOr
+    par = parent
     mult = [1, -1][side == 'R']
     for i in range(2):
         mc.setAttr(ctlsGrp[i] + '.ry', -80)
         mc.makeIdentity(ctlsGrp[i], apply=True, r=True, t=True)
-        trsLib.match(ctlsGrp[i], ctlOr)
+        trsLib.match(ctlsGrp[i], par)
         mc.parent(ctlsGrp[i], par)
         mc.makeIdentity(ctlsGrp[i], apply=True, r=True, t=True)
         crvLib.moveShape(curve=ctls[i], move=(mult * 0.6, 0,  0.3))
@@ -234,9 +234,8 @@ def createSideMainCtl(name = '', parent = '', snapJnt = '', side = 'L'):
 
 
 def createMiddleMainCtl(name = '', parent = '', snapJnt = '', side = 'C',up = True):
-    ctlPlacement = mc.createNode('transform', name = name + 'CtrlPlacement_GRP',p = parent)
-    trsLib.match(ctlPlacement, snapJnt)
-    squashMakro = mc.createNode('transform', name = name + 'CtrlMouthSquashMAKRO_GRP',  p = ctlPlacement)
+
+    squashMakro = mc.createNode('transform', name = name + 'CtrlMouthSquashMAKRO_GRP',  p = parent)
     ctlOr = mc.createNode('transform', name = name + 'CtrlOrient_GRP',  p = squashMakro)
 
     mc.setAttr(ctlOr + '.tz', 2.5)
@@ -250,12 +249,32 @@ def createMiddleMainCtl(name = '', parent = '', snapJnt = '', side = 'C',up = Tr
                              orient=(0, 0, 1),
                              shape="square",
                              color=control.COLORS[side],
-                             scale=[2, 0.3, 1],
+                             scale=[2, 0.1, 1],
                              lockHideAttrs=['s'],
                              matchTranslate=ctlOr)
     mc.parent(ctl.zro, ctlOr)
     mc.makeIdentity(ctl.zro, apply = True, r = True, t = True)
     return ctl.name, ctl.zro
+
+def createMouthCtl(name = '', parent = '', snapJnt = '', side = 'C'):
+
+    ctl = control.Control(descriptor=name,
+                             side= side,
+                             orient=(0, 0, 1),
+                             shape="square",
+                             color=control.COLORS[side],
+                             scale=[1, 0.2, 1],
+                             lockHideAttrs=['s'],
+                             matchTranslate=parent,
+                             matchRotate= parent )
+
+    mc.parent(ctl.zro, parent)
+    mc.makeIdentity(ctl.zro, apply = True, r = True, t = True)
+
+    return ctl.name, ctl.zro
+
+
+
 
 
 
