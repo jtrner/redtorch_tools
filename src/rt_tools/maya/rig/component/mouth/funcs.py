@@ -127,6 +127,8 @@ def createZipperJnts(name = '', crv = '',upCurve = '' ,posJnts = '', parent = ''
 
     outTerList= []
     BNDJNTS = []
+    locMods = []
+    outTerCtls = []
     for i in (0,1,3,5,7,8):
         niceName = posJnts[i].split('_JNT')[0]
         outTer = mc.createNode('transform', name = niceName + 'Orient_GRP', p = jntParent)
@@ -140,9 +142,11 @@ def createZipperJnts(name = '', crv = '',upCurve = '' ,posJnts = '', parent = ''
         terOrGrp = mc.createNode('transform', name = niceName + 'Orient2_GRP', p = outTerMode2)
         terModGrp = mc.createNode('transform', name = niceName + 'ModifyB_GRP', p = terOrGrp)
         outTerCtl,outTerCtlGrp = createTerCtl(name = niceName , parent = posJnts[i], up = up)
+        outTerCtls.append(outTerCtl)
         mc.parent(outTerCtlGrp, terModGrp)
         mc.parent(posJnts[i], TerMode)
         BNDJNTS.append(bndJnt)
+        locMods.append(TerMode)
         if i in (1,7):
             outSecLoc = mc.createNode('transform', name=niceName + 'RotDrive_LOC',)
             trsLib.match(outSecLoc, t = bndJnt)
@@ -164,7 +168,7 @@ def createZipperJnts(name = '', crv = '',upCurve = '' ,posJnts = '', parent = ''
         mc.parent(posJnts[i], outBnd)
 
 
-    return BNDJNTS, tempList, outTerList, outBndList
+    return BNDJNTS, tempList, outTerList, outBndList,locMods,outTerCtls,posJnts
 
 
 def createTerCtl(name = '', parent = '', side = 'C', up = True):
@@ -313,7 +317,7 @@ def createJntAndParent(name = '',parent = '', side = 'C',up = True):
     OutJnt = mc.joint(ctl.name, name = name + '_JNT', rad = 0.4)
 
 
-    return ctl.name,ctl.zro,OutJnt
+    return ctl.name,ctl.zro,OutJnt, outModLocTrans
 
 def createMainHierarchyJnts(name = '', parent = '', middle = False):
     if not middle:
@@ -327,6 +331,81 @@ def createMainHierarchyJnts(name = '', parent = '', middle = False):
         outModLocTrans = mc.createNode('transform',  name = name + 'MainModify_LOC', p = mainMod)
         outModLocShape = mc.createNode('locator', name=name + 'ModifyShape_LOC', p=outModLocTrans)
         return  outModLocTrans, mainMod
+
+def createNoseCtls(name = '', parent = '',mainSnap = '', cummelaSnap = '', leftSnap = '', rightSnap = '',side = 'C'):
+    noseCtlOri = mc.createNode('transform', name = 'noseCtrlBaseOri_GRP', p = parent)
+    trsLib.match(noseCtlOri, mainSnap)
+    noseCtlMakro = mc.createNode('transform', name = 'noseCtrlMAKRO_GRP', p = noseCtlOri)
+
+    ctls = []
+    ctlGrp = []
+    for i in range(5):
+        ctl = control.Control(descriptor=name + '{}'.format(i),
+                                 side=side,
+                                 shape="triangle",
+                                 orient = [0,0, 1],
+                                 color=control.SECCOLORS[side],
+                                 moveShape=[0, 0 , 0],
+                                 scale=[0.05, 0.05, 0.05],
+                                 lockHideAttrs=[],
+                                 matchTranslate=noseCtlMakro,
+                                 matchRotate = noseCtlMakro)
+        ctls.append(ctl.name)
+        ctlGrp.append(ctl.zro)
+    print(ctls)
+    print(ctlGrp)
+    noseCtl = mc.rename(ctls[0], 'nose_CTL')
+    noseCtlModGrp = mc.rename(ctlGrp[0], 'noseCtlMod_GRP')
+    mc.parent(noseCtlModGrp, noseCtlMakro)
+
+    noseCtlBase = mc.rename(ctls[1], 'noseCtlBase_CTL')
+    noseCtlBaseGrp = mc.rename(ctlGrp[1], 'noseCtrlBaseModctl_GRP')
+
+    cumellaCtl = mc.rename(ctls[2], 'columella_CTL')
+    cumellaCtlModGrp = mc.rename(ctlGrp[2], 'noseCtlMod_GRP')
+
+    r_nostrilCtl = mc.rename(ctls[3], 'R_nostril_CTL')
+    r_nostrilCtlGrp = mc.rename(ctlGrp[3], 'R_nostrilCtrlMod_GRP')
+
+    l_nostrilCtl = mc.rename(ctls[4], 'L_nostril_CTL')
+    l_nostrilCtlGrp = mc.rename(ctlGrp[4], 'L_nostrilCtrlMod_GRP')
+
+    noseCtlBaseOriGrp = mc.createNode('transform', name = 'noseCtrlBaseOri_GRP', p = noseCtl)
+    mc.move(0,0,1, noseCtlBaseOriGrp, r = True, ws =  True)
+    noseCtlBaseModGrp = mc.createNode('transform', name = 'noseCtlBaseMod_GRP', p = noseCtlBaseOriGrp)
+    trsLib.match(noseCtlBaseGrp, noseCtlBaseModGrp)
+    mc.parent(noseCtlBaseGrp, noseCtlBaseModGrp)
+
+    culumelCtlOriGrp = mc.createNode('transform', name = 'columellaCtrlOri_GRP', p = noseCtlBase)
+    trsLib.match(culumelCtlOriGrp, cummelaSnap)
+    trsLib.match(cumellaCtlModGrp, culumelCtlOriGrp)
+    mc.parent(cumellaCtlModGrp,culumelCtlOriGrp)
+
+    r_nostrilCtlOri = mc.createNode('transform', name = 'R_nostrilCtrlOri_GRP', p = noseCtlBase)
+    trsLib.match(r_nostrilCtlOri, rightSnap)
+    r_nostrilMakro = mc.createNode('transform', name = 'R_nostrilCtrlMAKRO_GRP' , p = r_nostrilCtlOri)
+    trsLib.match(r_nostrilCtlGrp, r_nostrilMakro)
+    mc.parent(r_nostrilCtlGrp,r_nostrilMakro)
+
+    l_nostrilCtlOri = mc.createNode('transform', name = 'L_nostrilCtrlOri_GRP', p = noseCtlBase)
+    trsLib.match(l_nostrilCtlOri, leftSnap)
+    l_nostrilMakro = mc.createNode('transform', name = 'L_nostrilCtrlMAKRO_GRP' , p = l_nostrilCtlOri)
+    trsLib.match(l_nostrilCtlGrp, l_nostrilMakro)
+    mc.parent(l_nostrilCtlGrp,l_nostrilMakro)
+    mc.move(0, -18, 0, noseCtlOri, r=True, ws=True)
+
+    noseCtl = noseCtl.split('|')[-1]
+    noseCtlBase = noseCtlBase.split('|')[-1]
+    cumellaCtl = cumellaCtl.split('|')[-1]
+    return noseCtl, noseCtlBase, cumellaCtl
+
+
+
+
+
+
+
+
 
 
 

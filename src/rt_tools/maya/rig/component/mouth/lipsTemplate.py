@@ -35,6 +35,7 @@ class LipsTemplate(template.Template):
         self.localLipRigGrp = mc.createNode('transform', name = 'localLips_Rig')
         self.rigGrp = mc.createNode('transform', name='lipRig_GRP', p = self.localLipRigGrp)
         self.facialCtrlGrp = mc.createNode('transform', name='facialCTRL_GRP')
+        self.noseCtlGrp = mc.createNode('transform', name = 'noseCtlGrp', p = self.facialCtrlGrp)
 
         self.mouthMakro = mc.createNode('transform', name = 'mouthMAKRO_Driver_GRP', p = self.localLipRigGrp)
         # mouthMakro part
@@ -96,7 +97,7 @@ class LipsTemplate(template.Template):
         self.noseBendMakro = mc.createNode('transform', name = 'NoseBendMAKRO_GRP', p = self.noseBendGrp)
         self.noseJntOri= mc.createNode('transform', name = 'NoseJntOri_GRP', p = self.noseBendMakro)
         self.noseJntMakro= mc.createNode('transform', name = 'NoseJntMAKRO_GRP', p = self.noseJntOri)
-        self.noseJntMod= mc.createNode('transform', name = 'NoseJntMod_GRP', p = self.noseJntMakro)
+        self.noseJntMod = mc.createNode('transform', name = 'NoseJntMod_GRP', p = self.noseJntMakro)
         self.noseJntBaseOr = mc.createNode('transform', name = 'noseJntBaseOri_GRP', p = self.mouthAndJawMain[3])
         mc.move(0, 0, 1, self.noseJntBaseOr, r = True, ws = True)
         self.noseJntBaseMakro= mc.createNode('transform', name = 'noseJntBaseMAKRO_GRP', p = self.noseJntBaseOr)
@@ -138,7 +139,7 @@ class LipsTemplate(template.Template):
                                                        p=self.upLipMakroJntCtl)
         self.leftUpMainJnt = mc.createNode('transform', name='L_localUpLipCornerOrient_GRP', p=self.upJntDrvr)
         self.rightUpMainJnt = mc.createNode('transform', name='R_localUpLipCornerOrient_GRP', p=self.upJntDrvr)
-        self.middleUpMainJnt = mc.createNode('transform', name='m_localUpLipCornerOrient_GRP', p=self.upJntDrvr)
+        self.middleUpMainJnt = mc.createNode('transform', name='m_localUpLipMainOrient_GRP', p=self.upJntDrvr)
 
         # low part
         self.lowLipRibbon = mc.createNode('transform', name='localLowLipRibbon_GRP', p=self.rigGrp)
@@ -206,6 +207,7 @@ class LipsTemplate(template.Template):
         # nose follow matches
         trsLib.match(self.noseMakroDrvrLoc,self.mouthAndJawMain[-1])
         mc.move(8, 0, 0, self.noseMakroDrvrLoc, r = True, ws = True)
+        mc.makeIdentity(self.noseMakroDrvr, apply = True, t = True, r = True, s = True)
         # mouth squash follow
         trsLib.match(self.mouthSquashDrvrLoc,self.mouthPiv)
         mc.move(0, 0, 1.5, self.mouthSquashDrvrLoc, r = True, ws = True)

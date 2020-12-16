@@ -8,8 +8,10 @@ from ....lib import attrLib
 from ....lib import container
 from ....lib import strLib
 from ....lib import deformLib
+from ....lib import keyLib
 from . import buildLip
 
+reload(keyLib)
 reload(deformLib)
 reload(buildLip)
 reload(trsLib)
@@ -209,6 +211,196 @@ class Lips(buildLip.BuildLip):
         # parent constraint one of locators under roll modify to the low transform above mid main jnt
         mc.parentConstraint(self.lowLipJntMidLoc,self.midLowMainMod, mo = True)
 
+        # connect noseMakro locator to the nose Bend makro
+        unit = mc.shadingNode('unitConversion', asUtility = True )
+        mc.setAttr(unit + '.conversionFactor', -0.100)
+        mc.connectAttr(self.noseMakroDrvrLoc + '.tz', unit+ '.input')
+        mc.connectAttr(unit + '.output', self.noseBendMakro+ '.rx')
+
+        # connect nose makro driver loc to the transfrom above the group of nose bind jnt
+        units = []
+        fact = 0.1
+        for i in range(3):
+            unit = mc.shadingNode('unitConversion', asUtility=True)
+            mc.setAttr(unit + '.conversionFactor', fact)
+            fact += 0.1
+            units.append(unit)
+        mc.setAttr(units[2] + '.conversionFactor', 0.060)
+        mc.connectAttr(self.noseMakroDrvrLoc + '.tx', units[0]+ '.input')
+        mc.connectAttr(self.noseMakroDrvrLoc + '.tx', units[2]+ '.input')
+        mc.connectAttr(self.noseMakroDrvrLoc + '.ty', units[1]+ '.input')
+        mc.connectAttr(units[0] + '.output', self.noseJntMakro+ '.tx')
+        mc.connectAttr(units[2]+ '.output', self.noseJntMakro+ '.rz')
+        mc.connectAttr(units[1] + '.output', self.noseJntMakro+ '.ty')
+
+        # connect the nose ctl to the group above nose joint
+        [mc.connectAttr(self.noseCtl + '.{}{}'.format(t,a), self.noseJntMod + '.{}{}'.format(t,a))for t in 'trs' for a in'xyz']
+
+        #connect nose ctl base to the noseJnt base mod group
+        [mc.connectAttr(self.noseCtlBase + '.{}{}'.format(t,a), self.noseJntBaseMod + '.{}{}'.format(t,a))for t in 'trs' for a in'xyz']
+
+        # connect right lipCorner makro to the right nostril joint makro
+        r_nostMakroMult = mc.createNode('multiplyDivide', name = 'R_nostrilMAKRO_MDN')
+        at = 0.020
+        for i in ['input2Z','input2X','input2Y']:
+            mc.setAttr(r_nostMakroMult +'.' + i, at)
+            at += 0.020
+        r_nostMakroOneg = mc.createNode('multiplyDivide', name = 'R_nostrilMAKROneg_MDN')
+        for i in ['input2X', 'input2Y', 'input2Z']:
+            mc.setAttr(r_nostMakroOneg +'.' + i, -1)
+        mc.connectAttr(self.r_cornerMakroLoc + '.tx', r_nostMakroMult + '.input1X')
+        mc.connectAttr(self.r_cornerMakroLoc + '.ty', r_nostMakroMult + '.input1Y')
+        mc.connectAttr(r_nostMakroMult + '.outputX', self.r_nostrilJntMakro + '.tx')
+        mc.connectAttr(r_nostMakroMult + '.outputY', self.r_nostrilJntMakro + '.ty')
+
+        unit1 = mc.shadingNode('unitConversion', asUtility=True)
+        mc.setAttr(unit1 + '.conversionFactor', 0.200)
+        unit2 = mc.shadingNode('unitConversion', asUtility=True)
+        mc.setAttr(unit2 + '.conversionFactor', -0.300)
+        mc.connectAttr(r_nostMakroMult + '.outputY', unit1 + '.input')
+        mc.connectAttr(r_nostMakroMult + '.outputX', unit2 + '.input')
+
+        mc.connectAttr(unit1 + '.output', self.r_nostrilJntMakro+ '.ry')
+        mc.connectAttr(unit2 + '.output', self.r_nostrilJntMakro+ '.rx')
+
+        mc.connectAttr(r_nostMakroMult + '.outputX', r_nostMakroOneg + '.input1X')
+        mc.connectAttr(r_nostMakroOneg + '.outputX', self.r_nostrilJntMakro + '.tz')
+
+        # connect left lipCorner makro to the left nostril joint makro
+        l_nostMakroMult = mc.createNode('multiplyDivide', name = 'L_nostrilMAKRO_MDN')
+        at = 0.020
+        for i in ['input2Z','input2X','input2Y']:
+            mc.setAttr(l_nostMakroMult +'.' + i, at)
+            at += 0.020
+        l_nostMakroOneg = mc.createNode('multiplyDivide', name = 'L_nostrilMAKROneg_MDN')
+        for i in ['input2X', 'input2Y', 'input2Z']:
+            mc.setAttr(l_nostMakroOneg +'.' + i, -1)
+        mc.connectAttr(self.l_cornerMakroLoc + '.tx', l_nostMakroMult + '.input1X')
+        mc.connectAttr(self.l_cornerMakroLoc + '.ty', l_nostMakroMult + '.input1Y')
+        mc.connectAttr(l_nostMakroMult + '.outputX', self.l_nostrilJntMakro + '.tx')
+        mc.connectAttr(l_nostMakroMult + '.outputY', self.l_nostrilJntMakro + '.ty')
+
+        unit1 = mc.shadingNode('unitConversion', asUtility=True)
+        mc.setAttr(unit1 + '.conversionFactor', 0.200)
+        unit2 = mc.shadingNode('unitConversion', asUtility=True)
+        mc.setAttr(unit2 + '.conversionFactor', -0.300)
+        mc.connectAttr(l_nostMakroMult + '.outputY', unit1 + '.input')
+        mc.connectAttr(l_nostMakroMult + '.outputX', unit2 + '.input')
+
+        mc.connectAttr(unit1 + '.output', self.l_nostrilJntMakro+ '.ry')
+        mc.connectAttr(unit2 + '.output', self.l_nostrilJntMakro+ '.rx')
+
+        mc.connectAttr(l_nostMakroMult + '.outputX', l_nostMakroOneg + '.input1X')
+        mc.connectAttr(l_nostMakroOneg + '.outputX', self.l_nostrilJntMakro + '.tz')
+
+        # connect columella ctl to the group above columella joint
+        [mc.connectAttr(self.columellaCtl + '.{}{}'.format(t,a), self.columJntMod + '.{}{}'.format(t,a))for t in 'trs' for a in'xyz']
+
+        # TODO: connect jaw ctl to the group obove jaw joints later
+        # connect up lip out ctls to the locals
+        [mc.connectAttr(self.cln(self.R_upLipOutCtl) + '.{}{}'.format(t,a), self.R_upLipOutCtl + '.{}{}'.format(t,a))for t in 'tr' for a in'xyz']
+        [mc.connectAttr(self.cln(self.L_upLipOutCtl) + '.{}{}'.format(t,a), self.L_upLipOutCtl + '.{}{}'.format(t,a))for t in 'tr' for a in'xyz']
+        [mc.connectAttr(self.cln(self.M_upLipOutCtl) + '.{}{}'.format(t,a), self.M_upLipOutCtl + '.{}{}'.format(t,a))for t in 'tr' for a in'xyz']
+        # connect low lip out ctls to the locals
+        [mc.connectAttr(self.cln(self.R_lowLipOutCtl) + '.{}{}'.format(t,a), self.R_lowLipOutCtl + '.{}{}'.format(t,a))for t in 'tr' for a in'xyz']
+        [mc.connectAttr(self.cln(self.L_lowLipOutCtl) + '.{}{}'.format(t,a), self.L_lowLipOutCtl + '.{}{}'.format(t,a))for t in 'tr' for a in'xyz']
+        [mc.connectAttr(self.cln(self.M_lowLipOutCtl) + '.{}{}'.format(t,a), self.M_lowLipOutCtl + '.{}{}'.format(t,a))for t in 'tr' for a in'xyz']
+
+        # conect local upLip main modLoc to the upLipMidMod loc
+        mc.orientConstraint(self.m_upLipCornerMod_loc,self.M_upLipMidModLoc, mo = True)
+        mc.orientConstraint(self.m_lowLipCornerMod_loc,self.M_lowLipMidModLoc, mo = True)
+
+        # connect up micro controls to the locator above the bind jnts
+        for ctl,loc in zip(self.microUpCtls,self.upLocMod):
+            [mc.connectAttr(ctl + '.{}{}'.format(t, a),loc + '.{}{}'.format(t, a)) for t in 'trs' for a in 'xyz']
+
+        # connect low micro controls to the locator above the bind jnts
+        for ctl,loc in zip(self.microLowCtls,self.lowLocMod):
+            [mc.connectAttr(ctl + '.{}{}'.format(t, a),loc + '.{}{}'.format(t, a)) for t in 'trs' for a in 'xyz']
+
+        # pointConstraint up zip target locators to the zip joints
+        for ctl,loc in zip(self.upTerLocs,self.upZipJnts):
+            mc.pointConstraint(ctl, loc , mo = True)
+
+        # pointConstraint low zip target locators to the zip joints
+        for ctl,loc in zip(self.lowTerLocs,self.lowZipJnts):
+            mc.pointConstraint(ctl, loc , mo = True)
+        # connect stuff to the zip joints
+        attrLib.addFloat(self.leftUpCornerCtl, ln = 'zip', min = 0, dv = 0)
+        attrLib.addFloat(self.rightUpCornerCtl, ln = 'zip', min = 0, dv = 0)
+
+
+        upmults = []
+        for i in self.upZipJnts:
+            mult = mc.createNode('multiplyDivide', name  = i + '_MDN')
+            upmults.append(mult)
+        mult = mc.createNode('multiplyDivide', name  = 'R_outTertiaryZip_MD1')
+        upmults.append(mult)
+        for j in ['input2X', 'input2Y', 'input2Z']:
+            keyLib.setDriven(self.leftUpCornerCtl + '.zip', upmults[0] + '.' +  j, [0,11], [0,1],itt='auto', ott = 'auto')
+        for j in ['input2X', 'input2Y', 'input2Z']:
+            keyLib.setDriven(self.leftUpCornerCtl + '.zip', upmults[1] + '.' +  j, [0,6,9,18], [0,0.03,0.2,1],itt='auto', ott = 'auto')
+        for j in ['input2X', 'input2Y', 'input2Z']:
+            keyLib.setDriven(self.leftUpCornerCtl + '.zip', upmults[2] + '.' +  j, [0,4,8,14], [0,0.2,0.6,1],itt='auto', ott = 'auto')
+        for j in ['input2X', 'input2Y', 'input2Z']:
+            keyLib.setDriven(self.leftUpCornerCtl + '.zip', upmults[3] + '.' +  j, [0,3,17], [0,0,1],itt='auto', ott = 'auto')
+        for j in ['input2X', 'input2Y', 'input2Z']:
+            keyLib.setDriven(self.leftUpCornerCtl + '.zip', upmults[4] + '.' +  j, [4,8,20], [0,0.05,1],itt='auto', ott = 'auto')
+        for j in ['input2X', 'input2Y', 'input2Z']:
+            keyLib.setDriven(self.rightUpCornerCtl + '.zip', upmults[5] + '.' +  j, [4,8,20], [0,0.05,1],itt='auto', ott = 'auto')
+        for j in ['input2X', 'input2Y', 'input2Z']:
+            keyLib.setDriven(self.rightUpCornerCtl + '.zip', upmults[6] + '.' +  j, [0,3,17], [0,0,1],itt='auto', ott = 'auto')
+        for j in ['input2X', 'input2Y', 'input2Z']:
+            keyLib.setDriven(self.rightUpCornerCtl + '.zip', upmults[7] + '.' +  j, [0,4,8,14], [0,0.2,0.6,1],itt='auto', ott = 'auto')
+        for j in ['input2X', 'input2Y', 'input2Z']:
+            keyLib.setDriven(self.rightUpCornerCtl + '.zip', upmults[8] + '.' +  j, [0,6,9,18], [0,0.03,0.2,1],itt='auto', ott = 'auto')
+        for j in ['input2X', 'input2Y', 'input2Z']:
+            keyLib.setDriven(self.rightUpCornerCtl + '.zip', upmults[9] + '.' +  j, [0,11], [0,1],itt='auto', ott = 'auto')
+
+
+        a = ['tx', 'ty', 'tz']
+        b = ['input1X', 'input1Y', 'input1Z']
+        c = ['input2X', 'input2Y', 'input2Z']
+        upZipTemp = []
+        upMultTemp = []
+        for i in range(10):
+            if i in [5]:
+                continue
+            uplip = self.upZipJnts[i-1]
+            upZipTemp.append(uplip)
+        for i in range(10):
+            if i in [5,6]:
+                continue
+            upmult = upmults[i-1]
+            upMultTemp.append(upmult)
+        for i in range(8):
+            for j,k in zip(a,b):
+                mc.connectAttr(upZipTemp[i]+ '.' + j, upMultTemp[i] + '.' + k)
+        for j,k in zip(a,b):
+            mc.connectAttr(self.upZipJnts[4] + '.' + j,upmults[4] + '.' + k)
+            mc.connectAttr(self.upZipJnts[4] + '.' + j,upmults[5] + '.' + k)
+        l_mult = mc.createNode('multiplyDivide', name = 'L_midZipHalf_MDN')
+        r_mult = mc.createNode('multiplyDivide', name = 'R_midZipHalf_MDN')
+
+        for i in c:
+            mc.setAttr(l_mult + '.' + i, 0.5)
+            mc.setAttr(r_mult + '.' + i, 0.5)
+
+        mc.connectAttr(upmults[4] + '.output' , l_mult + '.input1' )
+        mc.connectAttr(upmults[5] + '.output' , r_mult + '.input1' )
+
+        upMidZipPls = mc.createNode('plusMinusAverage', name = 'upmidZip_PMA')
+        mc.connectAttr(l_mult + '.output',upMidZipPls + '.input3D[0]')
+        mc.connectAttr(r_mult + '.output',upMidZipPls + '.input3D[1]')
+
+        mc.connectAttr(upMultTemp[0] + '.output', self.upMicroJnts[5] + '.translate')
+        mc.connectAttr(upMultTemp[1] + '.output', self.upMicroJnts[0] + '.translate')
+        mc.connectAttr(upMultTemp[2] + '.output', self.upMicroJnts[1] + '.translate')
+        mc.connectAttr(upMultTemp[3] + '.output', self.upMicroJnts[6] + '.translate')
+        mc.connectAttr(upMultTemp[4] + '.output', self.upMicroJnts[2] + '.translate')
+        mc.connectAttr(upMultTemp[5] + '.output', self.upMicroJnts[3] + '.translate')
+        mc.connectAttr(upMultTemp[6] + '.output', self.upMicroJnts[8] + '.translate')
+        mc.connectAttr(upMultTemp[7] + '.output', self.upMicroJnts[4] + '.translate')
 
     def cln(self,node):
         node = node.replace('local', '')
