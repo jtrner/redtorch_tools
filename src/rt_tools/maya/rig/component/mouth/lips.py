@@ -7,8 +7,10 @@ from ....lib import trsLib
 from ....lib import attrLib
 from ....lib import container
 from ....lib import strLib
+from ....lib import deformLib
 from . import buildLip
 
+reload(deformLib)
 reload(buildLip)
 reload(trsLib)
 reload(attrLib)
@@ -46,8 +48,9 @@ class Lips(buildLip.BuildLip):
 
     def build(self):
         super(Lips, self).build()
+
         # create wire for up and low zip curves
-        for i in [self.upLipZippercrv ,self.lowLipLowRezcrv ]:
+        for i in [self.upLipZippercrv ,self.lowLipZippercrv ]:
             mc.select(i, r=True)
             mc.wire(gw=False, en=1.000000, ce=0.000000, li=0.000000, w= self.zippercrv)
 
@@ -90,7 +93,7 @@ class Lips(buildLip.BuildLip):
         for i in [self.jntRollModupGrp  ,self.upLipCtlRoll]:
             mc.orientConstraint(self.upLipJawFollowDrvr, i, mo = True)
 
-        for i in [self.lowJntDrvr ,self.ctllowPlacement ]:
+        for i in [self.lowJntDrvr ,self.upjntCtlPlace ]:
             mc.parentConstraint(self.upLipJawFollowDrvr, i, mo = True)
 
         for i in [self.upJntDrvr ,self.ctlupPlacement  ]:
@@ -100,21 +103,111 @@ class Lips(buildLip.BuildLip):
                   self.rightUpMainJnt,self.leftUpLipCtlGrp, self.rightLowMainJnt,self.leftLowLipCtlGrp  ]:
             mc.parentConstraint(self.LipCornerJawFollowDrvr, i, mo = True)
 
-        #self.ctlLipCornerJawFollowDrvr,self.ctlupLipJawFollowDrvr,self.ctllowLipJawFollowDrvr
-        # should will parent constraint to the global groups
         for i in [self.cln(self.upJntDrvr), self.cln(self.ctlupPlacement)]:
             i = i.split('|')[-1]
-            mc.orientConstraint(self.ctlupLipJawFollowDrvr, i, mo = True)
+            mc.parentConstraint(self.ctlupLipJawFollowDrvr, i, mo = True)
 
         for i in [self.cln(self.lowJntDrvr), self.cln(self.ctllowPlacement)]:
             i = i.split('|')[-1]
-            mc.orientConstraint(self.ctllowLipJawFollowDrvr, i, mo = True)
+            mc.parentConstraint(self.ctllowLipJawFollowDrvr, i, mo = True)
 
         for i in [self.cln(self.leftUpMainJnt), self.cln(self.leftLowMainJnt),self.cln(self.rightLowLipCtlGrp),
                   self.cln(self.rightUpLipCtlGrp),self.cln(self.rightUpMainJnt),self.cln(self.leftUpLipCtlGrp),
                   self.cln(self.rightLowMainJnt),self.cln(self.leftLowLipCtlGrp),self.cln(self.mouthCtlOr)]:
             i = i.split('|')[-1]
-            mc.orientConstraint(self.ctlLipCornerJawFollowDrvr, i, mo = True)
+            mc.parentConstraint(self.ctlLipCornerJawFollowDrvr, i, mo = True)
+
+        # parent constraint stuff to the locators under upjntdrvr
+        mc.parentConstraint(self.M_upLipOutJnt ,self.upLipMidLoc, mo = True)
+        mc.parentConstraint(self.upLipLowRezBindJnts[0] ,self.r_upcornerOr , mo = True)
+        mc.orientConstraint(self.upLipMidLoc, self.M_upLipOutJnt  ,self.r_upmidSecOr, weight = 0.5, mo = True)
+        mc.orientConstraint(self.r_upcornerOr ,self.upLipMidLoc, self.r_upoutOrLoc,weight = 0.5, mo = True)
+
+        # parent constraint stuff to the locators under lowjntdrvr
+        mc.parentConstraint(self.M_lowLipOutJnt  ,self.lowLipMidLoc, mo = True)
+        mc.parentConstraint(self.lowLipLowRezBindJnts[0],self.r_lowcornerOr , mo = True)
+        mc.orientConstraint(self.lowLipMidLoc, self.M_lowLipOutJnt  ,self.r_lowmidSecOr, weight = 0.5, mo = True)
+        mc.orientConstraint(self.r_lowcornerOr  ,self.lowLipMidLoc, self.r_lowoutOrLoc,weight = 0.5, mo = True)
+
+        # parent constraint locators to the groups above upmakro controls
+        mc.parentConstraint(self.r_localUpLipDriverOutMod ,self.r_localUpLipOutOrient_GRP, mo = True )
+        mc.parentConstraint(self.m_localUpLipDriverOutMod ,self.m_localUpLipOutOrient_GRP, mo = True )
+        mc.parentConstraint(self.l_localUpLipDriverOutMod ,self.l_localUpLipOutOrient_GRP, mo = True )
+
+        # parent constraint locators to the groups above lowmakro controls
+        mc.parentConstraint(self.r_localLowLipDriverOutMod ,self.r_localLowLipOutOrient_GRP , mo = True )
+        mc.parentConstraint(self.m_localLowLipDriverOutMod ,self.m_localLowLipOutOrient_GRP, mo = True )
+        mc.parentConstraint(self.l_localLowLipDriverOutMod ,self.l_localLowLipOutOrient_GRP, mo = True )
+
+        # parent constraint locators on medrez curve to the  up micro groups
+        mc.parentConstraint(self.upSecMod,self.upTerOrientGrp[1] , mo = True)
+        mc.parentConstraint(self.upmicroOutMod , self.upZipOutBndGrp[0] , mo = True)
+        mc.parentConstraint(self.upmidSecMod ,self.upTerOrientGrp[2] , mo = True)
+        mc.parentConstraint(self.upMidMod ,self.upZipOutBndGrp[1], mo = True)
+        mc.parentConstraint(self.upMidSecModLoc ,self.upTerOrientGrp[3] , mo = True)
+        mc.parentConstraint(self.microOutModLoc ,self.upZipOutBndGrp[2]  , mo = True)
+        mc.parentConstraint(self.microOutSecMod ,self.upTerOrientGrp[4], mo = True)
+        mc.parentConstraint(self.l_outUpTerModLocHi,self.upTerOrientGrp[0], mo = True)
+        mc.parentConstraint(self.r_outUpTerModLocHi,self.upTerOrientGrp[5], mo = True)
+
+        # parent constraint locators on medrez curve to the  low micro groups
+        mc.parentConstraint(self.lowSecMod,self.lowTerOrientGrp[1] , mo = True)
+        mc.parentConstraint(self.lowmicroOutMod , self.lowZipOutBndGrp[0] , mo = True)
+        mc.parentConstraint(self.lowmidSecMod ,self.lowTerOrientGrp[2] , mo = True)
+        mc.parentConstraint(self.lowMidMod ,self.lowZipOutBndGrp[1], mo = True)
+        mc.parentConstraint(self.lowMidSecModLoc ,self.lowTerOrientGrp[3] , mo = True)
+        mc.parentConstraint(self.lowmicroOutModLoc ,self.lowZipOutBndGrp[2]  , mo = True)
+        mc.parentConstraint(self.lowmicroOutSecMod ,self.lowTerOrientGrp[4], mo = True)
+        mc.parentConstraint(self.l_outLowTerModLocHi,self.lowTerOrientGrp[0], mo = True)
+        mc.parentConstraint(self.r_outLowTerModLocHi,self.lowTerOrientGrp[5], mo = True)
+
+        #bind joints to up lowrez and medrez curves
+        deformLib.bind_geo(geos = self.upLipLowRezcrv, joints = self.upLipLowRezBindJnts)
+        deformLib.bind_geo(geos = self.upLipMedRezcrv, joints = self.upmedRezBindJnts)
+
+        #bind joints to low lowrez and medrez curves
+        deformLib.bind_geo(geos = self.lowLipLowRezcrv, joints = self.lowLipLowRezBindJnts)
+        deformLib.bind_geo(geos = self.lowLipMedRezcrv, joints = self.lowmedRezBindJnts)
+
+        # bind joints to the up highrez Curves
+        for index,value in enumerate(self.upMicroJnts):
+            if index in [0,5]:
+                continue
+            self.upHirzBndJnts.append(value)
+
+        deformLib.bind_geo(geos = self.upLipHiRezcrv, joints = self.upHirzBndJnts)
+        # bind joints to the low highrez Curves
+        for index,value in enumerate(self.lowMicroJnts):
+            if index in [0,5]:
+                continue
+            self.lowHirzBndJnts.append(value)
+
+        deformLib.bind_geo(geos = self.lowLipHiRezcrv, joints = self.lowHirzBndJnts)
+
+        # bind the mouth joint to the up curve temp(thouth not sure about it)
+
+        deformLib.bind_geo(geos=self.tempCurve, joints=self.mouthAndJawMain[2])
+
+        # connect the locator under ctl placement to the locator under up roll modify
+        attrLib.addFloat(self.upJntCtlLoc, ln = 'lipRoll', dv = 0)
+        mc.pointConstraint(self.upJntCtlLoc,self.jntUpRollLoc, mo = True)
+        unit = mc.shadingNode('unitConversion', asUtility = True )
+        mc.setAttr(unit + '.conversionFactor', 0.017)
+        mc.connectAttr(self.upJntCtlLoc+ '.lipRoll', unit+ '.input')
+        mc.connectAttr(unit + '.output', self.jntUpRollLoc+ '.rx')
+
+        # connect the locator under ctl placement to the locator under low roll modify
+        attrLib.addFloat(self.lowJntCtlLoc, ln = 'lipRoll', dv = 0)
+        mc.pointConstraint(self.lowJntCtlLoc,self.jntLowRollLoc, mo = True)
+        unit = mc.shadingNode('unitConversion', asUtility = True )
+        mc.setAttr(unit + '.conversionFactor', 0.017)
+        mc.connectAttr(self.lowJntCtlLoc+ '.lipRoll', unit+ '.input')
+        mc.connectAttr(unit + '.output', self.jntLowRollLoc+ '.rx')
+
+        # parent constraint one of locators under roll modify to the up transform above mid main jnt
+        mc.parentConstraint(self.upLipJntMidLoc,self.middleUpMainMod, mo = True)
+        # parent constraint one of locators under roll modify to the low transform above mid main jnt
+        mc.parentConstraint(self.lowLipJntMidLoc,self.midLowMainMod, mo = True)
 
 
     def cln(self,node):

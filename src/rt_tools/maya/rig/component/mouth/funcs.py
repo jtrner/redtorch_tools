@@ -22,6 +22,7 @@ def createCtlPlaceMent(name = '', parent = ''):
     squashMakro = mc.createNode('transform', name = name + 'MouthSquashMAKRO_GRP', p = parent)
     jntCtlLoc = mc.createNode('transform', name = name + 'JNTCtrl_LOC', p = squashMakro)
     jntCtlLocShape = mc.createNode('locator', name = name + 'JNTCtrlShape_LOC', p = jntCtlLoc)
+    return jntCtlLoc
 
 
 def createRollMod(name = '', parent = '', up = True):
@@ -39,6 +40,8 @@ def createRollMod(name = '', parent = '', up = True):
     mc.setAttr(midFlippedMod + '.sx', -1)
     jntMidFlippedLoc = mc.createNode('transform', name=name + 'JNTMidFlipped_LOC', p=midFlippedMod)
     jntMidFlippedLocShape = mc.createNode('locator', name=name + 'JNTMidFlippedShape_LOC', p=jntMidFlippedLoc)
+
+    return jntRollLoc, jntMidLoc
 
 
 
@@ -81,6 +84,7 @@ def createLocsJntDriver(name = '', parent = '',jntSnap = ''):
     mc.makeIdentity(cornerOrLoc, apply = True, t = True, r = True, s = True)
     mc.setAttr(cornerOrLoc + '.tx', -2)
     mc.setAttr(cornerOrLoc + '.tz', -1.2)
+    return midOrLoc, secOrLoc, outOrLoc, cornerOrLoc
 
 def createZipperJnts(name = '', crv = '',upCurve = '' ,posJnts = '', parent = '', jntParent = '', up = True):
     ZipperTargetLoc = mc.createNode('transform', name = name + 'ZipperTargetLoc_GRP', p = parent)
@@ -91,41 +95,43 @@ def createZipperJnts(name = '', crv = '',upCurve = '' ,posJnts = '', parent = ''
         trsLib.match(posJnts[i-1], tempList[i-1])
         mc.makeIdentity(posJnts[i-1], apply = True, t = True, r = True, s = True)
 
-    mc.rename(tempList[0], 'L_' + name + 'ZipOutTertiary_LOC')
-    mc.rename(tempList[1], 'L_' + name + 'ZipOutSecondary_LOC')
-    mc.rename(tempList[2],'L_' +  name + 'Out_RotDrive_LOC')
-    mc.rename(tempList[3], 'L_' + name + 'ZipMidSecondary_LOC')
-    mc.rename(tempList[4], 'C_' + name + 'DriverMid_LOC')
-    mc.rename(tempList[5], 'R_' + name + 'ZipMidSecondary_LOC')
-    mc.rename(tempList[6], 'R_' +name + 'ZipOut_LOC')
-    mc.rename(tempList[7], 'R_' +name + 'ZipOutSecondary_LOC')
-    mc.rename(tempList[8], 'R_' +name + 'ZipOutTertiary_LOC')
+    tempList[0] = mc.rename(tempList[0], 'L_' + name + 'ZipOutTertiary_LOC')
+    tempList[1] =mc.rename(tempList[1], 'L_' + name + 'ZipOutSecondary_LOC')
+    tempList[2] =mc.rename(tempList[2],'L_' +  name + 'Out_RotDrive_LOC')
+    tempList[3] =mc.rename(tempList[3], 'L_' + name + 'ZipMidSecondary_LOC')
+    tempList[4] =mc.rename(tempList[4], 'C_' + name + 'DriverMid_LOC')
+    tempList[5] =mc.rename(tempList[5], 'R_' + name + 'ZipMidSecondary_LOC')
+    tempList[6] =mc.rename(tempList[6], 'R_' +name + 'ZipOut_LOC')
+    tempList[7] =mc.rename(tempList[7], 'R_' +name + 'ZipOutSecondary_LOC')
+    tempList[8] =mc.rename(tempList[8], 'R_' +name + 'ZipOutTertiary_LOC')
 
     posJnts[0] = mc.rename(posJnts[0], 'L_' + name + 'outTertiaryZip_JNT')
     posJnts[0] = posJnts[0].split('|')[-1]
-    posJnts[1] = mc.rename(posJnts[1], 'L_' +name + 'outSecondaryZip_JNT')
+    posJnts[1] = mc.rename(posJnts[1], 'L_' + name + 'outSecondaryZip_JNT')
     posJnts[1] = posJnts[1].split('|')[-1]
-    posJnts[2] = mc.rename(posJnts[2], 'L_' +name + 'outZip_JNT')
+    posJnts[2] = mc.rename(posJnts[2], 'L_' + name + 'outZip_JNT')
     posJnts[2] = posJnts[2].split('|')[-1]
-    posJnts[3] = mc.rename(posJnts[3], 'L_' +name + 'midSecondaryZip_JNT')
+    posJnts[3] = mc.rename(posJnts[3], 'L_' + name + 'midSecondaryZip_JNT')
     posJnts[3] = posJnts[3].split('|')[-1]
     posJnts[4] = mc.rename(posJnts[4], 'C_' + name + 'midZip_JNT')
     posJnts[4] = posJnts[4].split('|')[-1]
     posJnts[5] = mc.rename(posJnts[5], 'R_' + name + 'midSecondaryZip_JNT')
     posJnts[5] = posJnts[5].split('|')[-1]
-    posJnts[6] = mc.rename(posJnts[6], 'R_' +name + 'outZip_JNT')
+    posJnts[6] = mc.rename(posJnts[6], 'R_' + name + 'outZip_JNT')
     posJnts[6] = posJnts[6].split('|')[-1]
-    posJnts[7] = mc.rename(posJnts[7], 'R_' +name + 'outSecondaryZip_JNT')
+    posJnts[7] = mc.rename(posJnts[7], 'R_' + name + 'outSecondaryZip_JNT')
     posJnts[7] = posJnts[7].split('|')[-1]
-    posJnts[8] = mc.rename(posJnts[8], 'R_' +name + 'outTertiaryZip_JNT')
+    posJnts[8] = mc.rename(posJnts[8], 'R_' + name + 'outTertiaryZip_JNT')
     posJnts[8] = posJnts[8].split('|')[-1]
 
 
-    temodgrp = []
+    outTerList= []
+    BNDJNTS = []
     for i in (0,1,3,5,7,8):
         niceName = posJnts[i].split('_JNT')[0]
         outTer = mc.createNode('transform', name = niceName + 'Orient_GRP', p = jntParent)
         trsLib.match(outTer, posJnts[i])
+        outTerList.append(outTer)
         outTerMode = mc.createNode('transform', name = niceName + 'Modify_GRP', p = outTer)
         outTerMode2 = mc.createNode('transform', name = niceName + 'Modify_GRP2', p = outTerMode)
         TerMode = mc.createNode('transform', name=niceName + 'Modify_LOC', p=outTerMode2)
@@ -136,6 +142,7 @@ def createZipperJnts(name = '', crv = '',upCurve = '' ,posJnts = '', parent = ''
         outTerCtl,outTerCtlGrp = createTerCtl(name = niceName , parent = posJnts[i], up = up)
         mc.parent(outTerCtlGrp, terModGrp)
         mc.parent(posJnts[i], TerMode)
+        BNDJNTS.append(bndJnt)
         if i in (1,7):
             outSecLoc = mc.createNode('transform', name=niceName + 'RotDrive_LOC',)
             trsLib.match(outSecLoc, t = bndJnt)
@@ -144,16 +151,20 @@ def createZipperJnts(name = '', crv = '',upCurve = '' ,posJnts = '', parent = ''
                 mc.setAttr(outSecLoc + '.ry', 180)
             mc.parent(outSecLoc, bndJnt)
 
-    bndjnts = []
+    outBndList =  []
     for i in (2,4,6):
         niceName = posJnts[i].split('_JNT')[0]
         outBnd = mc.createNode('transform', name = niceName + 'OutBnd_GRP', p = jntParent)
         trsLib.match(outBnd, posJnts[i])
+        outBndList.append(outBnd)
         outBndLoc = mc.createNode('transform', name=niceName + 'OutBnd_LOC', p=outBnd)
         outBndLocShape = mc.createNode('locator', name=niceName + 'OutBndShape_LOC', p= outBndLoc)
         bndJnt = mc.joint(outBnd, name = niceName + '_BND', rad = 0.2)
-        bndjnts.append(bndJnt)
+        BNDJNTS.append(bndJnt)
         mc.parent(posJnts[i], outBnd)
+
+
+    return BNDJNTS, tempList, outTerList, outBndList
 
 
 def createTerCtl(name = '', parent = '', side = 'C', up = True):
@@ -309,13 +320,13 @@ def createMainHierarchyJnts(name = '', parent = '', middle = False):
         cornerMod = mc.createNode('transform' , name = name + 'CornerModify_GRP',p = parent)
         outModLocTrans = mc.createNode('transform',  name = name + 'OutModify_LOC', p = cornerMod)
         outModLocShape = mc.createNode('locator', name=name + 'OutModifyShape_LOC', p=outModLocTrans)
-        return outModLocTrans
+        return outModLocTrans, cornerMod
 
     else:
         mainMod = mc.createNode('transform' , name = name + 'MainModify_GRP',p = parent)
         outModLocTrans = mc.createNode('transform',  name = name + 'MainModify_LOC', p = mainMod)
         outModLocShape = mc.createNode('locator', name=name + 'ModifyShape_LOC', p=outModLocTrans)
-        return  outModLocTrans
+        return  outModLocTrans, mainMod
 
 
 
