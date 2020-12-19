@@ -8,7 +8,10 @@ from ....lib import trsLib
 from ....lib import strLib
 from ....lib import deformLib
 from ....lib import control
+from ....lib import keyLib
 
+
+reload(keyLib)
 reload(control)
 reload(crvLib)
 reload(jntLib)
@@ -22,7 +25,7 @@ def createCtlPlaceMent(name = '', parent = ''):
     squashMakro = mc.createNode('transform', name = name + 'MouthSquashMAKRO_GRP', p = parent)
     jntCtlLoc = mc.createNode('transform', name = name + 'JNTCtrl_LOC', p = squashMakro)
     jntCtlLocShape = mc.createNode('locator', name = name + 'JNTCtrlShape_LOC', p = jntCtlLoc)
-    return jntCtlLoc
+    return jntCtlLoc, squashMakro
 
 
 def createRollMod(name = '', parent = '', up = True):
@@ -87,7 +90,7 @@ def createLocsJntDriver(name = '', parent = '',jntSnap = ''):
     return midOrLoc, secOrLoc, outOrLoc, cornerOrLoc
 
 def createZipperJnts(name = '', crv = '',upCurve = '' ,posJnts = '', parent = '', jntParent = '', up = True):
-    ZipperTargetLoc = mc.createNode('transform', name = name + 'ZipperTargetLoc_GRP', p = parent)
+    ZipperTargetLoc = mc.createNode('transform', name = name + 'ZipperTargetloc_GRP', p = parent)
 
     tempList = locOnCrv(name = 'result', parent = ZipperTargetLoc, numLocs = 9, crv = crv,
                  upCurve = upCurve, paramStart =0.97 ,paramEnd = 0.118, upAxis = 'y', posJnts = posJnts)
@@ -209,7 +212,7 @@ def createRollHirarchy(name = '', parent = '', up = True ):
     flippedLoc= mc.createNode('transform',  name = name + 'MidFlipped_LOC', p = flippedMod)
     mc.setAttr(flippedMod + '.sx', -1)
     flippedLocShape = mc.createNode('locator',  name = name + 'MidFlippedShape_LOC', p = flippedLoc)
-    return  ctlRollMod
+    return  ctlRollMod, roll, midLoc
 
 
 def createSideMainCtl(name = '', parent = '', snapJnt = '', side = 'L'):
@@ -269,7 +272,7 @@ def createMiddleMainCtl(name = '', parent = '', snapJnt = '', side = 'C',up = Tr
                              matchTranslate=ctlOr)
     mc.parent(ctl.zro, ctlOr)
     mc.makeIdentity(ctl.zro, apply = True, r = True, t = True)
-    return ctl.name, ctl.zro
+    return ctl.name, ctl.zro, squashMakro
 
 def createMouthCtl(name = '', parent = '', snapJnt = '', side = 'C'):
 
@@ -398,6 +401,265 @@ def createNoseCtls(name = '', parent = '',mainSnap = '', cummelaSnap = '', leftS
     noseCtlBase = noseCtlBase.split('|')[-1]
     cumellaCtl = cumellaCtl.split('|')[-1]
     return noseCtl, noseCtlBase, cumellaCtl
+
+
+def drivenCornerLip(leftUpCtl = '', leftLowCtl = '', rightUpCtl = '', rightLowCtl = '',
+                        leftUpLoc = '', leftLowLoc = '', rightUpLoc = '', rightLowLoc = ''):
+    # connect corner controls to the upCornerMod locators
+    for i in [leftUpCtl,rightUpCtl]:
+        attrLib.addFloat(i, ln = 'Z', dv = 0)
+        attrLib.addFloat(i, ln = 'puff',min = -10, max = 10, dv = 0)
+    pmas = []
+    for i in [leftUpCtl,rightUpCtl]:
+        pma = mc.createNode('plusMinusAverage', name = i + '_PMA')
+        mc.connectAttr(i + '.Z', pma + '.input2D[1].input2Dx')
+        pmas.append(pma)
+
+    keyLib.setDriven(leftUpCtl + '.translateX', pmas[0] + '.input2D[0].input2Dx', [-6], [-1.9], itt='spline',ott='spline')
+    keyLib.setDriven(leftUpCtl + '.translateX', pmas[0] + '.input2D[0].input2Dx', [0], [0], itt='auto',ott='auto')
+    keyLib.setDriven(leftUpCtl + '.translateX', pmas[0] + '.input2D[0].input2Dx', [15], [-4.702978], itt='spline',ott='spline')
+    keyLib.setDriven(rightUpCtl + '.translateX', pmas[1] + '.input2D[0].input2Dx', [-6], [1.9], itt='spline',ott='spline')
+    keyLib.setDriven(rightUpCtl + '.translateX', pmas[1] + '.input2D[0].input2Dx', [0], [0], itt='auto',ott='auto')
+    keyLib.setDriven(rightUpCtl + '.translateX', pmas[1] + '.input2D[0].input2Dx', [15], [4.702978], itt='spline',ott='spline')
+
+    for i,s in zip([leftUpCtl,rightUpCtl],[leftUpLoc,rightUpLoc]):
+        [mc.connectAttr(i + '.{}{}'.format(t, a),s + '.{}{}'.format(t, a)) for t in 's' for a in 'xyz']
+        [mc.connectAttr(i + '.{}{}'.format(t, a),s + '.{}{}'.format(t, a)) for t in 'r' for a in 'xz']
+        [mc.connectAttr(i + '.{}{}'.format(t, a),s + '.{}{}'.format(t, a)) for t in 't' for a in 'xy']
+
+    keyLib.setDriven(leftUpCtl + '.translateX', leftUpLoc + '.ry', [-3], [6.640919], itt='spline', ott='spline')
+    keyLib.setDriven(leftUpCtl + '.translateX', leftUpLoc + '.ry', [0], [0], itt='flat', ott='flat')
+    keyLib.setDriven(leftUpCtl + '.translateX', leftUpLoc + '.ry', [6], [10], itt='spline', ott='spline')
+
+    keyLib.setDriven(rightUpCtl + '.translateX', rightUpLoc + '.ry', [-3], [-6.640919], itt='spline', ott='spline')
+    keyLib.setDriven(rightUpCtl + '.translateX', rightUpLoc + '.ry', [0], [0], itt='flat', ott='flat')
+    keyLib.setDriven(rightUpCtl + '.translateX', rightUpLoc + '.ry', [6], [-10], itt='spline', ott='spline')
+    animCurves = mc.listConnections(rightUpCtl, source=True, type="animCurve")
+    animCurves2 = mc.listConnections(leftUpCtl, source=True, type="animCurve")
+    for i in animCurves:
+        mc.setAttr(i + '.preInfinity', 1)
+        mc.setAttr(i + '.postInfinity', 1)
+    for i in animCurves2:
+        mc.setAttr(i + '.preInfinity', 1)
+        mc.setAttr(i + '.postInfinity', 1)
+
+    for i,s in zip(pmas,[leftUpLoc,rightUpLoc]):
+        mc.connectAttr(i + '.output2D.output2Dx' , s + '.translateZ')
+
+    # connect corner controls to the lowCornerMod locators
+    for i in [leftLowCtl,rightLowCtl]:
+        attrLib.addFloat(i, ln = 'Z', dv = 0)
+        attrLib.addFloat(i, ln = 'puff',min = -10, max = 10, dv = 0)
+    pmas = []
+    for i in [leftLowCtl,rightLowCtl]:
+        pma = mc.createNode('plusMinusAverage', name = i + '_PMA')
+        mc.connectAttr(i + '.Z', pma + '.input2D[1].input2Dx')
+        pmas.append(pma)
+
+    keyLib.setDriven(leftLowCtl + '.translateX', pmas[0] + '.input2D[0].input2Dx', [-6], [-1.9], itt='spline',ott='spline')
+    keyLib.setDriven(leftLowCtl + '.translateX', pmas[0] + '.input2D[0].input2Dx', [0], [0], itt='auto',ott='auto')
+    keyLib.setDriven(leftLowCtl + '.translateX', pmas[0] + '.input2D[0].input2Dx', [15], [-4.702978], itt='spline',ott='spline')
+
+    keyLib.setDriven(rightLowCtl + '.translateX', pmas[1] + '.input2D[0].input2Dx', [-6], [1.9], itt='spline',ott='spline')
+    keyLib.setDriven(rightLowCtl + '.translateX', pmas[1] + '.input2D[0].input2Dx', [0], [0], itt='auto',ott='auto')
+    keyLib.setDriven(rightLowCtl + '.translateX', pmas[1] + '.input2D[0].input2Dx', [15], [4.702978], itt='spline',ott='spline')
+
+    for i,s in zip([leftLowCtl,rightLowCtl],[leftLowLoc,rightLowLoc]):
+        [mc.connectAttr(i + '.{}{}'.format(t, a),s + '.{}{}'.format(t, a)) for t in 's' for a in 'xyz']
+        [mc.connectAttr(i + '.{}{}'.format(t, a),s + '.{}{}'.format(t, a)) for t in 'r' for a in 'xz']
+        [mc.connectAttr(i + '.{}{}'.format(t, a),s + '.{}{}'.format(t, a)) for t in 't' for a in 'xy']
+    keyLib.setDriven(leftLowCtl+ '.translateX', leftLowLoc+ '.ry', [-3], [6.640919], itt='spline',ott='spline')
+    keyLib.setDriven(leftLowCtl + '.translateX', leftLowLoc + '.ry', [0], [0], itt='flat',ott='flat')
+    keyLib.setDriven(leftLowCtl+ '.translateX', leftLowLoc+ '.ry', [6], [10], itt='spline',ott='spline')
+
+    keyLib.setDriven(rightLowCtl + '.translateX', rightLowLoc+ '.ry', [-3], [-6.640919], itt='spline',ott='spline')
+    keyLib.setDriven(rightLowCtl + '.translateX', rightLowLoc + '.ry', [0], [0], itt='spline',ott='spline')
+    keyLib.setDriven(rightLowCtl+ '.translateX', rightLowLoc+ '.ry', [6], [-10], itt='spline',ott='spline')
+    animCurves = mc.listConnections(rightLowCtl , source=True, type="animCurve")
+    animCurves2 = mc.listConnections(leftLowCtl , source=True, type="animCurve")
+    for i in animCurves:
+        mc.setAttr(i + '.preInfinity', 1)
+        mc.setAttr(i + '.postInfinity', 1)
+    for i in animCurves2:
+        mc.setAttr(i + '.preInfinity', 1)
+        mc.setAttr(i + '.postInfinity', 1)
+
+    for i,s in zip(pmas,[leftLowLoc,rightLowLoc]):
+        mc.connectAttr(i + '.output2D.output2Dx' , s + '.translateZ')
+
+
+
+def connectBndZip(locali = True,leftLowCornerCtl = '',rightLowCornerCtl = '',lowZipJnts = '', lowMicroJnts = '',
+                  leftUpCornerCtl = '',rightUpCornerCtl = '', upZipJnts = '', upMicroJnts = ''):
+    if locali:
+        name = 'local'
+    else:
+        name = ''
+    attrLib.addFloat(leftUpCornerCtl, ln='zip', min=0, dv=0)
+    attrLib.addFloat(rightUpCornerCtl, ln='zip', min=0, dv=0)
+    upmults = []
+    for i in upZipJnts:
+        mult = mc.createNode('multiplyDivide', name=name + i + '_MDN')
+        upmults.append(mult)
+    mult = mc.createNode('multiplyDivide', name=name + 'R_outTertiaryZip_MD1')
+    upmults.append(mult)
+    for j in ['input2X', 'input2Y', 'input2Z']:
+        keyLib.setDriven(leftUpCornerCtl + '.zip', upmults[0] + '.' + j, [0, 11], [0, 1], itt='auto', ott='auto')
+    for j in ['input2X', 'input2Y', 'input2Z']:
+        keyLib.setDriven(leftUpCornerCtl + '.zip', upmults[1] + '.' + j, [0, 4, 8, 14], [0, 0.2, 0.6, 1],
+                         itt='auto', ott='auto')
+    for j in ['input2X', 'input2Y', 'input2Z']:
+        keyLib.setDriven(leftUpCornerCtl + '.zip', upmults[2] + '.' + j, [0, 3, 17], [0, 0, 1], itt='auto',
+                         ott='auto')
+    for j in ['input2X', 'input2Y', 'input2Z']:
+        keyLib.setDriven(leftUpCornerCtl + '.zip', upmults[3] + '.' + j, [0, 6, 9, 18], [0, 0.03, 0.2, 1],
+                         itt='auto', ott='auto')
+    for j in ['input2X', 'input2Y', 'input2Z']:
+        keyLib.setDriven(leftUpCornerCtl + '.zip', upmults[4] + '.' + j, [4, 8, 20], [0, 0.05, 1], itt='auto',
+                         ott='auto')
+    for j in ['input2X', 'input2Y', 'input2Z']:
+        keyLib.setDriven(rightUpCornerCtl + '.zip', upmults[5] + '.' + j, [4, 8, 20], [0, 0.05, 1], itt='auto',
+                         ott='auto')
+    for j in ['input2X', 'input2Y', 'input2Z']:
+        keyLib.setDriven(rightUpCornerCtl + '.zip', upmults[6] + '.' + j, [0, 6, 9, 18], [0, 0.03, 0.2, 1],
+                         itt='auto', ott='auto')
+    for j in ['input2X', 'input2Y', 'input2Z']:
+        keyLib.setDriven(rightUpCornerCtl + '.zip', upmults[7] + '.' + j, [0, 3, 17], [0, 0, 1], itt='auto',
+                         ott='auto')
+    for j in ['input2X', 'input2Y', 'input2Z']:
+        keyLib.setDriven(rightUpCornerCtl + '.zip', upmults[8] + '.' + j, [0, 4, 8, 14], [0, 0.2, 0.6, 1],
+                         itt='auto', ott='auto')
+    for j in ['input2X', 'input2Y', 'input2Z']:
+        keyLib.setDriven(rightUpCornerCtl + '.zip', upmults[9] + '.' + j, [0, 11], [0, 1], itt='auto', ott='auto')
+
+    a = ['tx', 'ty', 'tz']
+    b = ['input1X', 'input1Y', 'input1Z']
+    c = ['input2X', 'input2Y', 'input2Z']
+    upZipTemp = []
+    upMultTemp = []
+    for i in range(10):
+        if i in [5]:
+            continue
+        uplip = upZipJnts[i - 1]
+        upZipTemp.append(uplip)
+    for i in range(10):
+        if i in [5, 6]:
+            continue
+        upmult = upmults[i - 1]
+        upMultTemp.append(upmult)
+    for i in range(8):
+        for j, k in zip(a, b):
+            mc.connectAttr(upZipTemp[i] + '.' + j, upMultTemp[i] + '.' + k)
+    for j, k in zip(a, b):
+        mc.connectAttr(upZipJnts[4] + '.' + j, upmults[4] + '.' + k)
+        mc.connectAttr(upZipJnts[4] + '.' + j, upmults[5] + '.' + k)
+    l_mult = mc.createNode('multiplyDivide', name=name + 'L_midZipHalf_MDN')
+    r_mult = mc.createNode('multiplyDivide', name=name + 'R_midZipHalf_MDN')
+
+    for i in c:
+        mc.setAttr(l_mult + '.' + i, 0.5)
+        mc.setAttr(r_mult + '.' + i, 0.5)
+
+    mc.connectAttr(upmults[4] + '.output', l_mult + '.input1')
+    mc.connectAttr(upmults[5] + '.output', r_mult + '.input1')
+
+    upMidZipPls = mc.createNode('plusMinusAverage', name=name + 'upmidZip_PMA')
+    mc.connectAttr(l_mult + '.output', upMidZipPls + '.input3D[0]')
+    mc.connectAttr(r_mult + '.output', upMidZipPls + '.input3D[1]')
+    mc.connectAttr(upMultTemp[0] + '.output', upMicroJnts[5] + '.translate')
+    mc.connectAttr(upMultTemp[1] + '.output', upMicroJnts[0] + '.translate')
+    mc.connectAttr(upMultTemp[2] + '.output', upMicroJnts[1] + '.translate')
+    mc.connectAttr(upMultTemp[3] + '.output', upMicroJnts[6] + '.translate')
+    mc.connectAttr(upMultTemp[4] + '.output', upMicroJnts[2] + '.translate')
+    mc.connectAttr(upMultTemp[5] + '.output', upMicroJnts[3] + '.translate')
+    mc.connectAttr(upMultTemp[6] + '.output', upMicroJnts[8] + '.translate')
+    mc.connectAttr(upMultTemp[7] + '.output', upMicroJnts[4] + '.translate')
+
+    mc.connectAttr(upMidZipPls + '.output3D', upMicroJnts[7] + '.translate')
+
+    attrLib.addFloat(leftLowCornerCtl, ln='zip', min=0, dv=0)
+    attrLib.addFloat(rightLowCornerCtl, ln='zip', min=0, dv=0)
+    upmults = []
+    for i in lowZipJnts:
+        mult = mc.createNode('multiplyDivide', name=name + i + '_MDN')
+        upmults.append(mult)
+    mult = mc.createNode('multiplyDivide', name=name + 'R_outTertiaryZip_MD1')
+    upmults.append(mult)
+    for j in ['input2X', 'input2Y', 'input2Z']:
+        keyLib.setDriven(leftLowCornerCtl + '.zip', upmults[0] + '.' + j, [0, 11], [0, 1], itt='auto',
+                         ott='auto')
+    for j in ['input2X', 'input2Y', 'input2Z']:
+        keyLib.setDriven(leftLowCornerCtl + '.zip', upmults[1] + '.' + j, [0, 4, 8, 14], [0, 0.2, 0.6, 1],
+                         itt='auto', ott='auto')
+    for j in ['input2X', 'input2Y', 'input2Z']:
+        keyLib.setDriven(leftLowCornerCtl + '.zip', upmults[2] + '.' + j, [0, 3, 17], [0, 0, 1], itt='auto',
+                         ott='auto')
+    for j in ['input2X', 'input2Y', 'input2Z']:
+        keyLib.setDriven(leftLowCornerCtl + '.zip', upmults[3] + '.' + j, [0, 6, 9, 18], [0, 0.03, 0.2, 1],
+                         itt='auto', ott='auto')
+    for j in ['input2X', 'input2Y', 'input2Z']:
+        keyLib.setDriven(leftLowCornerCtl + '.zip', upmults[4] + '.' + j, [4, 8, 20], [0, 0.05, 1], itt='auto',
+                         ott='auto')
+    for j in ['input2X', 'input2Y', 'input2Z']:
+        keyLib.setDriven(rightLowCornerCtl + '.zip', upmults[5] + '.' + j, [4, 8, 20], [0, 0.05, 1], itt='auto',
+                         ott='auto')
+    for j in ['input2X', 'input2Y', 'input2Z']:
+        keyLib.setDriven(rightLowCornerCtl + '.zip', upmults[6] + '.' + j, [0, 6, 9, 18], [0, 0.03, 0.2, 1],
+                         itt='auto', ott='auto')
+    for j in ['input2X', 'input2Y', 'input2Z']:
+        keyLib.setDriven(rightLowCornerCtl + '.zip', upmults[7] + '.' + j, [0, 3, 17], [0, 0, 1], itt='auto',
+                         ott='auto')
+    for j in ['input2X', 'input2Y', 'input2Z']:
+        keyLib.setDriven(rightLowCornerCtl + '.zip', upmults[8] + '.' + j, [0, 4, 8, 14], [0, 0.2, 0.6, 1],
+                         itt='auto', ott='auto')
+    for j in ['input2X', 'input2Y', 'input2Z']:
+        keyLib.setDriven(rightLowCornerCtl + '.zip', upmults[9] + '.' + j, [0, 11], [0, 1], itt='auto',
+                         ott='auto')
+
+    a = ['tx', 'ty', 'tz']
+    b = ['input1X', 'input1Y', 'input1Z']
+    c = ['input2X', 'input2Y', 'input2Z']
+    upZipTemp = []
+    upMultTemp = []
+    for i in range(10):
+        if i in [5]:
+            continue
+        uplip = lowZipJnts[i - 1]
+        upZipTemp.append(uplip)
+    for i in range(10):
+        if i in [5, 6]:
+            continue
+        upmult = upmults[i - 1]
+        upMultTemp.append(upmult)
+    for i in range(8):
+        for j, k in zip(a, b):
+            mc.connectAttr(upZipTemp[i] + '.' + j, upMultTemp[i] + '.' + k)
+    for j, k in zip(a, b):
+        mc.connectAttr(lowZipJnts[4] + '.' + j, upmults[4] + '.' + k)
+        mc.connectAttr(lowZipJnts[4] + '.' + j, upmults[5] + '.' + k)
+    l_mult = mc.createNode('multiplyDivide', name=name + 'L_midZipHalf_MDN')
+    r_mult = mc.createNode('multiplyDivide', name=name + 'R_midZipHalf_MDN')
+
+    for i in c:
+        mc.setAttr(l_mult + '.' + i, 0.5)
+        mc.setAttr(r_mult + '.' + i, 0.5)
+
+    mc.connectAttr(upmults[4] + '.output', l_mult + '.input1')
+    mc.connectAttr(upmults[5] + '.output', r_mult + '.input1')
+
+    upMidZipPls = mc.createNode('plusMinusAverage', name=name + 'upmidZip_PMA')
+    mc.connectAttr(l_mult + '.output', upMidZipPls + '.input3D[0]')
+    mc.connectAttr(r_mult + '.output', upMidZipPls + '.input3D[1]')
+    mc.connectAttr(upMultTemp[0] + '.output', lowMicroJnts[5] + '.translate')
+    mc.connectAttr(upMultTemp[1] + '.output', lowMicroJnts[0] + '.translate')
+    mc.connectAttr(upMultTemp[2] + '.output', lowMicroJnts[1] + '.translate')
+    mc.connectAttr(upMultTemp[3] + '.output', lowMicroJnts[6] + '.translate')
+    mc.connectAttr(upMultTemp[4] + '.output', lowMicroJnts[2] + '.translate')
+    mc.connectAttr(upMultTemp[5] + '.output', lowMicroJnts[3] + '.translate')
+    mc.connectAttr(upMultTemp[6] + '.output', lowMicroJnts[8] + '.translate')
+    mc.connectAttr(upMultTemp[7] + '.output', lowMicroJnts[4] + '.translate')
+
+    mc.connectAttr(upMidZipPls + '.output3D', lowMicroJnts[7] + '.translate')
 
 
 

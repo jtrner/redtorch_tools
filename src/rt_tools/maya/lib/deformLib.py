@@ -1087,3 +1087,23 @@ def importDeformerWgts(path, newNode=None):
             wgt_attr = newNode + '.' + wgt_attr.split('.', 1)[-1]
         for i in range(len(wgts)):
             mc.setAttr('{}[{}]'.format(wgt_attr, i), wgts[i])
+
+def blendShapeTarget(objName = '', targetName = '',blendName = ''):
+    # add target
+    last_used_index = mc.blendShape(objName, q=True, weightCount=True)
+    new_target_index = 0 if last_used_index == 0 else last_used_index + 1
+    # the only way to add an internal target is to add a physical mesh and then delete it
+    temp_duplicate = mc.duplicate(objName, n=targetName)[0]
+    mc.blendShape(blendName, e=True, target=(objName, new_target_index, targetName, 1.0))
+    mc.delete(temp_duplicate)
+    # in case duplicated base shape had deformations on it,
+    # we reset the new target (0=base shape index)
+    mc.blendShape(blendName, e=True, resetTargetDelta=(0, new_target_index))
+    # enter sculpt target mode
+    mc.blendShape(blendName, e=True, weight=(new_target_index, 1.0))
+    # or use the target name: cmds.setAttr('%s.%s' % (bls, target_name), 1.0)
+    mc.sculptTarget(blendName, e=True, target=new_target_index)
+    # sculpt, sculpt, sculpt
+    # exit sculpt target mode
+    mc.sculptTarget(blendName, e=True, target=-1)
+    mc.blendShape(blendName, e=True, weight=(new_target_index, 0.0))

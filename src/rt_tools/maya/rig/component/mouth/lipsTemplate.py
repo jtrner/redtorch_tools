@@ -68,19 +68,19 @@ class LipsTemplate(template.Template):
         self.noseMakroDrvrLocShape = mc.createNode('locator', name='NoseMakroDriverShape_LOC', p=self.noseMakroDrvrLoc)
 
         # mouth squash part
-        self.mouthSquashDrvr = mc.createNode('transform', name = 'mouthSquashDriver_GRP', p = self.mouthMakro)
-        self.mouthSquashDrvrLoc= mc.createNode('transform',  name = 'mouthSquashDriver_LOC', p = self.mouthSquashDrvr)
-        self.mouthSquashDrvrLocShape = mc.createNode('locator', name='mouthSquashDriverShape_LOC', p=self.mouthSquashDrvrLoc)
+        self.mouthSquashDrvr = mc.createNode('transform', name = 'mouthSquashdriver_GRP', p = self.mouthMakro)
+        self.mouthSquashDrvrLoc= mc.createNode('transform',  name = 'mouthSquashdriver_LOC', p = self.mouthSquashDrvr)
+        self.mouthSquashDrvrLocShape = mc.createNode('locator', name='mouthSquashdriverShape_LOC', p=self.mouthSquashDrvrLoc)
 
         # lip corner makro part
         self.lipCornerMakroDrvr = mc.createNode('transform', name = 'LipCornerMAKRO_Driver_GRP', p = self.mouthMakro)
 
-        self.r_lipCornerMakroDrvr = mc.createNode('transform', name = 'R_lipCornerMAKRO_DriverOri_GRP', p = self.lipCornerMakroDrvr)
-        self.r_cornerMakroLoc = mc.createNode('transform',  name = 'R_lipCornerMAKRO_Driver_LOC', p = self.r_lipCornerMakroDrvr)
+        self.r_lipCornerMakroDrvr = mc.createNode('transform', name = 'R_lipCornerMAKRO_driverOri_GRP', p = self.lipCornerMakroDrvr)
+        self.r_cornerMakroLoc = mc.createNode('transform',  name = 'R_lipCornerMAKRO_driver_LOC', p = self.r_lipCornerMakroDrvr)
         self.r_cornerMakroLocShape = mc.createNode('locator', name='R_lipCornerMAKROShape_Driver_LOC', p=self.r_cornerMakroLoc)
-        self.l_lipCornerMakroDrvr = mc.createNode('transform', name = 'L_lipCornerMAKRO_DriverOri_GRP', p = self.lipCornerMakroDrvr)
-        self.l_cornerMakroLoc = mc.createNode('transform',  name = 'L_lipCornerMAKRO_Driver_LOC', p = self.l_lipCornerMakroDrvr)
-        self.l_cornerMakroLocShape = mc.createNode('locator', name='L_lipCornerMAKROShape_Driver_LOC', p=self.l_cornerMakroLoc)
+        self.l_lipCornerMakroDrvr = mc.createNode('transform', name = 'L_lipCornerMAKRO_driverOri_GRP', p = self.lipCornerMakroDrvr)
+        self.l_cornerMakroLoc = mc.createNode('transform',  name = 'L_lipCornerMAKRO_driver_LOC', p = self.l_lipCornerMakroDrvr)
+        self.l_cornerMakroLocShape = mc.createNode('locator', name='L_lipCornerMAKROShape_driver_LOC', p=self.l_cornerMakroLoc)
 
         self.mouthPiv = mc.createNode('transform', name='MouthCtrlPivotMod_GRP', p=self.rigGrp)
         #jaw part
@@ -121,16 +121,16 @@ class LipsTemplate(template.Template):
 
         # up part
         self.upLipRibbon = mc.createNode('transform', name='localUpLipRibbon_GRP', p=self.rigGrp)
-        self.noTuchyUp = mc.createNode('transform', name='localUpLipNoTouchy_GRP', p=self.upLipRibbon)
+        self.noTuchyUp = mc.createNode('transform', name='localUpLipNoTouch_GRP', p=self.upLipRibbon)
         self.upJntDrvr = mc.createNode('transform', name='localUpJntDrvr_GRP', p=self.upLipRibbon)
         self.upLipCtlGrp = mc.createNode('transform', name='localUpLipCtrl_GRP', p=self.upLipRibbon)
         self.upMicroJntCtlGrp = mc.createNode('transform', name='localUpLipMicroJntCtrl_GRP', p=self.upJntDrvr)
         self.upjntCtlPlace = mc.createNode('transform', name='localUpLipJNTCtrlPlacement_GRP', p=self.upJntDrvr)
         self.jntRollModupGrp = mc.createNode('transform', name='localUpLipJNTRollModify_GRP', p=self.upJntDrvr)
         self.upLipMakroJntCtl = mc.createNode('transform', name='upLipMakroJntCtrl_GRP', p=self.upJntDrvr)
-        self.upLipJntLocLowGrp = mc.createNode('transform', name='localUpLipJntLocLow_GRP', p=self.noTuchyUp)
-        self.jntLocMedUp = mc.createNode('transform', name='localUpLipJntLocMed_GRP', p=self.noTuchyUp)
-        self.jntLocHiUp = mc.createNode('transform', name='localupLipJntLocHi_GRP', p=self.noTuchyUp)
+        self.upLipJntLocLowGrp = mc.createNode('transform', name='localUpLipjntLocLow_GRP', p=self.noTuchyUp)
+        self.jntLocMedUp = mc.createNode('transform', name='localUpLipjntLocMed_GRP', p=self.noTuchyUp)
+        self.jntLocHiUp = mc.createNode('transform', name='localUpLipjntLocHi_GRP', p=self.noTuchyUp)
         self.r_localUpLipOutOrient_GRP = mc.createNode('transform', name='R_localUpLipOutOrient_GRP',
                                                        p=self.upLipMakroJntCtl)
         self.l_localUpLipOutOrient_GRP = mc.createNode('transform', name='L_localUpLipOutOrient_GRP',
@@ -143,16 +143,16 @@ class LipsTemplate(template.Template):
 
         # low part
         self.lowLipRibbon = mc.createNode('transform', name='localLowLipRibbon_GRP', p=self.rigGrp)
-        self.noTuchyLow = mc.createNode('transform', name='localLowLipNoTouchy_GRP', p=self.lowLipRibbon)
+        self.noTuchyLow = mc.createNode('transform', name='localLowLipNoTouch_GRP', p=self.lowLipRibbon)
         self.lowJntDrvr = mc.createNode('transform', name='localLowJntDrvr_GRP', p=self.lowLipRibbon)
         self.lowLipCtlGrp = mc.createNode('transform', name='localLowLipCtrl_GRP', p=self.lowLipRibbon)
         self.lowLipMakroJntCtl = mc.createNode('transform', name='lowLipMakroJntCtrl_GRP', p=self.lowJntDrvr)
         self.lowMicroJntCtlGrp = mc.createNode('transform', name='localLowLipMicroJntCtrl_GRP', p=self.lowJntDrvr)
         self.jntRollModlowGrp = mc.createNode('transform', name='localLowLipJNTRollModify_GRP', p=self.lowJntDrvr)
         self.lowjntCtlPlace = mc.createNode('transform', name='localLowLipJNTCtrlPlacement_GRP', p=self.lowJntDrvr)
-        self.lowLipJntLocLowGrp = mc.createNode('transform', name='localLowLipJntLocLow_GRP', p=self.noTuchyLow)
-        self.jntLocMedLow = mc.createNode('transform', name='localLowLipJntLocMed_GRP', p=self.noTuchyLow)
-        self.jntLocHiLow = mc.createNode('transform', name='localLowLipJntLocHi_GRP', p=self.noTuchyLow)
+        self.lowLipJntLocLowGrp = mc.createNode('transform', name='localLowLipjntLocLow_GRP', p=self.noTuchyLow)
+        self.jntLocMedLow = mc.createNode('transform', name='localLowLipjntLocMed_GRP', p=self.noTuchyLow)
+        self.jntLocHiLow = mc.createNode('transform', name='localLowLipjntLocHi_GRP', p=self.noTuchyLow)
         self.r_localLowLipOutOrient_GRP = mc.createNode('transform', name='R_localLowLipOutOrient_GRP',
                                                         p=self.lowLipMakroJntCtl)
         self.l_localLowLipOutOrient_GRP = mc.createNode('transform', name='L_localLowLipOutOrient_GRP',
@@ -176,19 +176,31 @@ class LipsTemplate(template.Template):
 
         self.ctlupLipJawFollowLoc = mc.createNode('transform',  name = 'ctlUpperLip_JawFollow_LOC', p = self.lipCtlFollowLoc)
         self.ctlupLipJawFollowLocShape = mc.createNode('locator', name='ctlUpperLip_JawFollowShape_LOC', p=self.ctlupLipJawFollowLoc)
+
         self.ctlupLipJawFollowDrvr= mc.createNode('transform',  name = 'ctlUpperLip_FollowDriver_LOC', p = self.ctlupLipJawFollowLoc)
         self.ctlupLipJawFollowDrvrShape = mc.createNode('locator', name='ctlUpperLip_FollowDriverShape_LOC', p=self.ctlupLipJawFollowDrvr)
 
         self.ctllowLipJawFollowLoc = mc.createNode('transform',  name = 'ctlLowerLip_JawFollow_LOC', p = self.lipCtlFollowLoc)
         self.ctllowLipJawFollowLocShape = mc.createNode('locator', name='ctllowerLip_JawFollowShape_LOC', p=self.ctllowLipJawFollowLoc)
+
         self.ctllowLipJawFollowDrvr= mc.createNode('transform',  name = 'ctllowerLip_FollowDriver_LOC', p = self.ctllowLipJawFollowLoc)
         self.ctllowLipJawFollowDrvrShape = mc.createNode('locator', name='ctllowerLip_FollowDriverShape_LOC', p=self.ctllowLipJawFollowDrvr)
 
         self.ctlLipCornerJawFollowLoc = mc.createNode('transform',  name = 'ctlLipCorners_JawFollow_LOC', p = self.lipCtlFollowLoc)
         self.ctlLipCornerJawFollowLocShape = mc.createNode('locator', name='ctlLipCorners_JawFollowShape_LOC', p=self.ctlLipCornerJawFollowLoc)
+
         self.ctlLipCornerJawFollowDrvr= mc.createNode('transform',  name = 'ctlLipCorners_FollowDriver_LOC', p = self.ctlLipCornerJawFollowLoc)
         self.ctlLipCornerJawFollowDrvrShape = mc.createNode('locator', name='ctlLipCorners_FollowDriverShape_LOC', p=self.ctlLipCornerJawFollowDrvr)
 
+        # cleaning outliner
+        self.localMidZipBaseModGrp = mc.createNode('transform', name = 'localUpLipMidZipBaseMod_GRP',p = self.upJntDrvr)
+        trsLib.match(self.localMidZipBaseModGrp, self.upBindJnts[1])
+        self.localMidZipBasePlaceModGrp = mc.createNode('transform', name = 'localUpLipMidZipplaceMod_GRP',p = self.upJntDrvr)
+        trsLib.match(self.localMidZipBasePlaceModGrp, self.upBindJnts[0])
+        self.lowlocalMidZipBaseModGrp = mc.createNode('transform', name='localLowLipMidZipBaseMod_GRP', p=self.lowJntDrvr)
+        trsLib.match(self.lowlocalMidZipBaseModGrp, self.lowBindJnts[1])
+        self.localMidZipBasePlaceModGrp = mc.createNode('transform', name='localUpLipMidZipplaceMod_GRP', p=self.lowJntDrvr)
+        trsLib.match(self.localMidZipBasePlaceModGrp, self.lowBindJnts[0])
 
     def matches(self):
         trsLib.match(self.mouthPiv, self.upBindJnts[-1])
@@ -211,6 +223,7 @@ class LipsTemplate(template.Template):
         # mouth squash follow
         trsLib.match(self.mouthSquashDrvrLoc,self.mouthPiv)
         mc.move(0, 0, 1.5, self.mouthSquashDrvrLoc, r = True, ws = True)
+        mc.makeIdentity(self.mouthSquashDrvrLoc, apply = True, t = True)
         # lip corner makro drvr
         trsLib.match(self.lipCornerMakroDrvr,self.mouthPiv)
         mc.move(10, 0, 1.5, self.lipCornerMakroDrvr, r = True, ws = True)
@@ -251,6 +264,9 @@ class LipsTemplate(template.Template):
         trsLib.match(self.ctlupLipJawFollowLoc, self.mouthPiv)
         trsLib.match(self.ctllowLipJawFollowLoc, self.mouthPiv)
         trsLib.match(self.ctlLipCornerJawFollowLoc, self.mouthPiv)
+        mc.move(0,-20, 0, self.ctlupLipJawFollowLoc, r = True, ws = True)
+        mc.move(0,-20, 0, self.ctllowLipJawFollowLoc, r = True, ws = True)
+        mc.move(0,-20, 0, self.ctlLipCornerJawFollowLoc, r = True, ws = True)
 
 
 

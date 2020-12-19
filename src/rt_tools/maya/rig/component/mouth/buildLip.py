@@ -170,7 +170,7 @@ class BuildLip(lipsTemplate.LipsTemplate):
         #****************************************************upPart******************************************
 
         mc.move(0, 1, 5, self.upjntCtlPlace, r=True, ws=True)
-        self.upJntCtlLoc = funcs.createCtlPlaceMent(name = 'localUpLip', parent = self.upjntCtlPlace)
+        self.upJntCtlLoc, self.upSquashMak = funcs.createCtlPlaceMent(name = 'localUpLip', parent = self.upjntCtlPlace)
 
         #create roll modify
         mc.move(0, 0.5,1.3, self.jntRollModupGrp, r=True, ws=True)
@@ -261,8 +261,8 @@ class BuildLip(lipsTemplate.LipsTemplate):
 
 
         # create left up joint hierarchy
-        l_upLipCornerMod_loc, self.leftUpMainMod = funcs.createMainHierarchyJnts(name='L_localUpLip', parent=self.leftUpMainJnt, middle=False)
-        mc.parent(self.upLipLowRezBindJnts[2],l_upLipCornerMod_loc)
+        self.l_upLipCornerMod_loc, self.leftUpMainMod = funcs.createMainHierarchyJnts(name='L_localUpLip', parent=self.leftUpMainJnt, middle=False)
+        mc.parent(self.upLipLowRezBindJnts[2],self.l_upLipCornerMod_loc)
         self.upLipLowRezBindJnts[2] = self.upLipLowRezBindJnts[2].split('|')[-1]
         [mc.setAttr(self.upLipLowRezBindJnts[2]+ '.{}{}'.format(r,a), 0) for r in 'r' for a in 'xyz']
         mc.setAttr(self.upLipLowRezBindJnts[2] + '.jointOrientY', 0)
@@ -271,20 +271,20 @@ class BuildLip(lipsTemplate.LipsTemplate):
         trsLib.match(l_upLip_rotdrvrLoc, t = self.upLipLowRezBindJnts[2])
         mc.parent(l_upLip_rotdrvrLoc, self.upLipLowRezBindJnts[2])
 
-        l_upLip_cornerbnd = mc.spaceLocator(name = 'L_localUpLipcornerBnd_LOC')
-        trsLib.match(l_upLip_cornerbnd, self.upLipLowRezBindJnts[2])
-        mc.parent(l_upLip_cornerbnd, self.upLipLowRezBindJnts[2])
-        l_upLip_cornerbnd = l_upLip_cornerbnd[0].split('|')[-1]
+        self.l_upLip_cornerbnd = mc.spaceLocator(name = 'L_localUpLipcornerBnd_LOC')
+        trsLib.match(self.l_upLip_cornerbnd, self.upLipLowRezBindJnts[2])
+        mc.parent(self.l_upLip_cornerbnd, self.upLipLowRezBindJnts[2])
+        self.l_upLip_cornerbnd = self.l_upLip_cornerbnd[0].split('|')[-1]
 
         self.upHirzBndJnts = []
-        self.l_upLipcorner= mc.joint(l_upLip_cornerbnd, name = 'L_localUpLipCorner_BND', rad = 0.4 )
+        self.l_upLipcorner= mc.joint(self.l_upLip_cornerbnd, name = 'L_localUpLipCorner_BND', rad = 0.4 )
         self.l_upLipcornerminor = mc.joint(self.l_upLipcorner, name = 'L_localUpLipCornerMinor_BND' ,  rad = 0.4)
         mc.setAttr(self.l_upLipcornerminor + '.tx', 0.3)
         self.upHirzBndJnts.append(self.l_upLipcorner)
 
         # create right up joint hierarchy
-        r_upLipCornerMod_loc, self.rightUpMainMod  = funcs.createMainHierarchyJnts(name='R_localUpLip', parent=self.rightUpMainJnt,  middle=False)
-        mc.parent(self.upLipLowRezBindJnts[0],r_upLipCornerMod_loc)
+        self.r_upLipCornerMod_loc, self.rightUpMainMod  = funcs.createMainHierarchyJnts(name='R_localUpLip', parent=self.rightUpMainJnt,  middle=False)
+        mc.parent(self.upLipLowRezBindJnts[0],self.r_upLipCornerMod_loc)
         self.upLipLowRezBindJnts[0] = self.upLipLowRezBindJnts[0].split('|')[-1]
         [mc.setAttr(self.upLipLowRezBindJnts[0]+ '.{}{}'.format(r,a), 0) for r in 'r' for a in 'xyz']
         mc.setAttr(self.upLipLowRezBindJnts[0] + '.jointOrientY', 0)
@@ -293,12 +293,12 @@ class BuildLip(lipsTemplate.LipsTemplate):
         trsLib.match(r_upLip_rotdrvrLoc, t = self.upLipLowRezBindJnts[0])
         mc.parent(r_upLip_rotdrvrLoc, self.upLipLowRezBindJnts[0])
 
-        r_upLip_cornerbnd = mc.spaceLocator(name = 'R_localUpLipcornerBnd_LOC')
-        trsLib.match(r_upLip_cornerbnd, self.upLipLowRezBindJnts[0])
-        mc.parent(r_upLip_cornerbnd, self.upLipLowRezBindJnts[0])
-        r_upLip_cornerbnd = r_upLip_cornerbnd[0].split('|')[-1]
+        self.r_upLip_cornerbnd = mc.spaceLocator(name = 'R_localUpLipcornerBnd_LOC')
+        trsLib.match(self.r_upLip_cornerbnd, self.upLipLowRezBindJnts[0])
+        mc.parent(self.r_upLip_cornerbnd, self.upLipLowRezBindJnts[0])
+        self.r_upLip_cornerbnd = self.r_upLip_cornerbnd[0].split('|')[-1]
 
-        self.r_upLipcorner= mc.joint(r_upLip_cornerbnd, name = 'R_localUpLipCorner_BND', rad = 0.4 )
+        self.r_upLipcorner= mc.joint(self.r_upLip_cornerbnd, name = 'R_localUpLipCorner_BND', rad = 0.4 )
         self.r_upLipcornerminor = mc.joint(self.r_upLipcorner, name = 'R_localUpLipCornerMinor_BND' ,  rad = 0.4)
         mc.setAttr(self.r_upLipcornerminor + '.tx', 0.3)
         self.upHirzBndJnts.append(self.r_upLipcorner)
@@ -318,9 +318,9 @@ class BuildLip(lipsTemplate.LipsTemplate):
 
         self.ctlupPlacement = mc.createNode('transform', name='localUpLipCtrlPlacement_GRP', p=self.upLipCtlGrp)
         trsLib.match(self.ctlupPlacement, self.upLipLowRezBindJnts[1])
-        uplipctl, uplipctlgrp = funcs.createMiddleMainCtl(name = 'localUpLip', parent = self.ctlupPlacement ,
+        self.uplipctl, self.uplipctlgrp, self.upsquashCtlMakro = funcs.createMiddleMainCtl(name = 'localUpLip', parent = self.ctlupPlacement ,
                                                     snapJnt=self.upLipLowRezBindJnts[1], side = 'C',up = True)
-        uplipctlgrp = mc.rename(uplipctlgrp, 'localUpLipCtrlModify_GRP')
+        self.uplipctlgrp = mc.rename(self.uplipctlgrp, 'localUpLipCtrlModify_GRP')
 
         # create left low main ctl
         self.leftUpLipCtlGrp = mc.createNode('transform', name= 'L_localUpLipCornerCtrlOrient_GRP', p=self.upLipCtlGrp)
@@ -338,12 +338,12 @@ class BuildLip(lipsTemplate.LipsTemplate):
         self.rightUpmainCtls,self.rightUpMainCtlGrp = funcs.createSideMainCtl(name = 'localUpLip', parent = self.rightUpLipCtlGrp,
                                                               snapJnt = self.upLipLowRezBindJnts[0], side = 'R')
         self.rightUpCornerCtl = mc.rename(self.rightUpmainCtls[0], 'R_localUpLipCorner_CTL' )
-        self.rightMinorCornerCtl = mc.rename(self.rightUpmainCtls[1], 'R_localUpLipCornerMinor_CTL' )
+        self.rightUpMinorCornerCtl = mc.rename(self.rightUpmainCtls[1], 'R_localUpLipCornerMinor_CTL' )
         self.rightCornerLowCtlGrp = mc.rename(self.rightUpMainCtlGrp[0], 'R_localUpLipCornerCtrlModify_GRP' )
         self.rightMinorCornerLowCtlGrp = mc.rename(self.rightUpMainCtlGrp[1], 'R_localUpLipCornerMinorModify_GRP' )
 
         # create up roll
-        self.upLipCtlRoll = funcs.createRollHirarchy(name = 'localUpLip', parent = self.upLipCtlGrp, up = True)
+        self.upLipCtlRoll, self.upRoll_loc, self.upMidRollLoc = funcs.createRollHirarchy(name = 'localUpLip', parent = self.upLipCtlGrp, up = True)
 
         # create secondary zip joints
         zipUpSecJnts = jntLib.create_on_curve(self.upLipZippercrv, numOfJoints = 9, parent = False, description='C_base', radius = 0.1)
@@ -366,7 +366,7 @@ class BuildLip(lipsTemplate.LipsTemplate):
 
         # create ctlPlacement
         mc.move(0, 1, 5, self.lowjntCtlPlace, r=True, ws=True)
-        self.lowJntCtlLoc = funcs.createCtlPlaceMent(name = 'localLowLip', parent = self.lowjntCtlPlace)
+        self.lowJntCtlLoc, self.lowSquashMak = funcs.createCtlPlaceMent(name = 'localLowLip', parent = self.lowjntCtlPlace)
 
         self.lowLipLowRezBindJnts = jntLib.create_on_curve(self.lowLipLowRezcrv, numOfJoints = 3, parent = False, description='C_base', radius= 0.2)
 
@@ -442,8 +442,8 @@ class BuildLip(lipsTemplate.LipsTemplate):
 
 
         # create left low joint hierarchy
-        l_upLipCornerMod_loc, self.leftLowMainMod  = funcs.createMainHierarchyJnts(name='L_localLowLip', parent=self.leftLowMainJnt, middle=False)
-        mc.parent(self.lowLipLowRezBindJnts[2],l_upLipCornerMod_loc)
+        self.l_lowLipCornerMod_loc, self.leftLowMainMod  = funcs.createMainHierarchyJnts(name='L_localLowLip', parent=self.leftLowMainJnt, middle=False)
+        mc.parent(self.lowLipLowRezBindJnts[2],self.l_lowLipCornerMod_loc)
         self.lowLipLowRezBindJnts[2] = self.lowLipLowRezBindJnts[2].split('|')[-1]
         [mc.setAttr(self.lowLipLowRezBindJnts[2]+ '.{}{}'.format(r,a), 0) for r in 'r' for a in 'xyz']
         mc.setAttr(self.lowLipLowRezBindJnts[2] + '.jointOrientY', 0)
@@ -452,21 +452,21 @@ class BuildLip(lipsTemplate.LipsTemplate):
         trsLib.match(l_LowLip_rotdrvrLoc, t = self.lowLipLowRezBindJnts[2])
         mc.parent(l_LowLip_rotdrvrLoc, self.lowLipLowRezBindJnts[2])
 
-        l_LowLip_cornerbnd = mc.spaceLocator(name = 'L_localLowLipcornerBnd_LOC')
-        trsLib.match(l_LowLip_cornerbnd, self.lowLipLowRezBindJnts[2])
-        mc.parent(l_LowLip_cornerbnd, self.lowLipLowRezBindJnts[2])
-        l_LowLip_cornerbnd = l_LowLip_cornerbnd[0].split('|')[-1]
+        self.l_lowLip_cornerbnd = mc.spaceLocator(name = 'L_localLowLipcornerBnd_LOC')
+        trsLib.match(self.l_lowLip_cornerbnd, self.lowLipLowRezBindJnts[2])
+        mc.parent(self.l_lowLip_cornerbnd, self.lowLipLowRezBindJnts[2])
+        self.l_lowLip_cornerbnd = self.l_lowLip_cornerbnd[0].split('|')[-1]
 
         self.lowHirzBndJnts = []
-        self.l_lowLipcorner= mc.joint(l_LowLip_cornerbnd, name = 'L_localLowLipCorner_BND', rad = 0.4 )
-        self.l_lowLipcornerminor = mc.joint(self.l_lowLipcorner, name = 'L_localUpLipCornerMinor_BND' ,  rad = 0.4)
+        self.l_lowLipcorner= mc.joint(self.l_lowLip_cornerbnd, name = 'L_localLowLipCorner_BND', rad = 0.4 )
+        self.l_lowLipcornerminor = mc.joint(self.l_lowLipcorner, name = 'L_localLowLipCornerMinor_BND' ,  rad = 0.4)
         mc.setAttr(self.l_lowLipcornerminor + '.tx', 0.3)
         self.lowHirzBndJnts.append(self.l_lowLipcorner)
 
 
         # create right low joint hierarchy
-        r_upLipCornerMod_loc , self.rightLowMainMod = funcs.createMainHierarchyJnts(name='R_localLowLip', parent=self.rightLowMainJnt, middle=False)
-        mc.parent(self.lowLipLowRezBindJnts[0],r_upLipCornerMod_loc)
+        self.r_lowLipCornerMod_loc , self.rightLowMainMod = funcs.createMainHierarchyJnts(name='R_localLowLip', parent=self.rightLowMainJnt, middle=False)
+        mc.parent(self.lowLipLowRezBindJnts[0],self.r_lowLipCornerMod_loc)
         self.lowLipLowRezBindJnts[0] = self.lowLipLowRezBindJnts[0].split('|')[-1]
         [mc.setAttr(self.lowLipLowRezBindJnts[0]+ '.{}{}'.format(r,a), 0) for r in 'r' for a in 'xyz']
         mc.setAttr(self.lowLipLowRezBindJnts[0] + '.jointOrientY', 0)
@@ -475,12 +475,12 @@ class BuildLip(lipsTemplate.LipsTemplate):
         trsLib.match(r_lowLip_rotdrvrLoc, t = self.lowLipLowRezBindJnts[0])
         mc.parent(r_lowLip_rotdrvrLoc, self.lowLipLowRezBindJnts[0])
 
-        r_lowLip_cornerbnd = mc.spaceLocator(name = 'R_localLowLipcornerBnd_LOC')
-        trsLib.match(r_lowLip_cornerbnd, self.lowLipLowRezBindJnts[0])
-        mc.parent(r_lowLip_cornerbnd, self.lowLipLowRezBindJnts[0])
-        r_lowLip_cornerbnd = r_lowLip_cornerbnd[0].split('|')[-1]
+        self.r_lowLip_cornerbnd = mc.spaceLocator(name = 'R_localLowLipcornerBnd_LOC')
+        trsLib.match(self.r_lowLip_cornerbnd, self.lowLipLowRezBindJnts[0])
+        mc.parent(self.r_lowLip_cornerbnd, self.lowLipLowRezBindJnts[0])
+        self.r_lowLip_cornerbnd = self.r_lowLip_cornerbnd[0].split('|')[-1]
 
-        self.r_LowLipcorner= mc.joint(r_lowLip_cornerbnd, name = 'R_localLowLipCorner_BND', rad = 0.4 )
+        self.r_LowLipcorner= mc.joint(self.r_lowLip_cornerbnd, name = 'R_localLowLipCorner_BND', rad = 0.4 )
         self.r_upLipcornerminor = mc.joint(self.r_LowLipcorner, name = 'R_localLowLipCornerMinor_BND' ,  rad = 0.4)
         mc.setAttr(self.r_upLipcornerminor + '.tx', 0.3)
         self.lowHirzBndJnts.append(self.r_LowLipcorner)
@@ -494,17 +494,17 @@ class BuildLip(lipsTemplate.LipsTemplate):
         # create middle low main ctl
         self.ctllowPlacement = mc.createNode('transform', name='localLowLipCtrlPlacement_GRP', p=self.upLipCtlGrp)
         trsLib.match(self.ctllowPlacement,self.lowLipLowRezBindJnts[1])
-        lowlipctl, lowlipctlgrp = funcs.createMiddleMainCtl(name = 'localLowLip', parent = self.ctllowPlacement,
+        self.lowlipctl, self.lowlipctlgrp, self.lowsquashCtlMakro = funcs.createMiddleMainCtl(name = 'localLowLip', parent = self.ctllowPlacement,
                                                       snapJnt=self.lowLipLowRezBindJnts[1], side = 'C', up = False)
-        lowlipctlgrp = mc.rename(lowlipctlgrp, 'localLowLipCtrlModify_GRP')
+        self.lowlipctlgrp = mc.rename(self.lowlipctlgrp, 'localLowLipCtrlModify_GRP')
 
         # create left low main ctl
         self.leftLowLipCtlGrp = mc.createNode('transform', name='L_localLowLipCornerCtrlOrient_GRP', p=self.lowLipCtlGrp)
         trsLib.match(self.leftLowLipCtlGrp, self.lowLipLowRezBindJnts[2])
         self.leftLowmainCtls,self.leftLowMainCtlGrp = funcs.createSideMainCtl(name = 'localLowLip', parent = self.leftLowLipCtlGrp ,
                                                               snapJnt = self.lowLipLowRezBindJnts[2], side = 'L')
-        self.leftCornerCtl = mc.rename(self.leftLowmainCtls[0], 'L_localLowLipCorner_CTL' )
-        self.leftMinorCornerCtl = mc.rename(self.leftLowmainCtls[1], 'L_localLowLipCornerMinor_CTL' )
+        self.leftLowCornerCtl = mc.rename(self.leftLowmainCtls[0], 'L_localLowLipCorner_CTL' )
+        self.leftLowMinorCornerCtl = mc.rename(self.leftLowmainCtls[1], 'L_localLowLipCornerMinor_CTL' )
         self.leftCornerLowCtlGrp = mc.rename(self.leftLowMainCtlGrp[0], 'L_localLowLipCornerCtrlModify_GRP' )
         self.leftMinorCornerLowCtlGrp = mc.rename(self.leftLowMainCtlGrp[1], 'L_localLowLipCornerMinorModify_GRP' )
 
@@ -514,12 +514,12 @@ class BuildLip(lipsTemplate.LipsTemplate):
         self.rightLowmainCtls,self.rightLowMainCtlGrp = funcs.createSideMainCtl(name = 'localLowLip', parent = self.rightLowLipCtlGrp,
                                                                 snapJnt = self.lowLipLowRezBindJnts[0], side = 'R')
         self.rightLowCornerCtl = mc.rename(self.rightLowmainCtls[0], 'R_localLowLipCorner_CTL' )
-        self.rightMinorCornerCtl = mc.rename(self.rightLowmainCtls[1], 'R_localLowLipCornerMinor_CTL' )
+        self.rightLowMinorCornerCtl = mc.rename(self.rightLowmainCtls[1], 'R_localLowLipCornerMinor_CTL' )
         self.rightCornerLowCtlGrp = mc.rename(self.rightLowMainCtlGrp[0], 'R_localLowLipCornerCtrlModify_GRP' )
         self.rightMinorCornerLowCtlGrp = mc.rename(self.rightLowMainCtlGrp[1], 'R_localLowLipCornerMinorModify_GRP' )
 
         # create low roll
-        self.lowLipCtlRoll = funcs.createRollHirarchy(name = 'localLowLip', parent = self.lowLipCtlGrp, up = False)
+        self.lowLipCtlRoll, self.lowRoll_loc, self.lowMidRollLoc = funcs.createRollHirarchy(name = 'localLowLip', parent = self.lowLipCtlGrp, up = False)
 
         # create zipper joints
         zipLowSecJnts = jntLib.create_on_curve(self.upLipZippercrv, numOfJoints = 9, parent = False, description='C_base', radius = 0.1)
@@ -539,12 +539,16 @@ class BuildLip(lipsTemplate.LipsTemplate):
                                                                                  leftSnap = self.leftnostrils[0] ,
                                                                                  rightSnap = self.rightnostrils[0])
 
+
         # duplicate the local rig
         output = trsLib.duplicate(self.upLipRibbon, search = 'local',replace = '', hierarchy= True )
         mc.setAttr(output[0] + '.ty', -20)
+        #mc.makeIdentity(output[0], apply = True, t = True)
         mc.parent(output[0], self.facialCtrlGrp)
         output = trsLib.duplicate(self.lowLipRibbon, search = 'local',replace = '', hierarchy= True )
         mc.setAttr(output[0] + '.ty', -20)
+        #mc.makeIdentity(output[0], apply = True, t = True)
         mc.parent(output[0], self.facialCtrlGrp)
+
 
 
