@@ -761,6 +761,11 @@ class Lips(buildLip.BuildLip):
         [mc.connectAttr(self.cln(self.uplipctl) + '.{}{}'.format(t, a), self.cln(self.upMidRollLoc) + '.{}{}'.format(t, a)) for t in 'r' for a in 'xyz']
         [mc.connectAttr(self.cln(self.lowlipctl) + '.{}{}'.format(t, a), self.cln(self.lowMidRollLoc) + '.{}{}'.format(t, a)) for t in 'r' for a in 'xyz']
 
+        # connect upCorner controls to the lower corner controls
+        for i in ['tx', 'ty', 'visibility','rotateOrder', 'zip', 'Z', 'puff']:
+            mc.connectAttr(self.cln(self.leftUpCornerCtl) + '.' + i, self.cln(self.leftLowCornerCtl) + '.' + i)
+            mc.connectAttr(self.cln(self.rightUpCornerCtl) + '.' + i, self.cln(self.rightLowCornerCtl) + '.' + i)
+
         #**********************************************************blendShapes*********************************************************
         mouthbls = mc.blendShape(self.geo, frontOfChain=True, n='mouth_bShp')[0]
         for i in ['L_CI','R_CI','L_CO','L_CD','L_CU','MODriver','R_CO','R_CD','R_CU','upLipPress','lowLipPress',
