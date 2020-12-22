@@ -237,7 +237,7 @@ class Lid2(template.Template):
         mc.connectAttr(self.aimCtl + '.fleshyEyelids', fleshyMul + '.input2X')
         mc.connectAttr(self.aimCtl + '.fleshyEyelids', fleshyMul + '.input2Y')
 
-        # create plusMinusAverage for sum of rotation of eye rotation and eyeLid control translation
+        # create plusMinusAverage for sum of rotation of eye rotation and eyelid control translation
         fkUpRotationPma = mc.createNode('plusMinusAverage' , name = self.name + '_up_fkRotation' + '_PMA')
         fkButtomRotationPma = mc.createNode('plusMinusAverage' , name = self.name + '_buttom_fkRotation' + '_PMA')
 

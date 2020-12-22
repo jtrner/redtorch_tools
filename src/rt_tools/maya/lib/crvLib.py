@@ -771,7 +771,7 @@ def attachToCurve(node=None, crv=None, uParam=None, upObj=None):
     [mc.connectAttr("{}.rotate{}".format(mop, x.title()), "{}.r{}".format(node, x)) for x in 'xyz']
 
 
-def attach(node=None, curve=None, upCurve=None, upAxis='y',param = 1, aimUparam=None):
+def attach(node=None, curve=None, upCurve=None, upAxis='y',param = 1, translate = False,aimUparam=None):
     """
     attaches given object to curve using pointOnCurveInfo node
 
@@ -884,8 +884,11 @@ def attach(node=None, curve=None, upCurve=None, upAxis='y',param = 1, aimUparam=
     mc.connectAttr(fmx + '.output', dmx + '.inputMatrix')
 
     # connect result
-    mc.connectAttr(dmx + '.outputTranslate', node + '.translate')
-    mc.connectAttr(dmx + '.outputRotate', node + '.rotate')
+    if translate:
+        mc.connectAttr(dmx + '.outputTranslate', node + '.translate')
+    else:
+        mc.connectAttr(dmx + '.outputTranslate', node + '.translate')
+        mc.connectAttr(dmx + '.outputRotate', node + '.rotate')
 
     return pci_1, pci_2
 
