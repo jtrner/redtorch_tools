@@ -7,9 +7,9 @@ from ....lib import trsLib
 from ....lib import attrLib
 from ....lib import container
 from ....lib import strLib
-from ...component import template
+from . import headTemplate
 
-reload(template)
+reload(headTemplate)
 reload(trsLib)
 reload(attrLib)
 reload(container)
@@ -19,17 +19,15 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-class MiscTemplate(template.Template):
+class MiscTemplate(headTemplate.HeadTemplate):
     """
-    base class for lip template
+    base class for misc template
     """
     def __init__(self,  **kwargs ):
         super(MiscTemplate, self).__init__(**kwargs)
 
     def build(self):
         super(MiscTemplate, self).build()
-        self.createGroups()
-        self.matches()
 
     def createGroups(self):
         self.localMiscJntGrp = mc.createNode('transform', name = 'localMiscjnt_GRP')

@@ -7,9 +7,9 @@ from ....lib import trsLib
 from ....lib import attrLib
 from ....lib import container
 from ....lib import strLib
-from ...component import template
+from . import headTemplate
 
-reload(template)
+reload(headTemplate)
 reload(trsLib)
 reload(attrLib)
 reload(container)
@@ -19,17 +19,15 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-class EyelidsTemplate(template.Template):
+class EyebrowsTemplate(headTemplate.HeadTemplate):
     """
     base class for lip template
     """
     def __init__(self,  **kwargs ):
-        super(EyelidsTemplate, self).__init__(**kwargs)
+        super(EyebrowsTemplate, self).__init__(**kwargs)
 
     def build(self):
-        super(EyelidsTemplate, self).build()
-        self.createGroups()
-        self.matches()
+        super(EyebrowsTemplate, self).build()
 
     def createGroups(self):
         self.localBrowsGrp = mc.createNode('transform', name = 'localBrows_GRP')

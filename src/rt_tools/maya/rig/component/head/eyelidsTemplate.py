@@ -7,7 +7,7 @@ from ....lib import trsLib
 from ....lib import attrLib
 from ....lib import container
 from ....lib import strLib
-from ...component import template
+from . import headTemplate
 
 reload(template)
 reload(trsLib)
@@ -19,15 +19,13 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-class EyelidsTemplate(template.Template):
+class EyelidsTemplate(headTemplate.HeadTemplate):
 
     def __init__(self,  **kwargs ):
         super(EyelidsTemplate, self).__init__(**kwargs)
 
     def build(self):
         super(EyelidsTemplate, self).build()
-        self.createGroups()
-        self.matches()
 
     def createGroups(self):
         self.eyelidCtlGrp = mc.createNode('transform', name = 'eyeLidsCtl_GRP')

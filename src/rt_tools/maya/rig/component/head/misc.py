@@ -74,3 +74,14 @@ class Misc(buildMisc.BulidMisc):
 
         [mc.connectAttr(self.miscCtls[6] + '.{}{}'.format(a, v), self.orbitalLowerModGrp + '.{}{}'.format(a, v)) for a in 't' for v in 'xyz']
 
+
+        # parent nasalLabial ctl groups under squash joint
+        # mc.parent(self.cheekCtlOriGrp, self.buttomJntSquash[0])
+        # mc.parent(self.nasalLabialCtlOriGrp, self.buttomJntSquash[0])
+        # mc.parent(self.cheekLowerCtlOriGrp, self.buttomJntSquash[2])
+        # mc.parent(self.earCtlOriGrp , self.topJntSquash[0])
+        # mc.parent(self.nasalCtlOriGrp, self.topJntSquash[0])
+        # mc.parent(self.orbitalLowerCtlOriGrp, self.topJntSquash[0])
+        # mc.parent(self.browFleshCtlOriGrp, self.topJntSquash[1])
+        # mc.parent(self.orbitalUpperCtlOriGrp, self.topJntSquash[1])
+        #

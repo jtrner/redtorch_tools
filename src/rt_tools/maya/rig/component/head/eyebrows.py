@@ -130,6 +130,10 @@ class Eyebrows(buildEyebrow.BuildEyebrow):
         connect.remapVal(self.mainCtls[1] + '.translateY', browShapes + '.brow_' + self.side + '_InDown',
                          inputMin=0, inputMax=-3, outputMin=0, outputMax=2, name=self.side + '_browInDownY')
 
+        #parent stuf under squash joints
+        mc.parent(self.browCtlGrp, self.topJntSquash[1])
+
+
 
 
 

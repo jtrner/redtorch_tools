@@ -174,7 +174,7 @@ class BuildLip(lipsTemplate.LipsTemplate):
 
         #create roll modify
         mc.move(0, 0.5,1.3, self.jntRollModupGrp, r=True, ws=True)
-        self.jntUpRollLoc, self.upLipJntMidLoc = funcs.createRollMod(name = 'localLowLip', parent = self.jntRollModupGrp,up = True)
+        self.jntUpRollLoc, self.upLipJntMidLoc = funcs.createRollMod(name = 'localUpLip', parent = self.jntRollModupGrp,up = True)
 
         self.upLipLowRezBindJnts = jntLib.create_on_curve(self.upLipLowRezcrv, numOfJoints = 3, parent = False, description='C_base', radius = 0.2)
 
@@ -309,7 +309,7 @@ class BuildLip(lipsTemplate.LipsTemplate):
         mc.parent(self.upLipLowRezBindJnts[1],self.m_upLipCornerMod_loc)
         self.upLipLowRezBindJnts[1] = self.upLipLowRezBindJnts[1].split('|')[-1]
 
-        self.mouthCtlOr = mc.createNode('transform', name = 'mouthCtlOri_GRP',p = self.facialCtrlGrp)
+        self.mouthCtlOr = mc.createNode('transform', name = 'mouthCtlOri_GRP', p = self.facialCtlGrp)
         trsLib.match( self.mouthCtlOr, self.mouthPiv)
         mc.setAttr(self.mouthCtlOr + '.tz', 6.5)
         mc.setAttr(self.mouthCtlOr + '.ty', 240.8)
@@ -539,16 +539,53 @@ class BuildLip(lipsTemplate.LipsTemplate):
                                                                                  leftSnap = self.leftnostrils[0] ,
                                                                                  rightSnap = self.rightnostrils[0])
 
+        # create jaw ctls
+        self.jawCtlOriGrp = mc.createNode('transform' ,name = 'jawCtlOri_GRP', p = self.facialCtlGrp)
+        trsLib.match(self.jawCtlOriGrp, self.mouthAndJawMain[1])
+        self.jawCtlMakroGrp = mc.createNode('transform', name = 'jawCtlMakr_GRP', p = self.jawCtlOriGrp)
+
+        ctl,grp = funcs.createCtl(parent = self.jawCtlMakroGrp, side = self.side )
+        self.jawCtlModGrp = mc.rename(grp, 'jawCtlMod_GRP')
+        self.jawCtl = mc.rename(ctl, 'jaw_CTL')
+        mc.parent(self.jawCtlModGrp,self.jawCtlMakroGrp)
+
+        self.jawCtlSecondaryCtlOriGrp = mc.createNode('transform', name = 'jawSecondaryCtlOri_GRP', p = self.jawCtl)
+        trsLib.match(self.jawCtlSecondaryCtlOriGrp,self.jawSecBndJnt[0] )
+
+        ctl,grp = funcs.createCtl(parent = self.jawCtlSecondaryCtlOriGrp , side = self.side)
+        self.jawSecModCtlGrp = mc.rename(grp, 'jawSecondaryCtlMod_GRP')
+        self.jawSecCtl = mc.rename(ctl, 'jawSecondary_CTL')
+        mc.parent(self.jawSecModCtlGrp ,self.jawCtlSecondaryCtlOriGrp)
+
+        ctl,grp = funcs.createCtl(parent = self.jawSecBndJnt[2], side = self.side)
+        self.mentalisModCtlGrp = mc.rename(grp, 'mentalisCtlMod_GRP')
+        self.mentalisCtl = mc.rename(ctl, 'mentalis_CTL')
+        mc.parent(self.mentalisModCtlGrp, self.jawSecCtl)
+
+        ctl,grp = funcs.createCtl(parent = self.jawSecBndJnt[1], side = self.side)
+        self.chinModCtlGrp = mc.rename(grp, 'chinCtlMod_GRP')
+        self.chinCtl = mc.rename(ctl, 'chin_CTL')
+        mc.parent(self.chinModCtlGrp, self.jawSecCtl)
+
+        self.jaw2ndFollowLoc = mc.createNode('transform', name = 'jaw2ndFollow_LOC',p = self.jawSecBndJnt[0])
+        self.jaw2ndFollowLocShape = mc.createNode('transform', name = 'jaw2ndFollowShape_LOC',p = self.jaw2ndFollowLoc)
+        self.lowMouthGrp = mc.createNode('transform', name = 'lowMouth_GRP')
+
+
+
+        mc.parent(self.lowMouthGrp ,self.jaw2ndFollowLoc )
+
+
 
         # duplicate the local rig
         output = trsLib.duplicate(self.upLipRibbon, search = 'local',replace = '', hierarchy= True )
         mc.setAttr(output[0] + '.ty', -20)
         #mc.makeIdentity(output[0], apply = True, t = True)
-        mc.parent(output[0], self.facialCtrlGrp)
+        mc.parent(output[0], self.facialCtlGrp)
         output = trsLib.duplicate(self.lowLipRibbon, search = 'local',replace = '', hierarchy= True )
         mc.setAttr(output[0] + '.ty', -20)
         #mc.makeIdentity(output[0], apply = True, t = True)
-        mc.parent(output[0], self.facialCtrlGrp)
+        mc.parent(output[0], self.facialCtlGrp)
 
 
 

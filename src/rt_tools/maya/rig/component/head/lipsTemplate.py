@@ -7,9 +7,9 @@ from ....lib import trsLib
 from ....lib import attrLib
 from ....lib import container
 from ....lib import strLib
-from ...component import template
+from . import headTemplate
 
-reload(template)
+reload(headTemplate)
 reload(trsLib)
 reload(attrLib)
 reload(container)
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-class LipsTemplate(template.Template):
+class LipsTemplate(headTemplate.HeadTemplate):
     """
     base class for lip template
     """
@@ -28,14 +28,12 @@ class LipsTemplate(template.Template):
 
     def build(self):
         super(LipsTemplate, self).build()
-        self.createGroups()
-        self.matches()
 
     def createGroups(self):
         self.localLipRigGrp = mc.createNode('transform', name = 'localLips_Rig')
+        self.facialCtlGrp = mc.createNode('transform', name = 'facialCtlGrp')
         self.rigGrp = mc.createNode('transform', name='lipRig_GRP', p = self.localLipRigGrp)
-        self.facialCtrlGrp = mc.createNode('transform', name='facialCTRL_GRP')
-        self.noseCtlGrp = mc.createNode('transform', name = 'noseCtlGrp', p = self.facialCtrlGrp)
+        self.noseCtlGrp = mc.createNode('transform', name = 'noseCtlGrp', p = self.facialCtlGrp)
 
         self.mouthMakro = mc.createNode('transform', name = 'mouthMAKRO_Driver_GRP', p = self.localLipRigGrp)
         # mouthMakro part
@@ -164,7 +162,7 @@ class LipsTemplate(template.Template):
         self.middleLowMainJnt = mc.createNode('transform', name='m_localLowLipCornerOrient_GRP', p=self.lowJntDrvr)
 
         # global part
-        self.mouthAncFollowLoc = mc.createNode('transform',  name = 'MouthAnchorFollow_LOC',p = self.facialCtrlGrp)
+        self.mouthAncFollowLoc = mc.createNode('transform',  name = 'MouthAnchorFollow_LOC',p = self.facialCtlGrp)
         self.mouthAncFollowLocShape = mc.createNode('locator', name='MouthAnchorFollowShape_LOC', p=self.mouthAncFollowLoc)
         self.ctlPivotFollowOri = mc.createNode('transform',  name = 'MouthCtrlPivotFollowOri_GRP',p = self.mouthAncFollowLoc)
         self.mouthAncFollowDrvr = mc.createNode('transform',  name = 'MouthCtrlPivotDriver_LOC',p = self.ctlPivotFollowOri)
@@ -172,7 +170,7 @@ class LipsTemplate(template.Template):
 
         self.lipFollowLocGrp = mc.createNode('transform', name = 'LipFollowLoc_GRP', p =self.mouthMakro)
 
-        self.lipCtlFollowLoc = mc.createNode('transform', name = 'LipCtrlFollowLoc_GRP', p = self.facialCtrlGrp)
+        self.lipCtlFollowLoc = mc.createNode('transform', name = 'LipCtrlFollowLoc_GRP', p = self.facialCtlGrp)
 
         self.ctlupLipJawFollowLoc = mc.createNode('transform',  name = 'ctlUpperLip_JawFollow_LOC', p = self.lipCtlFollowLoc)
         self.ctlupLipJawFollowLocShape = mc.createNode('locator', name='ctlUpperLip_JawFollowShape_LOC', p=self.ctlupLipJawFollowLoc)

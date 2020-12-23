@@ -234,9 +234,10 @@ class Eyelids(buildEyelid.BuildEyelid):
 
 
 
-
-
-
+        #parent stuf under squash head joints
+        # mc.parent(self.eyelidCtlGrp,self.topJntSquash[0])
+        #
+        #
 
 
 

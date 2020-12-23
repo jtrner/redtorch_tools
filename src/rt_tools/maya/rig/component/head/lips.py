@@ -407,6 +407,7 @@ class Lips(buildLip.BuildLip):
                          inputMin = 0, inputMax=3.527, outputMin=0, outputMax=-6.5)
 
         # connect up mid lip ctl to the up lip jnt ctl loc
+        self.upJntCtlLoc = self.upJntCtlLoc.split('|')[-1]
         for i in [self.uplipctl, self.lowlipctl,self.upJntCtlLoc, self.lowJntCtlLoc,self.cln(self.upJntCtlLoc),
                   self.cln(self.lowJntCtlLoc),self.cln(self.uplipctl),self.cln(self.lowlipctl)]:
             attrLib.addFloat(i, ln = 'lipRoll', dv = 0)
@@ -492,6 +493,12 @@ class Lips(buildLip.BuildLip):
 
         #  create locs on global curves
         # move transforms above global locators that drives by the curves
+        self.jntLocHiUp = self.jntLocHiUp.split('|')[-1]
+        self.jntLocHiLow = self.jntLocHiLow.split('|')[-1]
+        self.jntLocMedUp = self.jntLocMedUp.split('|')[-1]
+        self.jntLocMedLow = self.jntLocMedLow.split('|')[-1]
+        self.upLipJntLocLowGrp = self.upLipJntLocLowGrp.split('|')[-1]
+        self.lowLipJntLocLowGrp = self.lowLipJntLocLowGrp.split('|')[-1]
         for i in [self.cln(self.jntLocHiUp),self.cln(self.jntLocHiLow),self.cln(self.upLipJntLocLowGrp),self.cln(self.lowLipJntLocLowGrp),
                   self.cln(self.jntLocMedUp),self.cln(self.jntLocMedLow),'UpLipZipperTargetloc_GRP','LowLipZipperTargetloc_GRP',]:
          mc.move( 0, 20, 0,i, r = True, ws = True)
@@ -591,6 +598,13 @@ class Lips(buildLip.BuildLip):
         self.lowLipZipOutTerLocRight = mc.rename(lowTargets[8], 'R_LowLipZipOutTertiary_LOC')
 
         # parent constraint locators on the curves to the transforms on top of global controls
+        self.l_localUpLipOutOrient_GRP = self.l_localUpLipOutOrient_GRP.split('|')[-1]
+        self.m_localUpLipOutOrient_GRP = self.m_localUpLipOutOrient_GRP.split('|')[-1]
+        self.r_localUpLipOutOrient_GRP = self.r_localUpLipOutOrient_GRP.split('|')[-1]
+        self.l_localLowLipOutOrient_GRP = self.l_localLowLipOutOrient_GRP.split('|')[-1]
+        self.m_localLowLipOutOrient_GRP = self.m_localUpLipOutOrient_GRP.split('|')[-1]
+        self.r_localLowLipOutOrient_GRP = self.r_localLowLipOutOrient_GRP.split('|')[-1]
+
         for i,j in zip([self.cln(self.l_UpLipDriverOutMod),self.cln(self.m_UpLipDriverOutMod),self.cln(self.r_UpLipDriverOutMod)],
                         [self.cln(self.l_localUpLipOutOrient_GRP),self.cln(self.m_localUpLipOutOrient_GRP), self.cln(self.r_localUpLipOutOrient_GRP)]):
             mc.parentConstraint(i, j , mo = True)
@@ -675,6 +689,9 @@ class Lips(buildLip.BuildLip):
         [mc.connectAttr(self.cln(self.rightLowMinorCornerCtl) + '.{}{}'.format(t, a), self.cln(self.r_lowLip_cornerbnd) + '.{}{}'.format(t, a)) for t in 'tr' for a in 'xyz']
 
         # connect locator under lip corner makro group to the lip corner joint
+        self.l_cornerMakroLoc = self.l_cornerMakroLoc.split('|')[-1]
+        self.r_cornerMakroLoc = self.r_cornerMakroLoc.split('|')[-1]
+
         leftRemapCornerMakroGlob = connect.remapVal(self.cln(self.l_cornerMakroLoc) + '.ty',self.cln(self.upLipLowRezBindJnts[2]) + '.tz',
                                                     name = 'L_lipCornerTZ_MAKROGlob',
                          inputMin = 0, inputMax=-6, outputMin=0, outputMax=-3)
@@ -684,6 +701,8 @@ class Lips(buildLip.BuildLip):
 
         mc.connectAttr(leftRemapCornerMakroGlob + '.outValue',self.cln(self.lowLipLowRezBindJnts[2]) + '.tz')
         mc.connectAttr(rightRemapCornerMakroGlob + '.outValue',self.cln(self.lowLipLowRezBindJnts[0]) + '.tz')
+
+        self.mouthSquashDrvrLoc = self.mouthSquashDrvrLoc.split('|')[-1]
 
         rightUpSquashGlob = connect.remapVal(self.cln(self.mouthSquashDrvrLoc) + '.ty',self.cln(self.upSquashMak) + '.ty',
                                              name = 'upLip_mouthSquashCtlCorrGlob',
@@ -822,6 +841,12 @@ class Lips(buildLip.BuildLip):
 
         mc.parent(self.tempCurve,'Zipper_CRV1BaseWire' , 'Zipper_CRV1BaseWire1',self.noTuchyUp)
 
+
+        #parent stuf under squash head ctl
+        # mc.parent(self.mouthCtlOr,self.buttomJntSquash[1])
+        # mc.parent(self.lipFollowLocGrp, self.buttomJntSquash[1])
+        # mc.parent(self.noseCtlGrp, self.buttomJntSquash[0])
+        #
 
 
     def cln(self,node):

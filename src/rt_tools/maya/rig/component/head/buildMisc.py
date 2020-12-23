@@ -198,4 +198,3 @@ class BulidMisc(miscTemplate.MiscTemplate):
             self.miscCtls.append(ctl)
 
 
-

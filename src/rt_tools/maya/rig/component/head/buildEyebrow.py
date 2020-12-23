@@ -11,9 +11,9 @@ from ....lib import strLib
 from ....lib import deformLib
 from ....lib import control
 from . import funcs
-from . import eyelidsTemplate
+from . import eyebrowsTemplate
 
-reload(eyelidsTemplate)
+reload(eyebrowsTemplate)
 reload(funcs)
 reload(control)
 reload(crvLib)
@@ -25,7 +25,7 @@ reload(strLib)
 reload(deformLib)
 
 
-class BuildEyebrow(eyelidsTemplate.EyelidsTemplate):
+class BuildEyebrow(eyebrowsTemplate.EyebrowsTemplate):
     """Class for creating eyebrows"""
     def __init__(self,  **kwargs ):
         super(BuildEyebrow, self).__init__(**kwargs)
