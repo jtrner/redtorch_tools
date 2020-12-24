@@ -41,8 +41,21 @@ class BuildLip(lipsTemplate.LipsTemplate):
                         'leftnostril': 'leftnostril',
                         'leftnostrilFlare': 'leftnostrilFlare',
                         'rightnostril': 'rightnostril',
-                        'rightnostrilFlare': 'rightnostrilFlare'
-                        }
+                        'rightnostrilFlare': 'rightnostrilFlare',
+                        'tongueBase':'tongueBase',
+                        'tongue_01':'tongue_01',
+                        'tongue_02':'tongue_02',
+                        'tongue_03':'tongue_03',
+                        'tongue_04':'tongue_04',
+                        'tongue_05':'tongue_05',
+                        'topTeeth': 'topTeeth',
+                        'lowTeeth': 'lowTeeth',
+                        'upTeethWireMid':'upTeethWireMid',
+                        'upTeethWireLeft':'upTeethWireLeft',
+                        'upTeethWireRight':'upTeethWireRight',
+                        'lowTeethWireMid':'lowTeethWireMid',
+                        'lowTeethWireLeft':'lowTeethWireLeft',
+                        'lowTeethWireRight':'lowTeethWireRight',}
 
     def createBlueprint(self):
         super(BuildLip, self).createBlueprint()
@@ -109,8 +122,121 @@ class BuildLip(lipsTemplate.LipsTemplate):
             mc.joint(self.blueprints['rightnostril'] , name = self.blueprints['rightnostrilFlare'])
             mc.xform(self.blueprints['rightnostrilFlare'], ws = True, t = (29.6, 262.14, 2.9))
 
+        self.blueprints['tongueBase'] = '{}_tongueBase_BLU'.format(self.name)
+        if not mc.objExists(self.blueprints['tongueBase']):
+            mc.joint(self.blueprintGrp, name = self.blueprints['tongueBase'])
+            mc.xform(self.blueprints['tongueBase'], ws = True, t = (30, 260.928, -2.437))
+
+        self.blueprints['tongue_01'] = '{}_tongue_01_BLU'.format(self.name)
+        if not mc.objExists(self.blueprints['tongue_01']):
+            mc.joint(self.blueprints['tongueBase'], name = self.blueprints['tongue_01'])
+            mc.xform(self.blueprints['tongue_01'], ws = True, t = (30, 260.928, -1.041))
+
+        self.blueprints['tongue_02'] = '{}_tongue_02_BLU'.format(self.name)
+        if not mc.objExists(self.blueprints['tongue_02']):
+            mc.joint(self.blueprints['tongue_01'], name = self.blueprints['tongue_02'])
+            mc.xform(self.blueprints['tongue_02'], ws = True, t = (30, 260.928, 0.255))
+
+        self.blueprints['tongue_03'] = '{}_tongue_03_BLU'.format(self.name)
+        if not mc.objExists(self.blueprints['tongue_03']):
+            mc.joint(self.blueprints['tongue_02'], name = self.blueprints['tongue_03'])
+            mc.xform(self.blueprints['tongue_03'], ws = True, t = (30, 260.928, 1.554))
+
+        self.blueprints['tongue_04'] = '{}_tongue_04_BLU'.format(self.name)
+        if not mc.objExists(self.blueprints['tongue_04']):
+            mc.joint(self.blueprints['tongue_03'], name = self.blueprints['tongue_04'])
+            mc.xform(self.blueprints['tongue_04'], ws = True, t = (30, 260.928, 2.69))
+
+        self.blueprints['tongue_05'] = '{}_tongue_05_BLU'.format(self.name)
+        if not mc.objExists(self.blueprints['tongue_05']):
+            mc.joint(self.blueprints['tongue_04'], name = self.blueprints['tongue_05'])
+            mc.xform(self.blueprints['tongue_05'], ws = True, t = (30, 260.928, 3.648))
+
+        self.blueprints['topTeeth'] = '{}_topTeeth_BLU'.format(self.name)
+        if not mc.objExists(self.blueprints['topTeeth']):
+            mc.joint(self.blueprintGrp, name = self.blueprints['topTeeth'])
+            mc.xform(self.blueprints['topTeeth'], ws = True, t = (30, 261.418, 3.466))
+
+        self.blueprints['lowTeeth'] = '{}_lowTeeth_BLU'.format(self.name)
+        if not mc.objExists(self.blueprints['lowTeeth']):
+            mc.joint(self.blueprintGrp, name = self.blueprints['lowTeeth'])
+            mc.xform(self.blueprints['lowTeeth'], ws = True, t = (30, 260.472, 3.444))
+
+        self.blueprints['upTeethWireMid'] = '{}_upTeethWireMid_BLU'.format(self.name)
+        if not mc.objExists(self.blueprints['upTeethWireMid']):
+            mc.joint(self.blueprintGrp, name = self.blueprints['upTeethWireMid'])
+            mc.xform(self.blueprints['upTeethWireMid'], ws = True, t = (30, 261.449, 3.444))
+
+        self.blueprints['upTeethWireLeft'] = '{}_upTeethWireLeft_BLU'.format(self.name)
+        if not mc.objExists(self.blueprints['upTeethWireLeft']):
+            mc.joint(self.blueprintGrp, name = self.blueprints['upTeethWireLeft'])
+            mc.xform(self.blueprints['upTeethWireLeft'], ws = True, t = (32, 261.47,-1.083))
+
+        self.blueprints['upTeethWireRight'] = '{}_upTeethWireRight_BLU'.format(self.name)
+        if not mc.objExists(self.blueprints['upTeethWireRight']):
+            mc.joint(self.blueprintGrp, name = self.blueprints['upTeethWireRight'])
+            mc.xform(self.blueprints['upTeethWireRight'], ws = True, t = (28, 261.47, -1.083))
+
+        self.blueprints['lowTeethWireMid'] = '{}_lowTeethWireMid_BLU'.format(self.name)
+        if not mc.objExists(self.blueprints['lowTeethWireMid']):
+            mc.joint(self.blueprintGrp, name = self.blueprints['lowTeethWireMid'])
+            mc.xform(self.blueprints['lowTeethWireMid'], ws = True, t = (30, 260.178, 3.444))
+
+        self.blueprints['lowTeethWireLeft'] = '{}_lowTeethWireLeft_BLU'.format(self.name)
+        if not mc.objExists(self.blueprints['lowTeethWireLeft']):
+            mc.joint(self.blueprintGrp, name = self.blueprints['lowTeethWireLeft'])
+            mc.xform(self.blueprints['lowTeethWireLeft'], ws = True, t = (32, 260.178,-1.083))
+
+        self.blueprints['lowTeethWireRight'] = '{}_lowTeethWireRight_BLU'.format(self.name)
+        if not mc.objExists(self.blueprints['lowTeethWireRight']):
+            mc.joint(self.blueprintGrp, name = self.blueprints['lowTeethWireRight'])
+            mc.xform(self.blueprints['lowTeethWireRight'], ws = True, t = (28, 260.178, -1.083))
+
 
     def createJoints(self):
+        par = self.moduleGrp
+        self.upTeethWire = []
+        for alias, blu in self.blueprints.items():
+            if not alias in ('upTeethWireMid','upTeethWireLeft', 'upTeethWireRight'):
+                continue
+            jnt = '{}_{}_JNT'.format(self.name, self.aliases[alias])
+            jnt = mc.joint(par, n=jnt, rad = 0.4)
+            trsLib.setTRS(jnt, self.blueprintPoses[alias], space='world')
+            self.joints[alias] = jnt
+            self.upTeethWire.append(jnt)
+        self.lowTeethWire = []
+        for alias, blu in self.blueprints.items():
+            if not alias in ('lowTeethWireMid', 'lowTeethWireLeft','lowTeethWireRight',):
+                continue
+            jnt = '{}_{}_JNT'.format(self.name, self.aliases[alias])
+            jnt = mc.joint(par, n=jnt, rad = 0.4)
+            trsLib.setTRS(jnt, self.blueprintPoses[alias], space='world')
+            self.joints[alias] = jnt
+            self.lowTeethWire.append(jnt)
+
+        par = self.moduleGrp
+        self.teethJnts = []
+        for alias, blu in self.blueprints.items():
+            if not alias in ('topTeeth', 'lowTeeth'):
+                continue
+            jnt = '{}_{}_JNT'.format(self.name, self.aliases[alias])
+            jnt = mc.joint(par, n=jnt, rad = 0.4)
+            trsLib.setTRS(jnt, self.blueprintPoses[alias], space='world')
+            self.joints[alias] = jnt
+            self.teethJnts.append(jnt)
+
+        par = self.moduleGrp
+        self.tongueJnts = []
+        for alias, blu in self.blueprints.items():
+            if not alias in ('tongueBase', 'tongue_01', 'tongue_02', 'tongue_03', 'tongue_04', 'tongue_05'):
+                continue
+            jnt = '{}_{}_JNT'.format(self.name, self.aliases[alias])
+            jnt = mc.joint(par, n=jnt, rad = 0.4)
+            trsLib.setTRS(jnt, self.blueprintPoses[alias], space='world')
+            self.joints[alias] = jnt
+            self.tongueJnts.append(jnt)
+            par = jnt
+
         par = self.moduleGrp
         self.mouthAndJawMain = []
         for alias, blu in self.blueprints.items():
@@ -531,6 +657,8 @@ class BuildLip(lipsTemplate.LipsTemplate):
         self.lowLipMidLoc, self.r_lowmidSecOr,self.r_lowoutOrLoc,self.r_lowcornerOr = funcs.createLocsJntDriver(name = 'R_localLowLip',
                                                                                  parent =self.lowJntDrvr,  jntSnap = self.lowBindJnts[0])
 
+
+
         # create nose ctls
         self.noseCtl, self.noseCtlBase, self.columellaCtl = funcs.createNoseCtls(name = 'noseCtl',
                                                                                  parent = self.noseCtlGrp,
@@ -567,15 +695,84 @@ class BuildLip(lipsTemplate.LipsTemplate):
         self.chinCtl = mc.rename(ctl, 'chin_CTL')
         mc.parent(self.chinModCtlGrp, self.jawSecCtl)
 
-        self.jaw2ndFollowLoc = mc.createNode('transform', name = 'jaw2ndFollow_LOC',p = self.jawSecBndJnt[0])
-        self.jaw2ndFollowLocShape = mc.createNode('transform', name = 'jaw2ndFollowShape_LOC',p = self.jaw2ndFollowLoc)
+        self.jaw2ndFollowLoc = mc.createNode('transform', name = 'jaw2ndFollow_LOC',p = self.jawSecCtl )
+        self.jaw2ndFollowLocShape = mc.createNode('locator', name = 'jaw2ndFollowShape_LOC',p = self.jaw2ndFollowLoc)
         self.lowMouthGrp = mc.createNode('transform', name = 'lowMouth_GRP')
 
+        #create teeth hierarchy
+        self.upTeethOriGrp = mc.createNode('transform', name = 'topTeethOri_GRP',p  = self.facialCtlGrp )
+        trsLib.match(self.upTeethOriGrp, self.teethJnts[0])
 
+        self.lowTeethOriGrp = mc.createNode('transform', name = 'lowTeethOri_GRP', p = self.lowMouthGrp)
+        trsLib.match(self.lowTeethOriGrp, self.teethJnts[1])
+
+        self.upTeethMakroGrp, self.upteethCtls,self.upteethGrps,self.upTeethSquashMakro = funcs.createTeethHierarchy(jnt=self.teethJnts[0],
+                                                                                         parent=self.upTeethOriGrp, side=self.side,
+                                   scale=[1, 1, 1],prefix = 'top',leftPos= self.upTeethWire[1], rightPos = self.upTeethWire[2])
+        self.lowTeethMakroGrp ,self.lowteethCtls,self.lowteethGrps, self.lowTeethSquashMakro= funcs.createTeethHierarchy(jnt=self.teethJnts[1],
+                                                                                         parent=self.lowTeethOriGrp, side=self.side,
+                                   scale=[1, 1, 1],prefix = 'low',leftPos= self.lowTeethWire[1], rightPos = self.lowTeethWire[2])
+
+        # wire curves to the gums
+        mc.select(self.upGum, r=True)
+        mc.wire(gw=False, en=1.000000, ce=0.000000, li=0.000000, w= self.upTeethCurve)
+        shape = mc.listRelatives(self.upGum, shapes=True)[0]
+        wire = mc.listConnections(shape + '.inMesh', d=False, s=True)[0]
+        mc.setAttr(wire + '.dropoffDistance[0]', 20)
+        mc.select(self.lowGum, r=True)
+        mc.wire(gw=False, en=1.000000, ce=0.000000, li=0.000000, w= self.lowTeethCurve)
+        shape = mc.listRelatives(self.lowGum, shapes=True)[0]
+        wire = mc.listConnections(shape + '.inMesh', d=False, s=True)[0]
+        mc.setAttr(wire + '.dropoffDistance[0]', 20)
+
+        # connect stuff to the teeth makro grp
+        attrLib.addFloat(self.mouthCtl, ln = 'teethFollow', min = 0, max = 1, dv = 1)
+        self.mouthAncFollowDrvr,self.mouthCtl,self.upTeethMakroGrp,
+        teethMult = mc.createNode('multiplyDivide', name = 'TeethFollowAct_MDN')
+        mc.connectAttr(self.mouthCtl + '.teethFollow', teethMult + '.input1X')
+        mc.connectAttr(self.mouthCtl + '.teethFollow', teethMult + '.input1Y')
+        mc.connectAttr(self.mouthAncFollowDrvr + '.tx', teethMult + '.input2X')
+        mc.connectAttr(self.mouthAncFollowDrvr + '.ty', teethMult + '.input2Y')
+        mc.connectAttr(teethMult + '.outputX', self.upTeethMakroGrp + '.tx')
+        mc.connectAttr(teethMult+ '.outputY', self.upTeethMakroGrp + '.ty')
+        mc.connectAttr(teethMult + '.outputX', self.lowTeethMakroGrp + '.tx')
+        mc.connectAttr(teethMult+ '.outputY', self.lowTeethMakroGrp + '.ty')
+
+
+
+        self.tongueCtls = []
+        self.tongueGrps = []
+        par = self.lowTeethMakroGrp
+        for i in self.tongueJnts:
+            ctl, grp = funcs.createTongueHierarchy(jnt=i, parent= par , name= i, side = self.side, scale = [1,1,1])
+            newName = i.replace('_JNT', '_CTL')
+            ctl = mc.rename(ctl, newName)
+            mc.parent(i, ctl)
+            self.tongueCtls.append(ctl)
+            newName = ctl.replace('_CTL', '_GRP')
+            grp = mc.rename(grp, newName)
+            self.tongueGrps.append(grp)
+            par = i
 
         mc.parent(self.lowMouthGrp ,self.jaw2ndFollowLoc )
 
+        # skin wire joints to the teeth curve
+        deformLib.bind_geo(geos = self.upTeethCurve, joints = self.upTeethWire)
+        deformLib.bind_geo(geos = self.lowTeethCurve, joints = self.lowTeethWire)
 
+
+        # parent wire joints under hierarchy
+        self.l_lowTeethWireModGrp,self.r_lowTeethWireModGrp,self.m_lowTeethWireModGrp,self.l_upTeethWireOriGrp,self.r_upTeethWireOriGrp,self.m_upTeethWireOriGrp,self.lowwireModGrp,self.upwireModGrp = funcs.createTeethJntHierarchy(pos=self.mouthPiv,upTeethWire=self.upTeethWire,
+                                                                                          lowTeethWire=self.lowTeethWire, parent = self.facialCtlGrp)
+
+
+        # connect stuff to the modgrps above teeth ctls
+        [mc.connectAttr(self.lowteethCtls[1] + '.{}{}'.format(a,v), self.l_lowTeethWireModGrp + '.{}{}'.format(a,v))for a in 'trs' for v in 'xyz']
+        [mc.connectAttr(self.lowteethCtls[2] + '.{}{}'.format(a,v), self.r_lowTeethWireModGrp + '.{}{}'.format(a,v))for a in 'trs' for v in 'xyz']
+        [mc.connectAttr(self.lowteethCtls[0] + '.{}{}'.format(a,v), self.m_lowTeethWireModGrp + '.{}{}'.format(a,v))for a in 'trs' for v in 'xyz']
+        [mc.connectAttr(self.upteethCtls[1] + '.{}{}'.format(a,v), self.l_upTeethWireOriGrp + '.{}{}'.format(a,v))for a in 'trs' for v in 'xyz']
+        [mc.connectAttr(self.upteethCtls[2] + '.{}{}'.format(a,v), self.r_upTeethWireOriGrp + '.{}{}'.format(a,v))for a in 'trs' for v in 'xyz']
+        [mc.connectAttr(self.upteethCtls[0] + '.{}{}'.format(a,v), self.m_upTeethWireOriGrp + '.{}{}'.format(a,v))for a in 'trs' for v in 'xyz']
 
         # duplicate the local rig
         output = trsLib.duplicate(self.upLipRibbon, search = 'local',replace = '', hierarchy= True )

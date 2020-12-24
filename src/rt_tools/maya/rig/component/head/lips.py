@@ -33,13 +33,17 @@ class Lips(buildLip.BuildLip):
     """
     base class for lip template
     """
-    def __init__(self, side='C', prefix='lip',geo = '', zippercrv = '',upLipLowRezcrv = '',
-                 upLipMedRezcrv= '', upLipHiRezcrv = '',upLipZippercrv = '',lowLipLowRezcrv = '',
-                 lowLipHiRezcrv = '',lowLipMedRezcrv= '',lowLipZippercrv = '',upBindJnts =[],
-                 lowBindJnts = [],numJnts=20,**kwargs):
+    def __init__(self, side='C', prefix='lip',geo = '',upGum = '',lowGum = '',upTeethCurve = '',lowTeethCurve = '',
+                 zippercrv = '',upLipLowRezcrv = '',upLipMedRezcrv= '', upLipHiRezcrv = '',
+                 upLipZippercrv = '',lowLipLowRezcrv = '',lowLipHiRezcrv = '',lowLipMedRezcrv= '',
+                 lowLipZippercrv = '',upBindJnts =[],lowBindJnts = [],numJnts=20,**kwargs):
         kwargs['side'] = side
         kwargs['prefix'] = prefix
         self.geo = geo
+        self.upGum = upGum
+        self.lowGum = lowGum
+        self.upTeethCurve = upTeethCurve
+        self.lowTeethCurve = lowTeethCurve
         self.zippercrv = zippercrv
         self.upLipLowRezcrv = upLipLowRezcrv
         self.upLipMedRezcrv = upLipMedRezcrv
@@ -335,6 +339,21 @@ class Lips(buildLip.BuildLip):
                          inputMax =3.572,outputMin = 0,outputMax= -5.8, name = 'lowLip_mouthSquashCtrlCo_RMV')
 
         # TODO: connect jaw ctl to the group obove jaw joints later
+        # connect jaw secondary to the mouthSquashLocator
+        mc.parentConstraint(self.jawSecBndJnt[0],self.mouthSquashDrvrLoc, mo = True)
+        funcs.teethSetDriven(drvr=self.mouthSquashDrvrLoc + '.ty', drvn=self.lowTeethSquashMakro + '.ty',
+                             times = [0,3.571931], values = [0,-2.00446], itt = 'linear', ott = 'spline')
+        funcs.teethSetDriven(drvr=self.mouthSquashDrvrLoc + '.ty', drvn=self.lowTeethSquashMakro + '.tz',
+                             times = [0,3.571931], values = [0,0.0637189], itt = 'linear', ott = 'spline')
+        funcs.teethSetDriven(drvr=self.mouthSquashDrvrLoc + '.ty', drvn=self.lowTeethSquashMakro + '.rx',
+                             times = [0,3.571931], values = [0,9.718864], itt = 'linear', ott = 'spline')
+        funcs.teethSetDriven(drvr=self.mouthSquashDrvrLoc + '.ty', drvn=self.upTeethSquashMakro + '.ty',
+                             times = [0,3.571931], values = [0,1.718509], itt = 'linear', ott = 'spline')
+        funcs.teethSetDriven(drvr=self.mouthSquashDrvrLoc + '.ty', drvn=self.upTeethSquashMakro + '.tz',
+                             times = [0,3.571931], values = [0,-0.14018], itt = 'linear', ott = 'spline')
+        funcs.teethSetDriven(drvr=self.mouthSquashDrvrLoc + '.ty', drvn=self.upTeethSquashMakro + '.rx',
+                             times = [0,3.571931], values = [0,-5.272712], itt = 'linear', ott = 'spline')
+
         # connect up lip out ctls to the locals
         [mc.connectAttr(self.cln(self.R_upLipOutCtl) + '.{}{}'.format(t,a), self.R_upLipOutCtl + '.{}{}'.format(t,a))for t in 'tr' for a in'xyz']
         [mc.connectAttr(self.cln(self.L_upLipOutCtl) + '.{}{}'.format(t,a), self.L_upLipOutCtl + '.{}{}'.format(t,a))for t in 'tr' for a in'xyz']
@@ -784,6 +803,11 @@ class Lips(buildLip.BuildLip):
         for i in ['tx', 'ty', 'visibility','rotateOrder', 'zip', 'Z', 'puff']:
             mc.connectAttr(self.cln(self.leftUpCornerCtl) + '.' + i, self.cln(self.leftLowCornerCtl) + '.' + i)
             mc.connectAttr(self.cln(self.rightUpCornerCtl) + '.' + i, self.cln(self.rightLowCornerCtl) + '.' + i)
+
+        # clean out the outliner
+        self.lowwireModGrp, self.upwireModGrp
+        mc.parent(self.upTeethCurve,'aa_topTeethWire_CRV1BaseWire', self.upwireModGrp)
+        mc.parent(self.lowTeethCurve,'aa_lowTeethWire_CRV1BaseWire', self.lowwireModGrp)
 
         #**********************************************************blendShapes*********************************************************
         mouthbls = mc.blendShape(self.geo, frontOfChain=True, n='mouth_bShp')[0]
