@@ -32,7 +32,19 @@ class HeadTemplate(template.Template):
         self.matches()
 
     def createGroups(self):
+        self.globalRigGrp = mc.createNode('transform', name = 'global_Rig')
+        self.headSquashMechanicGrp = mc.createNode('transform', name = 'headSquetchMechanics_GRP', p = self.globalRigGrp)
+        self.globalBotJntOriGrp = mc.createNode('transform', name = 'globalHeadBotJntOri_GRP', p = self.globalRigGrp)
+        self.globalBotJntModGrp = mc.createNode('transform', name = 'globalHeadBotJntMod_GRP', p = self.globalBotJntOriGrp)
+        self.globalTopJntOriGrp = mc.createNode('transform', name = 'globalHeadTopJntOri_GRP', p = self.globalRigGrp)
+        self.globalTopJntModGrp = mc.createNode('transform', name = 'globalHeadTopJntMod_GRP', p = self.globalTopJntOriGrp)
         self.facialCtlGrp = mc.createNode('transform', name = 'facialCTL_GRP')
+        self.headSquashCtlGrp = mc.createNode('transform', name = 'headSquatchCtl_GRP', p = self.facialCtlGrp)
+
+        self.botSquashOriGrp = mc.createNode('transform', name = 'botSquatchOri_GRP', p = self.headSquashCtlGrp)
+        self.midSquashOriGrp = mc.createNode('transform', name = 'midSquatchOri_GRP', p = self.headSquashCtlGrp)
+        self.topSquashOriGrp = mc.createNode('transform', name = 'topSquatchOri_GRP', p = self.headSquashCtlGrp)
+
         self.mouthCtlGrp = mc.createNode('transform', name = 'mouthCtl_GRP', p = self.facialCtlGrp)
         self.headTopCtlOriGrp = mc.createNode('transform', name = 'headTopCtlOri_GRP', p = self.mouthCtlGrp)
         self.headButtomCtlOriGrp = mc.createNode('transform', name = 'headButtomCtlOri_GRP', p = self.mouthCtlGrp)
@@ -41,3 +53,16 @@ class HeadTemplate(template.Template):
         trsLib.match(self.facialCtlGrp, self.buttomJntSquash[0])
         trsLib.match(self.headTopCtlOriGrp, self.topJntSquash[0])
         trsLib.match(self.headButtomCtlOriGrp, self.buttomJntSquash[0])
+        trsLib.match(self.globalBotJntOriGrp, self.buttomJntSquash[0])
+        trsLib.match(self.globalTopJntOriGrp, self.topJntSquash[0])
+
+        trsLib.match(self.botSquashOriGrp, self.headSquashDrvrJnts[1])
+        mc.move(0,-1,10, self.botSquashOriGrp, r = True, ws = True)
+        trsLib.match(self.topSquashOriGrp, self.headSquashDrvrJnts[0])
+        mc.move(0,1,10, self.topSquashOriGrp, r = True, ws = True)
+
+        mc.delete(mc.parentConstraint(self.headSquashDrvrJnts[-1],self.headSquashDrvrJnts[-2], self.midSquashOriGrp))
+        mc.move(0,0,10, self.midSquashOriGrp, r = True, ws = True)
+
+
+

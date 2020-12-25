@@ -38,10 +38,41 @@ class BuildHead(headTemplate.HeadTemplate):
                         'headTop_squashGuide_01':'headTop_squashGuide_01',
                         'headTop_squashGuide_02':'headTop_squashGuide_02',
                         'headTop_squashGuide_03':'headTop_squashGuide_03',
-                        'headTop_squashGuide_04':'headTop_squashGuide_04',}
+                        'headTop_squashGuide_04':'headTop_squashGuide_04',
+                        'Flood':'Flood',
+                        'headTopSquashDrvrJnt':'headTopSquashDrvrJnt',
+                        'headBotSquashDrvrJnt':'headBotSquashDrvrJnt',
+                        'l_headMidSquashDrvrJnt': 'l_headMidSquashDrvrJnt',
+                        'r_headMidSquashDrvrJnt': 'r_headMidSquashDrvrJnt'
+                        }
 
     def createBlueprint(self):
         super(BuildHead, self).createBlueprint()
+        self.blueprints['headTopSquashDrvrJnt'] = '{}_headTopSquashDrvrJnt_BLU'.format(self.name)
+        if not mc.objExists(self.blueprints['headTopSquashDrvrJnt']):
+            mc.joint(self.blueprintGrp, name=self.blueprints['headTopSquashDrvrJnt'])
+            mc.xform(self.blueprints['headTopSquashDrvrJnt'], ws=True, t=(0, 183.472, -2.934))
+
+        self.blueprints['headBotSquashDrvrJnt'] = '{}_headBotSquashDrvrJnt_BLU'.format(self.name)
+        if not mc.objExists(self.blueprints['headBotSquashDrvrJnt']):
+            mc.joint(self.blueprintGrp, name=self.blueprints['headBotSquashDrvrJnt'])
+            mc.xform(self.blueprints['headBotSquashDrvrJnt'], ws=True, t=(0, 165.226, -2.934))
+
+        self.blueprints['l_headMidSquashDrvrJnt'] = 'l_headMidSquashDrvrJnt_BLU'
+        if not mc.objExists(self.blueprints['l_headMidSquashDrvrJnt']):
+            mc.joint(self.blueprintGrp, name=self.blueprints['l_headMidSquashDrvrJnt'])
+            mc.xform(self.blueprints['l_headMidSquashDrvrJnt'], ws=True, t=(1.1, 175.214, -2.934))
+
+        self.blueprints['r_headMidSquashDrvrJnt'] = 'r_headMidSquashDrvrJnt_BLU'
+        if not mc.objExists(self.blueprints['r_headMidSquashDrvrJnt']):
+            mc.joint(self.blueprintGrp, name=self.blueprints['r_headMidSquashDrvrJnt'])
+            mc.xform(self.blueprints['r_headMidSquashDrvrJnt'], ws=True, t=(-1.1, 175.214, -2.934))
+
+        self.blueprints['Flood'] = '{}_Flood_BLU'.format(self.name)
+        if not mc.objExists(self.blueprints['Flood']):
+            mc.joint(self.blueprintGrp, name=self.blueprints['Flood'])
+            mc.xform(self.blueprints['Flood'], ws=True, t=(0, 178.813, -5.773))
+
         self.blueprints['headBot_squashGuide_01'] = '{}_headBot_squashGuide_01_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['headBot_squashGuide_01']):
             mc.joint(self.blueprintGrp, name=self.blueprints['headBot_squashGuide_01'])
@@ -88,6 +119,28 @@ class BuildHead(headTemplate.HeadTemplate):
             mc.xform(self.blueprints['headTop_squashGuide_04'], ws=True, t=(0, 183.472, -2.934))
 
     def createJoints(self):
+        par = self.moduleGrp
+        self.headSquashDrvrJnts = []
+        for alias, blu in self.blueprints.items():
+            if not alias in ('headTopSquashDrvrJnt', 'headBotSquashDrvrJnt','l_headMidSquashDrvrJnt','r_headMidSquashDrvrJnt'):
+                continue
+            jnt = '{}_JNT'.format(self.aliases[alias])
+            jnt = mc.joint(par, n=jnt, rad=0.4)
+            trsLib.setTRS(jnt, self.blueprintPoses[alias], space='world')
+            self.joints[alias] = jnt
+            self.headSquashDrvrJnts.append(jnt)
+
+        par = self.moduleGrp
+        self.headFloodJnt = []
+        for alias, blu in self.blueprints.items():
+            if not alias in ('Flood'):
+                continue
+            jnt = '{}_{}_JNT'.format(self.name, self.aliases[alias])
+            jnt = mc.joint(par, n=jnt, rad=0.4)
+            trsLib.setTRS(jnt, self.blueprintPoses[alias], space='world')
+            self.joints[alias] = jnt
+            self.headFloodJnt.append(jnt)
+
         par = self.moduleGrp
         self.buttomJntSquash = []
         for alias, blu in self.blueprints.items():
@@ -147,6 +200,86 @@ class BuildHead(headTemplate.HeadTemplate):
         self.headTopSquashCtlOriGrp = mc.createNode('transform' , name = 'headTopSquatchCtrlGuideOri_GRP', p = self.topHeadCtl)
         self.headTopSquashCtlModGrp = mc.createNode('transform' , name = 'headTopSquatchCtrlGuideMod_GRP', p = self.headTopSquashCtlOriGrp)
         mc.parent(self.topJntSquash[0] ,self.headTopSquashCtlModGrp )
+
+        # duplicate buttom squash joints
+        self.headBotGlobalJnts = trsLib.duplicate(self.buttomJntSquash[0], search = 'head', replace = 'global', hierarchy = True)
+        mc.parent(self.headBotGlobalJnts[0],self.globalBotJntModGrp )
+
+        # duplicate top squash joints
+        self.headTopGlobalJnts = trsLib.duplicate(self.topJntSquash[0], search = 'head', replace = 'global', hierarchy = True)
+        mc.parent(self.headTopGlobalJnts[0],self.globalTopJntModGrp )
+
+        self.botSquashCurve = crvLib.fromJnts(self.buttomJntSquash, degree=3, name='headBotSquashIk_CRV')
+        self.botSquashCurve = mc.listRelatives(self.botSquashCurve, parent = True)[0]
+        mc.parent(self.botSquashCurve ,self.globalBotJntModGrp)
+
+
+        self.topSquashCurve = crvLib.fromJnts(self.topJntSquash, degree=3, name='headTopSquashIk_CRV')
+        self.topSquashCurve = mc.listRelatives(self.topSquashCurve, parent = True)[0]
+
+
+        self.headTopIkHandle = mc.ikHandle(n='headTopSquash_IKH', sj=self.topJntSquash[0], ee=self.topJntSquash[-1],
+                                           sol='ikSplineSolver',c=self.topSquashCurve, ccv=False)[0]
+        mc.parent(self.topSquashCurve ,self.globalTopJntModGrp)
+        mc.parent(self.headTopIkHandle ,self.headSquashMechanicGrp)
+
+        self.headBotIkHandle = mc.ikHandle(n='headButtomSquash_IKH', sj=self.buttomJntSquash[0], ee=self.buttomJntSquash[-1],
+                                           sol='ikSplineSolver', c=self.botSquashCurve, ccv=False)[0]
+        mc.parent(self.botSquashCurve ,self.globalBotJntModGrp)
+        mc.parent(self.headBotIkHandle ,self.headSquashMechanicGrp)
+
+        # create hierarchy for squash drvr joints
+        self.headMidSquashDrvrOriGrp = mc.createNode('transform', name = 'headMid_SquetchDriverOri_GRP', p = self.headSquashMechanicGrp)
+        mc.delete(mc.parentConstraint(self.headSquashDrvrJnts[-1],self.headSquashDrvrJnts[-2], self.headMidSquashDrvrOriGrp ))
+        self.headMidSquashDrvrModGrp = mc.createNode('transform', name = 'headMid_SquetchDriverMod_GRP', p = self.headMidSquashDrvrOriGrp)
+        mc.parent(self.headSquashDrvrJnts[-1],self.headSquashDrvrJnts[-2], self.headMidSquashDrvrModGrp)
+
+        self.headTopSquashDrvrOriGrp = mc.createNode('transform', name='headTop_SquetchDriverOri_GRP',p=self.headSquashMechanicGrp)
+        mc.delete(mc.parentConstraint(self.headSquashDrvrJnts[0],  self.headTopSquashDrvrOriGrp))
+        self.headTopSquashDrvrModGrp = mc.createNode('transform', name='headTop_SquetchDriverMod_GRP',p=self.headTopSquashDrvrOriGrp)
+        mc.parent(self.headSquashDrvrJnts[0], self.headTopSquashDrvrModGrp)
+
+        self.headBotSquashDrvrOriGrp = mc.createNode('transform', name='headBot_SquetchDriverOri_GRP',p=self.headSquashMechanicGrp)
+        mc.delete(mc.parentConstraint(self.headSquashDrvrJnts[1],  self.headBotSquashDrvrOriGrp))
+        self.headBotSquashDrvrModGrp = mc.createNode('transform', name='headBot_SquetchDriverMod_GRP',p=self.headBotSquashDrvrOriGrp)
+        mc.parent(self.headSquashDrvrJnts[1], self.headBotSquashDrvrModGrp)
+
+        # create curve on top and buttom squash joints
+        self.buttomJntSquash.reverse()
+        self.allJntsSquash =  self.buttomJntSquash + self.topJntSquash
+
+        self.masterHeadCurve = crvLib.fromJnts(self.allJntsSquash, degree = 3 ,name = 'headSquetchMaster_CRV')
+        self.masterHeadCurve = mc.listRelatives(self.masterHeadCurve, parent = True)[0]
+        mc.parent(self.masterHeadCurve, self.headSquashMechanicGrp)
+
+        # create wire for top and bot head squash curves
+        for i in [self.topSquashCurve ,self.botSquashCurve ]:
+            mc.select(i, r=True)
+            mc.wire(gw=False, en=1.000000, ce=0.000000, li=0.000000, w= self.masterHeadCurve)
+
+        self.headSquashDrvrJnts.pop(-1)
+        deformLib.bind_geo(geos = self.masterHeadCurve, joints = self.headSquashDrvrJnts)
+
+        self.squashCtls = []
+        self.squashGrps = []
+        for i in [self.botSquashOriGrp,self.midSquashOriGrp,self.topSquashOriGrp]:
+            ctl, grp = funcs.createCtl(parent = i ,side = 'C',scale = [1, 1, 1], shape = 'sphere')
+            newName = i.replace('Ori_GRP', '_CTL')
+            ctl = mc.rename(ctl, newName)
+            self.squashCtls.append(ctl)
+            newName = ctl.replace('_CTL', '_ZRO')
+            grp = mc.rename(grp, newName)
+            self.squashGrps.append(grp)
+            mc.parent(grp, i)
+
+
+
+
+
+
+
+
+
 
 
 

@@ -40,12 +40,12 @@ def detachHead(geoName = '',edge = '',name = '', movement = 50):
     mc.setAttr(newName + '.ty', movement)
     return newName
 
-def createCtl(parent = '',side = 'L',scale = [1, 1, 1]):
+def createCtl(parent = '',side = 'L',scale = [1, 1, 1],shape = 'square'):
     mult = [-1, 1][side == 'L']
     ctl = control.Control(descriptor='',
                           side=side,
                           orient=(0,1,0),
-                          shape="square",
+                          shape=shape,
                           color=control.SECCOLORS[side],
                           scale=scale,
                           moveShape=[0,0,0.7],
@@ -885,6 +885,35 @@ def createTeethJntHierarchy(pos = '', upTeethWire = [], lowTeethWire = [], paren
 def teethSetDriven(drvr = '', drvn = '',times = [],values = [], itt = '', ott = ''):
 
         keyLib.setDriven(drvr, drvn, times, values, itt=itt, ott=ott)
+
+def createSquashStretch(curve = '', joints = []):
+    curveInfoNode = mc.createNode('curveInfo', name = '{}'.format(curve) + '_CIN')
+    curveShape = mc.listRelatives(curve, shapes = True)[0]
+    mc.connectAttr(curveShape + '.worldSpace[0]', curveInfoNode + '.inputCurve')
+    curveStretchMult = mc.createNode('multiplyDivide', name = '{}'.format(curve) + 'stretch_MDN')
+    mc.setAttr(curveStretchMult + '.operation', 2)
+    mc.connectAttr(curveInfoNode + '.arcLength', curveStretchMult + '.input1X')
+    multVal = mc.getAttr(curveStretchMult + '.input1X')
+    mc.setAttr(curveStretchMult + '.input2X', multVal)
+    for i in joints:
+        mc.connectAttr(curveStretchMult + '.outputX', i + '.sy')
+
+    curvePowerMult = mc.createNode('multiplyDivide', name = '{}'.format(curve) + 'power_MDN')
+    mc.setAttr(curvePowerMult + '.operation', 3)
+    mc.setAttr(curvePowerMult + '.input2X', 0.5)
+    mc.connectAttr(curveStretchMult + '.outputX',curvePowerMult + '.input1X')
+    curveValumeMult = mc.createNode('multiplyDivide', name = '{}'.format(curve) + 'volume_MDN')
+    mc.setAttr(curveValumeMult + '.operation', 2)
+    mc.setAttr(curveValumeMult + '.input1X', 1)
+    mc.connectAttr(curvePowerMult + '.outputX',curveValumeMult + '.input2X')
+
+    for i in joints:
+        mc.connectAttr(curveValumeMult + '.outputX', i + '.sx')
+        mc.connectAttr(curveValumeMult + '.outputX', i + '.sz')
+
+
+
+
 
 
 

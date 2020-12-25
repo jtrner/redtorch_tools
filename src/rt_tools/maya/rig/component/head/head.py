@@ -33,7 +33,7 @@ class Head(buildHead.BuildHead):
     """
     base class for head template
     """
-    def __init__(self, side='L', prefix='head',geo = '', headEdge = '', headMovement = '',**kwargs):
+    def __init__(self, side='C', prefix='head',geo = '', headEdge = '', headMovement = '',**kwargs):
         kwargs['side'] = side
         kwargs['prefix'] = prefix
         self.geo = geo
@@ -44,4 +44,16 @@ class Head(buildHead.BuildHead):
 
     def build(self):
         super(Head, self).build()
+        # connect stuf to the group above squash joints
+        self.buttomHeadCtl,self.headBotSquashDrvrModGrp
+        [mc.connectAttr(self.buttomHeadCtl + '.{}{}'.format(a,v), self.globalBotJntModGrp + '.{}{}'.format(a,v))for a in 'trs'for v in 'xyz']
+        [mc.connectAttr(self.topHeadCtl + '.{}{}'.format(a,v), self.globalTopJntModGrp + '.{}{}'.format(a,v))for a in 'trs'for v in 'xyz']
 
+        funcs.createSquashStretch(curve = self.botSquashCurve, joints = self.buttomJntSquash)
+        funcs.createSquashStretch(curve = self.topSquashCurve, joints = self.topJntSquash)
+
+        # connect squash clts to the transforms above squash joints
+
+        [mc.connectAttr(self.squashCtls[0] + '.{}{}'.format(a,v), self.headBotSquashDrvrModGrp + '.{}{}'.format(a,v))for a in 'trs'for v in 'xyz']
+        [mc.connectAttr(self.squashCtls[1] + '.{}{}'.format(a,v), self.headMidSquashDrvrModGrp + '.{}{}'.format(a,v))for a in 'trs'for v in 'xyz']
+        [mc.connectAttr(self.squashCtls[2] + '.{}{}'.format(a,v), self.headTopSquashDrvrModGrp + '.{}{}'.format(a,v))for a in 'trs'for v in 'xyz']
