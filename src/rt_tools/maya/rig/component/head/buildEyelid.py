@@ -119,6 +119,16 @@ class BuildEyelid(eyelidsTemplate.EyelidsTemplate):
             par = jnt
             self.cheeckJoints.append(jnt)
 
+        self.orientJnts(self.cheeckJoints)
+
+    def orientJnts(self, jnts):
+        upLoc = mc.createNode('transform')
+        trsLib.match(upLoc, jnts[0])
+        mc.move(0, 100000, 0, upLoc, r=True, ws=True)
+        jntLib.orientUsingAim(jnts=jnts, upAim=upLoc,
+                              aimAxes='z', upAxes='y')
+        mc.delete(upLoc)
+
 
     def build(self):
         super(BuildEyelid, self).build()

@@ -76,9 +76,7 @@ class Jaw(template.Template):
         self.setOut('joints', str(self.joints))
 
     def orientJnts(self, jnts):
-        print(jnts)
         upLoc = mc.createNode('transform')
-        print(jnts[0])
         trsLib.match(upLoc, jnts[0])
         mc.move(0, 100000, 0, upLoc, r=True, ws=True)
         jntLib.setOrientToWorld(jnts[0])

@@ -40,11 +40,11 @@ def detachHead(geoName = '',edge = '',name = '', movement = 50):
     mc.setAttr(newName + '.ty', movement)
     return newName
 
-def createCtl(parent = '',side = 'L',scale = [1, 1, 1],shape = 'square'):
+def createCtl(parent = '',side = 'L',scale = [1, 1, 1],shape = 'square', orient = (0,1,0)):
     mult = [-1, 1][side == 'L']
     ctl = control.Control(descriptor='',
                           side=side,
-                          orient=(0,1,0),
+                          orient=orient,
                           shape=shape,
                           color=control.SECCOLORS[side],
                           scale=scale,
@@ -72,14 +72,14 @@ def locOnCrv(name = '', parent = '', numLocs = 3, crv = '',
 def cheekRaiseHierarchy(name = '',parent = '',side = 'L', position= ''):
     cheekJntZ = mc.createNode('transform', name = side + '_cheeckRaiseJntZ',p = parent)
     cheekJntOri = mc.createNode('transform', name = side + '_cheekRaiseJntOri', p = cheekJntZ)
-    trsLib.match(cheekJntOri, position)
+    trsLib.match(cheekJntOri,t = position, r = position)
     cheekJntMod = mc.createNode('transform', name = side + 'cheeckRaiseJntMod', p = cheekJntOri)
     return cheekJntMod,cheekJntZ
 
 def sharpJntsHierarchy(name = '', parent = '',joint = '',middle = False):
     if middle:
         oriGrp = mc.createNode('transform', name = name + '_ori_GRP',p = parent)
-        trsLib.match(oriGrp, joint)
+        trsLib.match(oriGrp, t = joint,r = joint)
         modGrp = mc.createNode('transform', name = name + '_mod_GRP', p = oriGrp)
         makroGrp = mc.createNode('transform', name = name + '_makro_GRP', p = modGrp)
         mc.parent(joint, makroGrp)
@@ -87,7 +87,7 @@ def sharpJntsHierarchy(name = '', parent = '',joint = '',middle = False):
         return modGrp,makroGrp
     else:
         oriGrp = mc.createNode('transform', name = name + '_ori_GRP',p = parent)
-        trsLib.match(oriGrp, joint)
+        trsLib.match(oriGrp, t = joint, r = joint)
         modGrp = mc.createNode('transform', name = name + '_mod_GRP', p = oriGrp)
         mc.parent(joint, modGrp)
         modGrp = modGrp.split('|')[-1]
@@ -139,7 +139,7 @@ def createRollMod(name = '', parent = '', up = True):
     mult = [1, -1][up == True]
     jntRollLoc = mc.createNode('transform', name=name + 'JNTRoll_LOC', p=parent)
     jntRollLocShape = mc.createNode('locator', name=name + 'JNTRollShape_LOC', p=jntRollLoc)
-    mc.setAttr(jntRollLoc + '.tz',  0.3)
+    mc.setAttr(jntRollLoc + '.tz',  2)
     jntMidMod = mc.createNode('transform', name=name + 'JNTMidModify_GRP', p=jntRollLoc)
     mc.setAttr(jntMidMod + '.tz', 1)
     mc.setAttr(jntMidMod + '.ty', mult * 0.5)
@@ -189,7 +189,7 @@ def createZipperJnts(name = '', crv = '',upCurve = '' ,posJnts = '', parent = ''
     tempList = locOnCrv(name = 'result', parent = ZipperTargetLoc, numLocs = 9, crv = crv,
                  upCurve = upCurve, paramStart =0.97 ,paramEnd = 0.118, upAxis = 'y', posJnts = posJnts)
     for i in range(9):
-        trsLib.match(posJnts[i-1], tempList[i-1])
+        trsLib.match(posJnts[i-1], t = tempList[i-1],r = tempList[i-1])
         mc.makeIdentity(posJnts[i-1], apply = True, t = True, r = True, s = True)
 
     tempList[0] = mc.rename(tempList[0], 'L_' + name + 'ZipOutTertiary_LOC')
@@ -229,7 +229,7 @@ def createZipperJnts(name = '', crv = '',upCurve = '' ,posJnts = '', parent = ''
     for i in (0,1,3,5,7,8):
         niceName = posJnts[i].split('_JNT')[0]
         outTer = mc.createNode('transform', name = niceName + 'Orient_GRP', p = jntParent)
-        trsLib.match(outTer, posJnts[i])
+        trsLib.match(outTer, t = posJnts[i], r =  posJnts[i])
         outTerList.append(outTer)
         outTerMode = mc.createNode('transform', name = niceName + 'Modify_GRP', p = outTer)
         outTerMode2 = mc.createNode('transform', name = niceName + 'Modify_GRP2', p = outTerMode)
@@ -256,7 +256,7 @@ def createZipperJnts(name = '', crv = '',upCurve = '' ,posJnts = '', parent = ''
     for i in (2,4,6):
         niceName = posJnts[i].split('_JNT')[0]
         outBnd = mc.createNode('transform', name = niceName + 'OutBnd_GRP', p = jntParent)
-        trsLib.match(outBnd, posJnts[i])
+        trsLib.match(outBnd, t = posJnts[i], r= posJnts[i])
         outBndList.append(outBnd)
         outBndLoc = mc.createNode('transform', name=niceName + 'OutBnd_LOC', p=outBnd)
         outBndLocShape = mc.createNode('locator', name=niceName + 'OutBndShape_LOC', p= outBndLoc)
@@ -427,7 +427,7 @@ def createMainHierarchyJnts(name = '', parent = '', middle = False):
 
 def createNoseCtls(name = '', parent = '',mainSnap = '', cummelaSnap = '', leftSnap = '', rightSnap = '',side = 'C'):
     noseCtlOri = mc.createNode('transform', name = 'noseCtrlBaseori_GRP', p = parent)
-    trsLib.match(noseCtlOri, mainSnap)
+    trsLib.match(noseCtlOri, t = mainSnap, r = mainSnap)
     noseCtlMakro = mc.createNode('transform', name = 'noseCtrlMAKRO_GRP', p = noseCtlOri)
 
     ctls = []
@@ -466,24 +466,24 @@ def createNoseCtls(name = '', parent = '',mainSnap = '', cummelaSnap = '', leftS
     noseCtlBaseOriGrp = mc.createNode('transform', name = 'noseCtrlBaseOri_GRP', p = noseCtl)
     mc.move(0,0,1, noseCtlBaseOriGrp, r = True, ws =  True)
     noseCtlBaseModGrp = mc.createNode('transform', name = 'noseCtlBaseMod_GRP', p = noseCtlBaseOriGrp)
-    trsLib.match(noseCtlBaseGrp, noseCtlBaseModGrp)
+    trsLib.match(noseCtlBaseGrp, t = noseCtlBaseModGrp, r= noseCtlBaseModGrp)
     mc.parent(noseCtlBaseGrp, noseCtlBaseModGrp)
 
     culumelCtlOriGrp = mc.createNode('transform', name = 'columellaCtrlOri_GRP', p = noseCtlBase)
-    trsLib.match(culumelCtlOriGrp, cummelaSnap)
-    trsLib.match(cumellaCtlModGrp, culumelCtlOriGrp)
+    trsLib.match(culumelCtlOriGrp, t = cummelaSnap, r = cummelaSnap)
+    trsLib.match(cumellaCtlModGrp, t = culumelCtlOriGrp, r = culumelCtlOriGrp)
     mc.parent(cumellaCtlModGrp,culumelCtlOriGrp)
 
     r_nostrilCtlOri = mc.createNode('transform', name = 'R_nostrilCtrlOri_GRP', p = noseCtlBase)
-    trsLib.match(r_nostrilCtlOri, rightSnap)
+    trsLib.match(r_nostrilCtlOri, t = rightSnap,r = rightSnap)
     r_nostrilMakro = mc.createNode('transform', name = 'R_nostrilCtrlMAKRO_GRP' , p = r_nostrilCtlOri)
-    trsLib.match(r_nostrilCtlGrp, r_nostrilMakro)
+    trsLib.match(r_nostrilCtlGrp, t = r_nostrilMakro, r = r_nostrilMakro)
     mc.parent(r_nostrilCtlGrp,r_nostrilMakro)
 
     l_nostrilCtlOri = mc.createNode('transform', name = 'L_nostrilCtrlOri_GRP', p = noseCtlBase)
-    trsLib.match(l_nostrilCtlOri, leftSnap)
+    trsLib.match(l_nostrilCtlOri, t = leftSnap,r = leftSnap)
     l_nostrilMakro = mc.createNode('transform', name = 'L_nostrilCtrlMAKRO_GRP' , p = l_nostrilCtlOri)
-    trsLib.match(l_nostrilCtlGrp, l_nostrilMakro)
+    trsLib.match(l_nostrilCtlGrp, t = l_nostrilMakro, r = l_nostrilMakro)
     mc.parent(l_nostrilCtlGrp,l_nostrilMakro)
     mc.move(0, -18, 0, noseCtlOri, r=True, ws=True)
 
@@ -776,8 +776,8 @@ def createTeethHierarchy(jnt = '', parent ='', side = '', scale = [1,1,1], prefi
     teethMakroGrp = mc.createNode('transform', name =prefix + '_TeethMAKRO_GRP', p = teethMouthSquashMakroGrp)
     TeethCtlGrp = mc.createNode('transform', name =prefix + '_TeethCtrl_GRP', p = teethMakroGrp)
     mc.move(0,0,-1, TeethCtlGrp, r = True, ws = True)
-    teethOriGrp = mc.createNode('transform', name = prefix +'_TeethOri_GRP', p = TeethCtlGrp)
-    trsLib.match(teethOriGrp, jnt)
+    teethOriGrp = mc.createNode('transform', name = prefix +'_TeethOri2_GRP', p = TeethCtlGrp)
+    trsLib.match(teethOriGrp, t = jnt, r = jnt)
 
     mult = [-1, 1][side == 'L']
     ctls = []
@@ -828,8 +828,10 @@ def createTeethHierarchy(jnt = '', parent ='', side = '', scale = [1,1,1], prefi
     mc.parent(groups[1], l_teethOri)
     mc.parent(groups[2], r_teethOri)
 
-    trsLib.match(l_teethOri, leftPos)
-    trsLib.match(r_teethOri, rightPos)
+    trsLib.match(l_teethOri, t = leftPos, r = leftPos)
+    trsLib.match(r_teethOri, t = rightPos, r = rightPos)
+    mc.move(0,-20,0, l_teethOri, r = True, ws = True)
+    mc.move(0,-20,0, r_teethOri, r = True, ws = True)
 
     controls.append(teethCtl)
     groups.append(teethGrp)
@@ -839,44 +841,44 @@ def createTeethJntHierarchy(pos = '', upTeethWire = [], lowTeethWire = [], paren
     # create hirarchy for the teeth stuff
     teethStuffGrp = mc.createNode('transform', name='TeethStuff_GRP', p = parent)
     lowTeethWireCrvGrp = mc.createNode('transform', name='LowTeethWire_GRP', p=teethStuffGrp)
-    trsLib.match(lowTeethWireCrvGrp, pos)
+    trsLib.match(lowTeethWireCrvGrp, t = pos, r = pos)
     lowTeethWireMod = mc.createNode('transform', name='LowTeethWireMod_GRP', p=lowTeethWireCrvGrp)
     lowTeethJntGrp = mc.createNode('transform', name='lowTeethJnt_GRP', p=teethStuffGrp)
-    trsLib.match(lowTeethJntGrp, pos)
+    trsLib.match(lowTeethJntGrp, t = pos, r = pos)
 
     l_lowTeethWireOriGrp = mc.createNode('transform', name='L_lowTeethWire_Ori_GRP', p=lowTeethJntGrp)
-    trsLib.match(l_lowTeethWireOriGrp, lowTeethWire[1])
+    trsLib.match(l_lowTeethWireOriGrp, t = lowTeethWire[1],r = lowTeethWire[1])
     l_lowTeethWireModGrp = mc.createNode('transform', name='L_lowTeethWire_mod_GRP', p=l_lowTeethWireOriGrp)
     mc.parent(lowTeethWire[1], l_lowTeethWireModGrp)
 
     r_lowTeethWireOriGrp = mc.createNode('transform', name='R_lowTeethWire_Ori_GRP', p=lowTeethJntGrp)
-    trsLib.match(r_lowTeethWireOriGrp, lowTeethWire[2])
+    trsLib.match(r_lowTeethWireOriGrp, t = lowTeethWire[2],r = lowTeethWire[2])
     r_lowTeethWireModGrp = mc.createNode('transform', name='R_lowTeethWire_mod_GRP', p=r_lowTeethWireOriGrp)
     mc.parent(lowTeethWire[2], r_lowTeethWireModGrp)
 
     m_lowTeethWireOriGrp = mc.createNode('transform', name='M_lowTeethWire_Ori_GRP', p=lowTeethJntGrp)
-    trsLib.match(m_lowTeethWireOriGrp, lowTeethWire[0])
+    trsLib.match(m_lowTeethWireOriGrp, lowTeethWire[0],r = lowTeethWire[0])
     m_lowTeethWireModGrp = mc.createNode('transform', name='M_lowTeethWire_mod_GRP', p=m_lowTeethWireOriGrp)
     mc.parent(lowTeethWire[0], m_lowTeethWireModGrp)
 
     upTeethWireCrvGrp = mc.createNode('transform', name='upTeethWire_GRP', p=teethStuffGrp)
-    trsLib.match(upTeethWireCrvGrp, pos)
+    trsLib.match(upTeethWireCrvGrp, t = pos, r = pos)
     upTeethWireMod = mc.createNode('transform', name='upTeethWireMod_GRP', p=upTeethWireCrvGrp)
     upTeethJntGrp = mc.createNode('transform', name='upTeethJnt_GRP', p=teethStuffGrp)
-    trsLib.match(upTeethJntGrp, pos)
+    trsLib.match(upTeethJntGrp, t = pos, r = pos)
 
     l_upTeethWireOriGrp = mc.createNode('transform', name='L_upTeethWire_Ori_GRP', p=upTeethJntGrp)
-    trsLib.match(l_upTeethWireOriGrp, upTeethWire[1])
+    trsLib.match(l_upTeethWireOriGrp, t = upTeethWire[1], r = upTeethWire[1])
     l_upTeethWireModGrp = mc.createNode('transform', name='L_upTeethWire_mod_GRP', p=l_upTeethWireOriGrp)
     mc.parent(upTeethWire[1], l_upTeethWireModGrp)
 
     r_upTeethWireOriGrp = mc.createNode('transform', name='R_upTeethWire_Ori_GRP', p=upTeethJntGrp)
-    trsLib.match(r_upTeethWireOriGrp,upTeethWire[2])
+    trsLib.match(r_upTeethWireOriGrp,t = upTeethWire[2], r = upTeethWire[2])
     r_upTeethWireModGrp = mc.createNode('transform', name='R_upTeethWire_mod_GRP', p=r_upTeethWireOriGrp)
     mc.parent(upTeethWire[2], r_upTeethWireModGrp)
 
     m_upTeethWireOriGrp = mc.createNode('transform', name='M_upTeethWire_Ori_GRP', p=upTeethJntGrp)
-    trsLib.match(m_upTeethWireOriGrp, upTeethWire[0])
+    trsLib.match(m_upTeethWireOriGrp, t = upTeethWire[0],r = upTeethWire[0])
     m_upTeethWireModGrp = mc.createNode('transform', name='M_upTeethWire_mod_GRP', p=m_upTeethWireOriGrp)
     mc.parent(upTeethWire[0], m_upTeethWireModGrp)
 

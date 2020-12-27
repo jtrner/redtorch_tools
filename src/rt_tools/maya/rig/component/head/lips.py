@@ -67,6 +67,7 @@ class Lips(buildLip.BuildLip):
                                 self.lowLipLowRezcrv,self.lowLipMedRezcrv,self.lowLipHiRezcrv,self.lowLipZippercrv]
 
         for i in todup:
+            attrLib.lockHideAttrs(i,['t','r','s'],lock = False)
             output = trsLib.duplicate(i, search = 'local',replace = '',hierarchy = True )
             mc.move(0,-20, 0, output, r = True, ws = True)
 
@@ -130,11 +131,12 @@ class Lips(buildLip.BuildLip):
         for i in [self.jntRollModupGrp  ,self.upLipCtlRoll]:
             mc.orientConstraint(self.upLipJawFollowDrvr, i, mo = True)
 
-        for i in [self.lowJntDrvr ,self.upjntCtlPlace ]:
+        for i in [self.upjntCtlPlace,self.ctlupPlacement ]:
             mc.parentConstraint(self.upLipJawFollowDrvr, i, mo = True)
 
-        for i in [self.upJntDrvr ,self.ctlupPlacement  ]:
+        for i in [self.lowJntDrvr ,self.ctllowPlacement  ]:
             mc.parentConstraint(self.lowLipJawFollowDrvr, i, mo = True)
+
 
         for i in [self.leftUpMainJnt ,self.leftLowMainJnt ,self.rightLowLipCtlGrp ,self.rightUpLipCtlGrp,
                   self.rightUpMainJnt,self.leftUpLipCtlGrp, self.rightLowMainJnt,self.leftLowLipCtlGrp  ]:
@@ -198,6 +200,10 @@ class Lips(buildLip.BuildLip):
         mc.parentConstraint(self.l_outLowTerModLocHi,self.lowTerOrientGrp[0], mo = True)
         mc.parentConstraint(self.r_outLowTerModLocHi,self.lowTerOrientGrp[5], mo = True)
 
+        # bind joints to the up Zipper Curves
+        deformLib.bind_geo(geos=self.upLipZippercrv, joints=self.upBindJnts)
+        # bind joints to the low zipper Curves
+        deformLib.bind_geo(geos=self.lowLipZippercrv, joints=self.lowBindJnts)
         #bind joints to up lowrez and medrez curves
         deformLib.bind_geo(geos = self.upLipLowRezcrv, joints = self.upLipLowRezBindJnts)
         deformLib.bind_geo(geos = self.upLipMedRezcrv, joints = self.upmedRezBindJnts)
@@ -338,7 +344,19 @@ class Lips(buildLip.BuildLip):
         connect.remapVal(self.mouthSquashDrvrLoc + '.ty', self.lowsquashCtlMakro + '.ty', inputMin= 0,
                          inputMax =3.572,outputMin = 0,outputMax= -5.8, name = 'lowLip_mouthSquashCtrlCo_RMV')
 
-        # TODO: connect jaw ctl to the group obove jaw joints later
+        # connect jaw ctl to the stuf
+        self.jawCtl,self.mainJawMakro
+        [mc.connectAttr(self.jawCtl + '.{}{}'.format(t,a), self.mainJntMod + '.{}{}'.format(t,a))for t in 'trs' for a in'xyz']
+        jawFwdMult = mc.createNode('multiplyDivide', name = 'jawFwdMakro_MDN')
+        mc.setAttr(jawFwdMult + '.input2X', 0.030)
+        unit = mc.shadingNode('unitConversion', asUtility=True)
+        mc.setAttr(unit + '.conversionFactor', 57.296)
+        mc.connectAttr(self.jawCtl + '.rx', unit + '.input')
+        mc.connectAttr(unit + '.output', jawFwdMult + '.input1X')
+        mc.connectAttr(jawFwdMult + '.outputX', self.mainJawMakro + '.translateZ')
+        mc.scaleConstraint(self.jawCtl,self.upTeethOriGrp, mo = True )
+
+
         # connect jaw secondary to the mouthSquashLocator
         mc.parentConstraint(self.jawSecBndJnt[0],self.mouthSquashDrvrLoc, mo = True)
         funcs.teethSetDriven(drvr=self.mouthSquashDrvrLoc + '.ty', drvn=self.lowTeethSquashMakro + '.ty',
@@ -621,7 +639,7 @@ class Lips(buildLip.BuildLip):
         self.m_localUpLipOutOrient_GRP = self.m_localUpLipOutOrient_GRP.split('|')[-1]
         self.r_localUpLipOutOrient_GRP = self.r_localUpLipOutOrient_GRP.split('|')[-1]
         self.l_localLowLipOutOrient_GRP = self.l_localLowLipOutOrient_GRP.split('|')[-1]
-        self.m_localLowLipOutOrient_GRP = self.m_localUpLipOutOrient_GRP.split('|')[-1]
+        self.m_localLowLipOutOrient_GRP = self.m_localLowLipOutOrient_GRP.split('|')[-1]
         self.r_localLowLipOutOrient_GRP = self.r_localLowLipOutOrient_GRP.split('|')[-1]
 
         for i,j in zip([self.cln(self.l_UpLipDriverOutMod),self.cln(self.m_UpLipDriverOutMod),self.cln(self.r_UpLipDriverOutMod)],
@@ -666,10 +684,6 @@ class Lips(buildLip.BuildLip):
         deformLib.bind_geo(geos = self.cln(self.upLipHiRezcrv), joints = uphirezBindJnts)
         # bind joints to the low highrez Curves
         deformLib.bind_geo(geos = self.cln(self.lowLipHiRezcrv), joints = lowhirezBindJnts)
-        # bind joints to the up Zipper Curves
-        deformLib.bind_geo(geos = self.cln(self.upLipZippercrv), joints = upZipperBindJnts)
-        # bind joints to the low zipper Curves
-        deformLib.bind_geo(geos = self.cln(self.lowLipZippercrv), joints = lowZipperBindJnts)
 
 
         # connect up micro controls to the locator above the bind jnts
@@ -804,10 +818,35 @@ class Lips(buildLip.BuildLip):
             mc.connectAttr(self.cln(self.leftUpCornerCtl) + '.' + i, self.cln(self.leftLowCornerCtl) + '.' + i)
             mc.connectAttr(self.cln(self.rightUpCornerCtl) + '.' + i, self.cln(self.rightLowCornerCtl) + '.' + i)
 
+        # connect jaw secondary ctl to the transform above secondary joint
+        [mc.connectAttr(self.jawSecCtl + '.{}{}'.format(t, a), self.jawSecJntMod + '.{}{}'.format(t, a)) for t in 'trs' for a in 'xyz']
+
+        # connect stuf to the jaw follow locators
+        self.upLipJawFollowLoc,self.LipCornerJawFollowLoc,self.lowLipJawFollowLoc
+        self.mouthAndJawMain[0],self.jawSecBndJnt[0]
+        upCon = mc.parentConstraint(self.mouthAndJawMain[0],self.jawSecBndJnt[0], self.upLipJawFollowLoc, mo = True)[0]
+        mc.setAttr(upCon + '.' + '{}'.format(self.mouthAndJawMain[0]) + 'W0', 0.99)
+        mc.setAttr(upCon + '.' + '{}'.format(self.jawSecBndJnt[0]) + 'W1', 0.01)
+        midCon = mc.parentConstraint(self.mouthAndJawMain[0],self.jawSecBndJnt[0], self.LipCornerJawFollowLoc, mo = True,skipRotate = 'x')[0]
+        lowCon = mc.parentConstraint(self.mouthAndJawMain[0],self.jawSecBndJnt[0], self.lowLipJawFollowLoc, mo = True)[0]
+        mc.setAttr(lowCon + '.' + '{}'.format(self.mouthAndJawMain[0]) + 'W0', 0.03)
+        mc.setAttr(lowCon + '.' + '{}'.format(self.jawSecBndJnt[0]) + 'W1', 0.97)
+
+        # connect jawFollow locators to the jawFollows
+        for i,j in zip([self.upLipJawFollowLoc,self.LipCornerJawFollowLoc,self.lowLipJawFollowLoc],
+                       [self.ctlupLipJawFollowLoc,self.ctlLipCornerJawFollowLoc,self.ctllowLipJawFollowLoc]):
+
+            [mc.connectAttr(i + '.{}{}'.format(t, a), j + '.{}{}'.format(t, a)) for t in'trs' for a in 'xyz']
+
         # clean out the outliner
         self.lowwireModGrp, self.upwireModGrp
         mc.parent(self.upTeethCurve,'aa_topTeethWire_CRV1BaseWire', self.upwireModGrp)
         mc.parent(self.lowTeethCurve,'aa_lowTeethWire_CRV1BaseWire', self.lowwireModGrp)
+
+        # connect transform above up bind joints to the transform above low bind joints
+        mc.parentConstraint(self.uplocalMidZipBaseModGrp,self.lowlocalMidZipBaseModGrp,  mo = True)[0]
+        mc.parentConstraint(self.uplocalMidZipBasePlaceModGrp,self.lowlocalMidZipBasePlaceModGrp,  mo = True)[0]
+
 
         #**********************************************************blendShapes*********************************************************
         mouthbls = mc.blendShape(self.geo, frontOfChain=True, n='mouth_bShp')[0]
@@ -854,16 +893,21 @@ class Lips(buildLip.BuildLip):
             mc.parent(i, self.noTuchyLow)
 
         for i,j in zip([self.zippercrv,self.upBindJnts[1],self.upBindJnts[0],self.lowBindJnts[1],self.lowBindJnts[0]],
-                     [self.localLipRigGrp,self.localMidZipBaseModGrp,self.localMidZipBasePlaceModGrp,
-                     self.lowlocalMidZipBaseModGrp,self.localMidZipBasePlaceModGrp]):
+                     [self.localLipRigGrp,self.uplocalMidZipBaseModGrp,self.uplocalMidZipBasePlaceModGrp,
+                     self.lowlocalMidZipBaseModGrp,self.lowlocalMidZipBasePlaceModGrp]):
             mc.parent(i,j)
         for i,j in zip([self.cln(self.upBindJnts[1]),self.cln(self.upBindJnts[0]),
                         self.cln(self.lowBindJnts[1]),self.cln(self.lowBindJnts[0])],
-                        [self.cln(self.localMidZipBaseModGrp),self.cln(self.localMidZipBasePlaceModGrp),
-                        self.cln(self.lowlocalMidZipBaseModGrp),self.cln(self.localMidZipBasePlaceModGrp)]):
+                        [self.cln(self.uplocalMidZipBaseModGrp),self.cln(self.uplocalMidZipBasePlaceModGrp),
+                        self.cln(self.lowlocalMidZipBaseModGrp),self.cln(self.lowlocalMidZipBasePlaceModGrp)]):
             mc.parent(i,j)
 
         mc.parent(self.tempCurve,'Zipper_CRV1BaseWire' , 'Zipper_CRV1BaseWire1',self.noTuchyUp)
+
+        # bind joints to the up Zipper Curves
+        deformLib.bind_geo(geos=self.cln(self.upLipZippercrv), joints=upZipperBindJnts)
+        # bind joints to the low zipper Curves
+        deformLib.bind_geo(geos=self.cln(self.lowLipZippercrv), joints=lowZipperBindJnts)
 
 
         #parent stuf under squash head ctl
@@ -876,3 +920,30 @@ class Lips(buildLip.BuildLip):
     def cln(self,node):
         node = node.replace('local', '')
         return node
+
+    # def connect(self):
+    #
+    #     super(Lips, self).connect()
+    #
+    #     par = self.getOut('ctlParent')
+    #     if par:
+    #         [mc.connectAttr(par + '.' + '{}{}'.format(i, s), self.downCtl.zro + '.' + '{}{}'.format(i, s)) for i in 'rt'
+    #          for s in 'xyz']
+    #
+    #     globPar = self.getOut('globalScale')
+    #     if globPar:
+    #         connect.matrix(globPar, self.moduleGrp)
+    #         connect.matrix(globPar, self.ctlGrp)
+    #
+    # def createSettings(self):
+    #     """
+    #     returns the list of attributes that will be displayed in the rigCreator UI
+    #     so user can change settings
+    #     """
+    #     super(Lips, self).createSettings()
+    #
+    #     attrLib.addString(self.blueprintGrp, 'blu_globalScale', v='C_neck.headCtl')
+    #     attrLib.addString(self.blueprintGrp, 'blu_ctlParent', v=self.side + '_jaw.ctl')
+
+
+

@@ -9,7 +9,7 @@ from ....lib import container
 from ....lib import strLib
 from . import headTemplate
 
-reload(template)
+reload(headTemplate)
 reload(trsLib)
 reload(attrLib)
 reload(container)
