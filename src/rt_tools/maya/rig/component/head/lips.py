@@ -339,10 +339,10 @@ class Lips(buildLip.BuildLip):
 
         #connect mouth squash driver loc to the mouthsquash ctlGrp
         connect.remapVal(self.mouthSquashDrvrLoc + '.ty', self.upsquashCtlMakro + '.ty', inputMin= 0,
-                         inputMax =3.572,outputMin = 0,outputMax= 5.8, name = 'upLip_mouthSquashCtrlCo_RMV')
+                         inputMax =3.572,outputMin = 0,outputMax= 2, name = 'upLip_mouthSquashCtrlCo_RMV')
 
         connect.remapVal(self.mouthSquashDrvrLoc + '.ty', self.lowsquashCtlMakro + '.ty', inputMin= 0,
-                         inputMax =3.572,outputMin = 0,outputMax= -5.8, name = 'lowLip_mouthSquashCtrlCo_RMV')
+                         inputMax =3.572,outputMin = 0,outputMax= -2, name = 'lowLip_mouthSquashCtrlCo_RMV')
 
         # connect jaw ctl to the stuf
         self.jawCtl,self.mainJawMakro
@@ -438,10 +438,10 @@ class Lips(buildLip.BuildLip):
         mc.connectAttr(rightRemapCornerMakro + '.outValue',self.lowLipLowRezBindJnts[0] + '.tz')
 
         rightUpSquash = connect.remapVal(self.mouthSquashDrvrLoc + '.ty',self.upSquashMak + '.ty', name = 'upLip_mouthSquashCtlCorr',
-                         inputMin = 0, inputMax=3.527, outputMin=0, outputMax=5.8)
+                         inputMin = 0, inputMax=3.527, outputMin=0, outputMax=2)
 
         rightUpSquash = connect.remapVal(self.mouthSquashDrvrLoc + '.ty',self.lowSquashMak+ '.ty', name = 'lowLip_mouthSquashCtlCorr',
-                         inputMin = 0, inputMax=3.527, outputMin=0, outputMax=-6.5)
+                         inputMin = 0, inputMax=3.527, outputMin=0, outputMax=-2)
 
         # connect up mid lip ctl to the up lip jnt ctl loc
         self.upJntCtlLoc = self.upJntCtlLoc.split('|')[-1]
@@ -739,11 +739,11 @@ class Lips(buildLip.BuildLip):
 
         rightUpSquashGlob = connect.remapVal(self.cln(self.mouthSquashDrvrLoc) + '.ty',self.cln(self.upSquashMak) + '.ty',
                                              name = 'upLip_mouthSquashCtlCorrGlob',
-                         inputMin = 0, inputMax=3.527, outputMin=0, outputMax=5.8)
+                         inputMin = 0, inputMax=3.527, outputMin=0, outputMax=2)
 
         rightUpSquashGlob = connect.remapVal(self.cln(self.mouthSquashDrvrLoc) + '.ty',self.cln(self.lowSquashMak)+ '.ty',
                                              name = 'lowLip_mouthSquashCtlCorrGlob',
-                         inputMin = 0, inputMax=3.527, outputMin=0, outputMax=-6.5)
+                         inputMin = 0, inputMax=3.527, outputMin=0, outputMax=-2)
 
         # connect up mid lip ctl to the up lip jnt ctl loc Glob
         upCrvCompensionGlob = mc.createNode('multiplyDivide', name = 'upLip_CrvCompensationGlob_MDN')
@@ -796,10 +796,10 @@ class Lips(buildLip.BuildLip):
         self.upsquashCtlMakro = self.upsquashCtlMakro.split('|')[-1]
         self.lowsquashCtlMakro = self.lowsquashCtlMakro.split('|')[-1]
         connect.remapVal(self.cln(self.mouthSquashDrvrLoc) + '.ty', self.cln(self.upsquashCtlMakro) + '.ty', inputMin= 0,
-                         inputMax =3.572,outputMin = 0,outputMax= 5.8, name = 'upLip_mouthSquashCtrlCo_RMV')
+                         inputMax =3.572,outputMin = 0,outputMax= 2, name = 'upLip_mouthSquashCtrlCo_RMV')
 
         connect.remapVal(self.cln(self.mouthSquashDrvrLoc) + '.ty', self.cln(self.lowsquashCtlMakro) + '.ty', inputMin= 0,
-                         inputMax =3.572,outputMin = 0,outputMax= -5.8, name = 'lowLip_mouthSquashCtrlCo_RMV')
+                         inputMax =3.572,outputMin = 0,outputMax= -2, name = 'lowLip_mouthSquashCtrlCo_RMV')
 
         # connect mid lip ctls to the roll locator undr lip ctl group
         for i,j in zip([self.cln(self.uplipctl),self.cln(self.lowlipctl)],[self.cln(self.upRoll_loc),self.cln(self.lowRoll_loc)]):
@@ -846,7 +846,6 @@ class Lips(buildLip.BuildLip):
         # connect transform above up bind joints to the transform above low bind joints
         mc.parentConstraint(self.uplocalMidZipBaseModGrp,self.lowlocalMidZipBaseModGrp,  mo = True)[0]
         mc.parentConstraint(self.uplocalMidZipBasePlaceModGrp,self.lowlocalMidZipBasePlaceModGrp,  mo = True)[0]
-
 
         #**********************************************************blendShapes*********************************************************
         mouthbls = mc.blendShape(self.geo, frontOfChain=True, n='mouth_bShp')[0]
@@ -914,36 +913,67 @@ class Lips(buildLip.BuildLip):
         # mc.parent(self.mouthCtlOr,self.buttomJntSquash[1])
         # mc.parent(self.lipFollowLocGrp, self.buttomJntSquash[1])
         # mc.parent(self.noseCtlGrp, self.buttomJntSquash[0])
-        #
-
 
     def cln(self,node):
         node = node.replace('local', '')
         return node
 
-    # def connect(self):
-    #
-    #     super(Lips, self).connect()
-    #
-    #     par = self.getOut('ctlParent')
-    #     if par:
-    #         [mc.connectAttr(par + '.' + '{}{}'.format(i, s), self.downCtl.zro + '.' + '{}{}'.format(i, s)) for i in 'rt'
-    #          for s in 'xyz']
-    #
-    #     globPar = self.getOut('globalScale')
-    #     if globPar:
-    #         connect.matrix(globPar, self.moduleGrp)
-    #         connect.matrix(globPar, self.ctlGrp)
-    #
-    # def createSettings(self):
-    #     """
-    #     returns the list of attributes that will be displayed in the rigCreator UI
-    #     so user can change settings
-    #     """
-    #     super(Lips, self).createSettings()
-    #
-    #     attrLib.addString(self.blueprintGrp, 'blu_globalScale', v='C_neck.headCtl')
-    #     attrLib.addString(self.blueprintGrp, 'blu_ctlParent', v=self.side + '_jaw.ctl')
+    def connect(self):
+
+        super(Lips, self).connect()
+
+        jawpar = self.getOut('jawParent')
+        if jawpar:
+            mc.parent(self.jawCtlOriGrp, jawpar)
+
+        mouthPar = self.getOut('mouthParent')
+        if mouthPar:
+            mc.parent(self.mouthCtlOr, mouthPar)
+            mc.parent(self.lipCtlFollowLoc , mouthPar)
+            mc.parent(self.mouthAncFollowLoc , mouthPar)
+
+        ribbonPar = self.getOut('ribbonParent')
+        if ribbonPar:
+            mc.parent(self.cln(self.upLipRibbon), ribbonPar)
+            mc.parent(self.cln(self.lowLipRibbon) , ribbonPar)
+
+        localPar = self.getOut('localParent')
+        if localPar:
+            mc.parent(self.localLipRigGrp, localPar)
+
+        nosePar = self.getOut('noseParent')
+        if nosePar:
+            mc.parent(self.noseCtlGrp, nosePar)
+
+        teethPar = self.getOut('teethParent')
+        if teethPar:
+            mc.parent(self.upTeethOriGrp , teethPar)
+
+        teethStufPar = self.getOut('teethStufParent')
+        if teethStufPar:
+            mc.parent(self.teethStuffGrp,teethStufPar)
+
+
+    def createSettings(self):
+        """
+        returns the list of attributes that will be displayed in the rigCreator UI
+        so user can change settings
+        """
+        super(Lips, self).createSettings()
+
+        # attrLib.addString(self.blueprintGrp, 'blu_globalScale', v='C_neck.headCtl')
+        attrLib.addString(self.blueprintGrp, 'blu_mouthParent', v='C_head.squashSecond')
+        attrLib.addString(self.blueprintGrp, 'blu_jawParent', v='C_head.squashThird')
+        attrLib.addString(self.blueprintGrp, 'blu_ribbonParent', v='C_head.ribbonCtlsParent')
+        attrLib.addString(self.blueprintGrp, 'blu_localParent', v='C_head.localRigs')
+        attrLib.addString(self.blueprintGrp, 'blu_noseParent', v='C_head.squashFirst')
+        attrLib.addString(self.blueprintGrp, 'blu_teethParent', v='C_head.facialRigGrp')
+        attrLib.addString(self.blueprintGrp, 'blu_teethStufParent', v='C_head.globalRigGrp')
+
+
+
+
+
 
 
 

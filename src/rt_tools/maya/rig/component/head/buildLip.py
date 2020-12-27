@@ -451,7 +451,7 @@ class BuildLip(lipsTemplate.LipsTemplate):
         mc.parent(self.upLipLowRezBindJnts[1],self.m_upLipCornerMod_loc)
         self.upLipLowRezBindJnts[1] = self.upLipLowRezBindJnts[1].split('|')[-1]
 
-        self.mouthCtlOr = mc.createNode('transform', name = 'mouthCtlOri_GRP', p = self.facialCtlGrp)
+        self.mouthCtlOr = mc.createNode('transform', name = 'mouthCtlOri_GRP')
         trsLib.match( self.mouthCtlOr, t = self.mouthPiv, r = self.mouthPiv)
         mc.setAttr(self.mouthCtlOr + '.tz', 6.5)
         mc.setAttr(self.mouthCtlOr + '.ty', 240.8)
@@ -684,7 +684,7 @@ class BuildLip(lipsTemplate.LipsTemplate):
                                                                                  rightSnap = self.rightnostrils[0])
 
         # create jaw ctls
-        self.jawCtlOriGrp = mc.createNode('transform' ,name = 'jawCtlOri_GRP', p = self.facialCtlGrp)
+        self.jawCtlOriGrp = mc.createNode('transform' ,name = 'jawCtlOri_GRP')
         trsLib.match(self.jawCtlOriGrp, t = self.mouthAndJawMain[1],r =self.mouthAndJawMain[1] )
         mc.move(0,-20, 0, self.jawCtlOriGrp, r = True, ws = True )
         self.jawCtlMakroGrp = mc.createNode('transform', name = 'jawCtlMakr_GRP', p = self.jawCtlOriGrp)
@@ -724,7 +724,7 @@ class BuildLip(lipsTemplate.LipsTemplate):
 
 
         #create teeth hierarchy
-        self.upTeethOriGrp = mc.createNode('transform', name = 'topTeethOri_GRP',p  = self.facialCtlGrp )
+        self.upTeethOriGrp = mc.createNode('transform', name = 'topTeethOri_GRP' )
         trsLib.match(self.upTeethOriGrp, t = self.teethJnts[0],r = self.teethJnts[0])
         mc.move(0,-20, 0, self.upTeethOriGrp, r = True, ws = True )
 
@@ -795,8 +795,10 @@ class BuildLip(lipsTemplate.LipsTemplate):
 
 
         # parent wire joints under hierarchy
+        self.teethStuffGrp = mc.createNode('transform', name='TeethStuff_GRP')
+
         self.l_lowTeethWireModGrp,self.r_lowTeethWireModGrp,self.m_lowTeethWireModGrp,self.l_upTeethWireOriGrp,self.r_upTeethWireOriGrp,self.m_upTeethWireOriGrp,self.lowwireModGrp,self.upwireModGrp = funcs.createTeethJntHierarchy(pos=self.mouthPiv,upTeethWire=self.upTeethWire,
-                                                                                          lowTeethWire=self.lowTeethWire, parent = self.facialCtlGrp)
+                                                                                          lowTeethWire=self.lowTeethWire, parent = self.teethStuffGrp)
 
 
         # connect stuff to the modgrps above teeth ctls
@@ -807,15 +809,17 @@ class BuildLip(lipsTemplate.LipsTemplate):
         [mc.connectAttr(self.upteethCtls[2] + '.{}{}'.format(a,v), self.r_upTeethWireOriGrp + '.{}{}'.format(a,v))for a in 'trs' for v in 'xyz']
         [mc.connectAttr(self.upteethCtls[0] + '.{}{}'.format(a,v), self.m_upTeethWireOriGrp + '.{}{}'.format(a,v))for a in 'trs' for v in 'xyz']
 
+
+
         # duplicate the local rig
         output = trsLib.duplicate(self.upLipRibbon, search = 'local',replace = '', hierarchy= True )
         mc.setAttr(output[0] + '.ty', -20)
         #mc.makeIdentity(output[0], apply = True, t = True)
-        mc.parent(output[0], self.facialCtlGrp)
+        # mc.parent(output[0], self.facialCtlGrp)
         output = trsLib.duplicate(self.lowLipRibbon, search = 'local',replace = '', hierarchy= True )
         mc.setAttr(output[0] + '.ty', -20)
         #mc.makeIdentity(output[0], apply = True, t = True)
-        mc.parent(output[0], self.facialCtlGrp)
+        # mc.parent(output[0], self.facialCtlGrp)
 
 
 

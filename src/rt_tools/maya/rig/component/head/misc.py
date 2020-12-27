@@ -75,13 +75,49 @@ class Misc(buildMisc.BulidMisc):
         [mc.connectAttr(self.miscCtls[6] + '.{}{}'.format(a, v), self.orbitalLowerModGrp + '.{}{}'.format(a, v)) for a in 't' for v in 'xyz']
 
 
-        # parent nasalLabial ctl groups under squash joint
-        # mc.parent(self.cheekCtlOriGrp, self.buttomJntSquash[0])
-        # mc.parent(self.nasalLabialCtlOriGrp, self.buttomJntSquash[0])
-        # mc.parent(self.cheekLowerCtlOriGrp, self.buttomJntSquash[2])
-        # mc.parent(self.earCtlOriGrp , self.topJntSquash[0])
-        # mc.parent(self.nasalCtlOriGrp, self.topJntSquash[0])
-        # mc.parent(self.orbitalLowerCtlOriGrp, self.topJntSquash[0])
-        # mc.parent(self.browFleshCtlOriGrp, self.topJntSquash[1])
-        # mc.parent(self.orbitalUpperCtlOriGrp, self.topJntSquash[1])
-        #
+    def connect(self):
+        super(Misc, self).connect()
+
+        ctlPar = self.getOut('ctlParent')
+        if ctlPar:
+            mc.parent(self.nasalCtlOriGrp , ctlPar)
+            mc.parent(self.earCtlOriGrp , ctlPar)
+            mc.parent(self.orbitalLowerCtlOriGrp , ctlPar)
+
+        ctlParB = self.getOut('ctlParentB')
+        if ctlParB:
+            mc.parent(self.browFleshCtlOriGrp , ctlParB)
+            mc.parent(self.orbitalUpperCtlOriGrp , ctlParB)
+
+        ctlParC = self.getOut('ctlParentC')
+        if ctlParC:
+            mc.parent(self.nasalLabialCtlOriGrp , ctlParC)
+            mc.parent(self.cheekCtlOriGrp , ctlParC)
+
+        ctlParD = self.getOut('ctlParentD')
+        if ctlParD:
+            mc.parent(self.cheekLowerCtlOriGrp , ctlParD)
+
+        applePar = self.getOut('appleParent')
+        if applePar:
+            mc.parent(self.appleCtlOriGrp , applePar)
+
+        localPar = self.getOut('localParent')
+        if localPar:
+            mc.parent(self.localMiscJntGrp, localPar)
+
+
+    def createSettings(self):
+        """
+        returns the list of attributes that will be displayed in the rigCreator UI
+        so user can change settings
+        """
+        super(Misc, self).createSettings()
+
+        attrLib.addString(self.blueprintGrp, 'blu_ctlParent', v='C_head.topSquashFirst')
+        attrLib.addString(self.blueprintGrp, 'blu_ctlParentB', v='C_head.topSquashSecond')
+        attrLib.addString(self.blueprintGrp, 'blu_ctlParentC', v='C_head.squashFirst')
+        attrLib.addString(self.blueprintGrp, 'blu_ctlParentD', v='C_head.squashThird')
+        attrLib.addString(self.blueprintGrp, 'blu_appleParent', v='C_head.facialCtlGrp')
+        attrLib.addString(self.blueprintGrp, 'blu_localParent', v='C_head.localRigs')
+

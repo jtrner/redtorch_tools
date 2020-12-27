@@ -71,6 +71,35 @@ class Eye(buildEye.BuildEye):
         mc.orientConstraint(self.eyeJoints[0],self.eyeMasterMakroLoc, mo = True)
 
 
+    def connect(self):
+        super(Eye, self).connect()
+
+        rigPar = self.getOut('rigParent')
+        if rigPar:
+            mc.parent(self.eyeRigGrp, rigPar)
+
+
+        aimPar = self.getOut('aimParent')
+        if aimPar:
+            mc.parent(self.eyeAimCtlOriGrp, aimPar)
+
+
+
+    def createSettings(self):
+        """
+        returns the list of attributes that will be displayed in the rigCreator UI
+        so user can change settings
+        """
+        super(Eye, self).createSettings()
+
+        attrLib.addString(self.blueprintGrp, 'blu_rigParent', v='C_head.topSquashFirst')
+        attrLib.addString(self.blueprintGrp, 'blu_aimParent', v='C_head.facialCtlGrp')
+
+
+
+
+
+
 
 
 

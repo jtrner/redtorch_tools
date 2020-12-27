@@ -130,13 +130,27 @@ class Eyebrows(buildEyebrow.BuildEyebrow):
         connect.remapVal(self.mainCtls[1] + '.translateY', browShapes + '.brow_' + self.side + '_InDown',
                          inputMin=0, inputMax=-3, outputMin=0, outputMax=2, name=self.side + '_browInDownY')
 
-        #parent stuf under squash joints
-        mc.parent(self.browCtlGrp, self.topJntSquash[1])
+    def connect(self):
+        super(Eyebrows, self).connect()
+
+        ctlPar = self.getOut('ctlParent')
+        if ctlPar:
+            mc.parent(self.browCtlGrp, ctlPar)
+
+        localPar = self.getOut('localParent')
+        if localPar:
+            mc.parent(self.localBrowsGrp , localPar)
 
 
+    def createSettings(self):
+        """
+        returns the list of attributes that will be displayed in the rigCreator UI
+        so user can change settings
+        """
+        super(Eyebrows, self).createSettings()
 
-
-
+        attrLib.addString(self.blueprintGrp, 'blu_ctlParent', v='C_head.topSquashSecond')
+        attrLib.addString(self.blueprintGrp, 'blu_localParent', v='C_head.localRigs')
 
 
 

@@ -154,6 +154,11 @@ class BuildHead(headTemplate.HeadTemplate):
             self.buttomJntSquash.append(jnt)
             par = jnt
         par = self.moduleGrp
+
+        self.setOut('squashFirst', self.buttomJntSquash[0])
+        self.setOut('squashSecond', self.buttomJntSquash[1])
+        self.setOut('squashThird', self.buttomJntSquash[2])
+
         self.topJntSquash = []
         for alias, blu in self.blueprints.items():
             if not alias in ('headTop_squashGuide_01', 'headTop_squashGuide_02', 'headTop_squashGuide_03',
@@ -165,6 +170,9 @@ class BuildHead(headTemplate.HeadTemplate):
             self.joints[alias] = jnt
             self.topJntSquash.append(jnt)
             par = jnt
+
+        self.setOut('topSquashFirst', self.topJntSquash[0])
+        self.setOut('topSquashSecond', self.topJntSquash[1])
 
 
     def build(self):
@@ -186,6 +194,7 @@ class BuildHead(headTemplate.HeadTemplate):
         self.buttomHeadCtl = mc.rename(ctl, 'headBottom_CTL')
         self.buttomHeadCtlGrp = mc.rename(grp, 'headBottomCtlMod_GRP')
         mc.parent(self.buttomHeadCtlGrp, self.headButtomCtlOriGrp)
+        self.setOut('ribbonCtlsParent', self.buttomHeadCtl )
 
         # create head top ctl
         ctl,grp = funcs.createCtl(parent = self.headTopCtlOriGrp,side = self.side,scale = [15,15,17])

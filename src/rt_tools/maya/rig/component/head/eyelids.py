@@ -236,19 +236,38 @@ class Eyelids(buildEyelid.BuildEyelid):
 
         #parent stuf under squash head joints
         # mc.parent(self.eyelidCtlGrp,self.topJntSquash[0])
-        #
-        #
+
+        #clean outliner
+        for i in [self.upLidHdCrv,self.upLidLdCrv,self.upLidBlink,
+                  self.lowLidHdCrv,self.lowLidLdCrv,self.lowLidBlink,self.lidBlinkCrv,self.tempCurve,self.upCreaseHd,
+                  self.lowCreaseHd,self.upCreaseLd,self.lowCreaseLd,
+                  'localL_lidBlink_CRVBaseWire','localL_lidBlink_CRVBaseWire1',
+                  'localL_upCreaseLD_CRVBaseWire','localL_lowCreaseLD_CRVBaseWire']:
+            mc.parent(i,self.eyelidCrvGrp)
+
+        mc.parent(self.eyelidCrvGrp, self.localEyelidRig)
 
 
+    def connect(self):
+        super(Eyelids, self).connect()
 
+        ctlPar = self.getOut('ctlParent')
+        if ctlPar:
+            mc.parent(self.eyelidCtlGrp, ctlPar)
 
+        localPar = self.getOut('localParent')
+        if localPar:
+            mc.parent(self.localEyelidRig, localPar)
 
-        # clean outliner
-        # for i in [self.upLidHdCrv,self.upLidLdCrv,self.upLidBlink,
-        #           self.lowLidHdCrv,self.lowLidLdCrv,self.lowLidBlink,self.lidBlinkCrv,self.tempCurve,
-        #           'localL_lidBlink_CRVBaseWire','localL_lidBlink_CRVBaseWire1']:
-        #     mc.parent(i,self.eyelidCrvGrp)
-        #
-        # for i in [self.upCreaseHd,self.lowCreaseHd,self.upCreaseLd,self.lowCreaseLd]:
-        #     mc.parent(i,self.eyeCreaseCrvGrp)
+    def createSettings(self):
+        """
+        returns the list of attributes that will be displayed in the rigCreator UI
+        so user can change settings
+        """
+        super(Eyelids, self).createSettings()
+
+        # attrLib.addString(self.blueprintGrp, 'blu_globalScale', v='C_neck.headCtl')
+        attrLib.addString(self.blueprintGrp, 'blu_ctlParent', v='C_head.topSquashFirst')
+        attrLib.addString(self.blueprintGrp, 'blu_localParent', v='C_head.localRigs')
+
 

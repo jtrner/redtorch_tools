@@ -32,13 +32,20 @@ class HeadTemplate(template.Template):
         self.matches()
 
     def createGroups(self):
-        self.globalRigGrp = mc.createNode('transform', name = 'global_Rig')
+        self.faceRigGrp = mc.createNode('transform', name = 'faceRig_GRP')
+        self.facialCtlGrp = mc.createNode('transform', name = 'facialCTL_GRP', p = self.faceRigGrp)
+        self.setOut('facialCtlGrp', self.facialCtlGrp)
+        self.facialRigGrp = mc.createNode('transform', name = 'facialRig_GRP', p = self.faceRigGrp)
+        self.setOut('facialRigGrp', self.facialRigGrp)
+        self.globalRigGrp = mc.createNode('transform', name = 'global_Rig', p = self.facialRigGrp )
+        self.setOut('globalRigGrp', self.globalRigGrp)
+        self.localRigsGrp = mc.createNode('transform', name = 'localRigs_GRP', p = self.facialRigGrp)
+        self.setOut('localRigs', self.localRigsGrp)
         self.headSquashMechanicGrp = mc.createNode('transform', name = 'headSquetchMechanics_GRP', p = self.globalRigGrp)
         self.globalBotJntOriGrp = mc.createNode('transform', name = 'globalHeadBotJntOri_GRP', p = self.globalRigGrp)
         self.globalBotJntModGrp = mc.createNode('transform', name = 'globalHeadBotJntMod_GRP', p = self.globalBotJntOriGrp)
         self.globalTopJntOriGrp = mc.createNode('transform', name = 'globalHeadTopJntOri_GRP', p = self.globalRigGrp)
         self.globalTopJntModGrp = mc.createNode('transform', name = 'globalHeadTopJntMod_GRP', p = self.globalTopJntOriGrp)
-        self.facialCtlGrp = mc.createNode('transform', name = 'facialCTL_GRP')
         self.headSquashCtlGrp = mc.createNode('transform', name = 'headSquatchCtl_GRP', p = self.facialCtlGrp)
 
         self.botSquashOriGrp = mc.createNode('transform', name = 'botSquatchOri_GRP', p = self.headSquashCtlGrp)

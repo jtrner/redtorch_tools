@@ -40,7 +40,7 @@ class EyelidsTemplate(headTemplate.HeadTemplate):
         self.creaseSharperJnt = mc.createNode('transform', name = self.side + '_CreaseShpJnt_ShaperJnt_GRP', p = self.eyeCreaseGrp)
         self.eyelidLocalRig = mc.createNode('transform', name = 'eyeLids_Rig_GRP',p = self.localEyelidRig)
         self.eyelidSharperJntGrp = mc.createNode('transform', name = self.name + '_ShaperJnt_GRP', p = self.eyelidLocalRig)
-        self.eyelidCrvGrp = mc.createNode('transform', name = self.name + '_Crv_GRP', p = self.eyelidLocalRig)
+        self.eyelidCrvGrp = mc.createNode('transform', name = self.name + '_Crv_GRP')
         self.upLidLocGrp = mc.createNode('transform',name = self.name + '_up_LOC', p = self.eyelidLocalRig  )
         self.lowLidLocGrp = mc.createNode('transform',name = self.name + '_low_LOC', p = self.eyelidLocalRig )
         self.uplidJntGrp = mc.createNode('transform', name = self.name + '_up_JNT_GRP', p = self.eyelidLocalRig)
@@ -95,6 +95,5 @@ class EyelidsTemplate(headTemplate.HeadTemplate):
 
 
     def matches(self):
-        trsLib.match(self.eyelidCrvGrp, self.upeEyelidparent[0])
         trsLib.match(self.eyelidSocketGrp, self.upeEyelidparent[0])
         mc.move(0,0,2,self.eyelidSocketGrp,r = True, ws = True)
