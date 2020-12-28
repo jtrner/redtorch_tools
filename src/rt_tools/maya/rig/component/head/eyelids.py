@@ -269,5 +269,18 @@ class Eyelids(buildEyelid.BuildEyelid):
         # attrLib.addString(self.blueprintGrp, 'blu_globalScale', v='C_neck.headCtl')
         attrLib.addString(self.blueprintGrp, 'blu_ctlParent', v='C_head.topSquashFirst')
         attrLib.addString(self.blueprintGrp, 'blu_localParent', v='C_head.localRigs')
+        attrLib.addString(self.blueprintGrp, 'blu_upLidHdCrv', v=self.upLidHdCrv)
+        attrLib.addString(self.blueprintGrp, 'blu_lowLidHdCrv', v=self.lowLidHdCrv)
+        attrLib.addString(self.blueprintGrp, 'blu_upLidLdCrv', v=self.upLidLdCrv)
+        attrLib.addString(self.blueprintGrp, 'blu_lowLidLdCrv', v=self.lowLidLdCrv)
+        attrLib.addString(self.blueprintGrp, 'blu_lidBlinkCrv', v=self.lidBlinkCrv)
+        attrLib.addString(self.blueprintGrp, 'blu_upLidBlink', v=self.upLidBlink)
+        attrLib.addString(self.blueprintGrp, 'blu_lowLidBlink', v=self.lowLidBlink)
+        attrLib.addString(self.blueprintGrp, 'blu_upCreaseHd', v=self.upCreaseHd)
+        attrLib.addString(self.blueprintGrp, 'blu_upCreaseLd', v=self.upCreaseLd)
+        attrLib.addString(self.blueprintGrp, 'blu_lowCreaseHd', v=self.lowCreaseHd)
+        attrLib.addString(self.blueprintGrp, 'blu_lowCreaseLd', v=self.lowCreaseLd)
+
+
 
 

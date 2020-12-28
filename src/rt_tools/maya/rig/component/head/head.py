@@ -57,3 +57,19 @@ class Head(buildHead.BuildHead):
         [mc.connectAttr(self.squashCtls[0] + '.{}{}'.format(a,v), self.headBotSquashDrvrModGrp + '.{}{}'.format(a,v))for a in 'trs'for v in 'xyz']
         [mc.connectAttr(self.squashCtls[1] + '.{}{}'.format(a,v), self.headMidSquashDrvrModGrp + '.{}{}'.format(a,v))for a in 'trs'for v in 'xyz']
         [mc.connectAttr(self.squashCtls[2] + '.{}{}'.format(a,v), self.headTopSquashDrvrModGrp + '.{}{}'.format(a,v))for a in 'trs'for v in 'xyz']
+
+    def connect(self):
+        super(Head, self).connect()
+
+
+
+    def createSettings(self):
+        """
+        returns the list of attributes that will be displayed in the rigCreator UI
+        so user can change settings
+        """
+        super(Head, self).createSettings()
+
+        attrLib.addString(self.blueprintGrp, 'blu_geo', v=self.geo)
+        attrLib.addString(self.blueprintGrp, 'blu_headEdge', v=self.headEdge)
+        attrLib.addString(self.blueprintGrp, 'blu_headMovement', v=self.headMovement)

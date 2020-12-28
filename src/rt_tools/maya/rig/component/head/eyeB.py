@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-class Eye(buildEye.BuildEye):
+class EyeB(buildEye.BuildEye):
     """
     base class for eye template
     """
@@ -39,12 +39,11 @@ class Eye(buildEye.BuildEye):
         kwargs['prefix'] = prefix
 
 
-        super(Eye, self).__init__(**kwargs)
+        super(EyeB, self).__init__(**kwargs)
 
     def build(self):
-        super(Eye, self).build()
+        super(EyeB, self).build()
         # connect stuf to the eyeMaster aim drvr socketMod grp
-        self.squashCtl,self.socketModGrp
         [mc.connectAttr(self.squashCtl + '.{}{}'.format(a,v), self.socketModGrp + '.{}{}'.format(a,v))for a in 'trs'for v in 'xyz']
 
         # aim stuf to the eyeMaster aim driver loc
@@ -72,7 +71,7 @@ class Eye(buildEye.BuildEye):
 
 
     def connect(self):
-        super(Eye, self).connect()
+        super(EyeB, self).connect()
 
         rigPar = self.getOut('rigParent')
         if rigPar:
@@ -90,7 +89,7 @@ class Eye(buildEye.BuildEye):
         returns the list of attributes that will be displayed in the rigCreator UI
         so user can change settings
         """
-        super(Eye, self).createSettings()
+        super(EyeB, self).createSettings()
 
         attrLib.addString(self.blueprintGrp, 'blu_rigParent', v='C_head.topSquashFirst')
         attrLib.addString(self.blueprintGrp, 'blu_aimParent', v='C_head.facialCtlGrp')

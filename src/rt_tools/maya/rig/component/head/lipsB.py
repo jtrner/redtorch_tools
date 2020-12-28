@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-class Lips(buildLip.BuildLip):
+class LipsB(buildLip.BuildLip):
     """
     base class for lip template
     """
@@ -57,10 +57,10 @@ class Lips(buildLip.BuildLip):
         self.lowBindJnts = lowBindJnts
         self.numJnts = numJnts
 
-        super(Lips, self).__init__(**kwargs)
+        super(LipsB, self).__init__(**kwargs)
 
     def build(self):
-        super(Lips, self).build()
+        super(LipsB, self).build()
         # duplicate some stuff
         # duplicateCurves
         todup = [self.upLipLowRezcrv,self.upLipMedRezcrv,self.upLipHiRezcrv,self.upLipZippercrv,
@@ -920,7 +920,7 @@ class Lips(buildLip.BuildLip):
 
     def connect(self):
 
-        super(Lips, self).connect()
+        super(LipsB, self).connect()
 
         jawpar = self.getOut('jawParent')
         if jawpar:
@@ -959,7 +959,7 @@ class Lips(buildLip.BuildLip):
         returns the list of attributes that will be displayed in the rigCreator UI
         so user can change settings
         """
-        super(Lips, self).createSettings()
+        super(LipsB, self).createSettings()
 
         # attrLib.addString(self.blueprintGrp, 'blu_globalScale', v='C_neck.headCtl')
         attrLib.addString(self.blueprintGrp, 'blu_mouthParent', v='C_head.squashSecond')
@@ -969,6 +969,23 @@ class Lips(buildLip.BuildLip):
         attrLib.addString(self.blueprintGrp, 'blu_noseParent', v='C_head.squashFirst')
         attrLib.addString(self.blueprintGrp, 'blu_teethParent', v='C_head.facialRigGrp')
         attrLib.addString(self.blueprintGrp, 'blu_teethStufParent', v='C_head.globalRigGrp')
+        attrLib.addString(self.blueprintGrp, 'blu_geo', v=self.geo )
+        attrLib.addString(self.blueprintGrp, 'blu_upGum', v=self.upGum )
+        attrLib.addString(self.blueprintGrp, 'blu_lowGum', v=self.lowGum )
+        attrLib.addString(self.blueprintGrp, 'blu_upTeethCurve', v=self.upTeethCurve )
+        attrLib.addString(self.blueprintGrp, 'blu_lowTeethCurve', v=self.lowTeethCurve )
+        attrLib.addString(self.blueprintGrp, 'blu_zippercrv', v=self.zippercrv )
+        attrLib.addString(self.blueprintGrp, 'blu_upLipLowRezcrv', v=self.upLipLowRezcrv )
+        attrLib.addString(self.blueprintGrp, 'blu_upLipMedRezcrv', v=self.upLipMedRezcrv )
+        attrLib.addString(self.blueprintGrp, 'blu_upLipHiRezcrv', v=self.upLipHiRezcrv )
+        attrLib.addString(self.blueprintGrp, 'blu_upLipZippercrv', v=self.upLipZippercrv )
+        attrLib.addString(self.blueprintGrp, 'blu_lowLipLowRezcrv', v=self.lowLipLowRezcrv )
+        attrLib.addString(self.blueprintGrp, 'blu_lowLipHiRezcrv', v=self.lowLipHiRezcrv )
+        attrLib.addString(self.blueprintGrp, 'blu_lowLipMedRezcrv', v=self.lowLipMedRezcrv )
+        attrLib.addString(self.blueprintGrp, 'blu_lowLipZippercrv', v=self.lowLipZippercrv )
+        attrLib.addString(self.blueprintGrp, 'blu_upBindJnts', v=self.upBindJnts )
+        attrLib.addString(self.blueprintGrp, 'blu_lowBindJnts', v=self.lowBindJnts )
+        attrLib.addString(self.blueprintGrp, 'blu_numJnts', v=self.numJnts )
 
 
 

@@ -31,6 +31,13 @@ from .component import birdArm
 from .component import wingFeather
 from .component import wingTail
 
+from .component.head import eyeB
+from .component.head import lipsB
+from .component.head import eyebrows
+from .component.head import eyelids
+from .component.head import head
+from .component.head import misc
+
 
 reload(workspace)
 reload(attrLib)
@@ -38,6 +45,12 @@ reload(connect)
 reload(deformLib)
 
 
+reload(eyeB)
+reload(lipsB)
+reload(eyebrows)
+reload(eyelids)
+reload(head)
+reload(misc)
 reload(wingTail)
 reload(jaw)
 reload(wingFeather)

@@ -151,6 +151,8 @@ class Eyebrows(buildEyebrow.BuildEyebrow):
 
         attrLib.addString(self.blueprintGrp, 'blu_ctlParent', v='C_head.topSquashSecond')
         attrLib.addString(self.blueprintGrp, 'blu_localParent', v='C_head.localRigs')
+        attrLib.addString(self.blueprintGrp, 'blu_geo', v=self.geo)
+
 
 
 

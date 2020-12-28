@@ -31,7 +31,7 @@ logger.setLevel(logging.INFO)
 
 class Misc(buildMisc.BulidMisc):
     """
-    base class for eyebrows template
+    base class for misc template
     """
     def __init__(self, side='L', prefix='misc',**kwargs):
         kwargs['side'] = side

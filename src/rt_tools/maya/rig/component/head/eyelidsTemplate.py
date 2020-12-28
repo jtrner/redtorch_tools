@@ -7,9 +7,9 @@ from ....lib import trsLib
 from ....lib import attrLib
 from ....lib import container
 from ....lib import strLib
-from . import headTemplate
+from ...component import template
 
-reload(headTemplate)
+reload(template)
 reload(trsLib)
 reload(attrLib)
 reload(container)
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-class EyelidsTemplate(headTemplate.HeadTemplate):
+class EyelidsTemplate(template.Template):
 
     def __init__(self,  **kwargs ):
         super(EyelidsTemplate, self).__init__(**kwargs)
