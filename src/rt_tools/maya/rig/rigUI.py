@@ -419,7 +419,7 @@ class UI(QtWidgets.QDialog):
         self.head_lb = QtWidgets.QLabel('head info')
         qtLib.setColor(self.head_lb, qtLib.SILVER_LIGHT)
         head_lb_lay.addWidget(self.head_lb)
-        self.head_lb.setMinimumSize(0,30)
+        self.head_lb.setMinimumSize(0,10)
 
         head_lay = qtLib.createHLayout(head_lb_lay)
 
@@ -428,13 +428,18 @@ class UI(QtWidgets.QDialog):
         head_lay.addWidget(self.geoBt)
         self.geo_le = QtWidgets.QLineEdit()
         head_lay.addWidget(self.geo_le)
+        self.geoData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'geo')
+        if self.geoData:
+            self.geo_le.setText(str(self.geoData))
         self.geoBt.clicked.connect(lambda : self.saveGeoData(name = 'geo', lineedit=self.geo_le))
-
 
         self.headEdgeBt = QtWidgets.QPushButton('head edge')
         head_lay.addWidget(self.headEdgeBt)
         self.headEdge_le = QtWidgets.QLineEdit()
         head_lay.addWidget(self.headEdge_le)
+        self.headEdgeData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'headEdge')
+        if self.headEdgeData:
+            self.headEdge_le.setText(str(self.headEdgeData))
         self.headEdgeBt.clicked.connect(lambda : self.saveEdgeData(name = 'headEdge', lineedit = self.headEdge_le))
 
         self.headMove_lb = QtWidgets.QLabel('head movement ')
@@ -448,7 +453,7 @@ class UI(QtWidgets.QDialog):
         self.lips_lb = QtWidgets.QLabel('lips info')
         qtLib.setColor(self.lips_lb, qtLib.SILVER_LIGHT)
         lips_lb_lay.addWidget(self.lips_lb)
-        self.lips_lb.setMinimumSize(0,30)
+        self.lips_lb.setMinimumSize(0,10)
 
         lips_lay = qtLib.createHLayout(lips_lb_lay)
 
@@ -456,198 +461,322 @@ class UI(QtWidgets.QDialog):
         lips_lay.addWidget(self.upperTeethBt)
         self.upperTeeth_le = QtWidgets.QLineEdit()
         lips_lay.addWidget(self.upperTeeth_le)
-        self.upperTeethBt.clicked.connect(lambda : self.saveGeoData(name = 'upper teeth', lineedit=self.upperTeeth_le))
+        self.upperTeethData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'upperteeth')
+        if self.upperTeethData:
+            self.upperTeeth_le.setText(str(self.upperTeethData))
+        self.upperTeethBt.clicked.connect(lambda : self.saveGeoData(name = 'upperteeth',
+                                                                    lineedit=self.upperTeeth_le))
 
 
         self.lowerTeethBt =  QtWidgets.QPushButton('lower Teeth')
         lips_lay.addWidget(self.lowerTeethBt)
         self.lowerTeeth_le = QtWidgets.QLineEdit()
         lips_lay.addWidget(self.lowerTeeth_le)
-        self.lowerTeethBt.clicked.connect(lambda : self.saveGeoData(name = 'lower teeth', lineedit=self.lowerTeeth_le))
+        self.lowerTeethData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'lowerteeth')
+        if self.lowerTeethData:
+            self.lowerTeeth_le.setText(str(self.lowerTeethData))
+        self.lowerTeethBt.clicked.connect(lambda : self.saveGeoData(name = 'lowerteeth',
+                                                                    lineedit=self.lowerTeeth_le))
 
 
         self.upperTeethCrvBt =  QtWidgets.QPushButton('up Teeth crv')
         lips_lay.addWidget(self.upperTeethCrvBt)
         self.upTeethCrv_le = QtWidgets.QLineEdit()
         lips_lay.addWidget(self.upTeethCrv_le)
-        self.upperTeethCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'upperTeethEdge', lineedit = self.upTeethCrv_le))
-
-
-        self.lowerTeethCrvBt =  QtWidgets.QPushButton('low Teeth crv')
-        lips_lay.addWidget(self.lowerTeethCrvBt)
-        self.lowTeethCrv_le = QtWidgets.QLineEdit()
-        lips_lay.addWidget(self.lowTeethCrv_le)
-        self.lowerTeethCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'lowerTeethEdge', lineedit = self.lowTeethCrv_le))
+        self.upperTeethEdgeData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'upperTeethEdge')
+        if self.upperTeethEdgeData:
+            self.upTeethCrv_le.setText(str(self.upperTeethEdgeData))
+        self.upperTeethCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'upperTeethEdge',
+                                                                        lineedit = self.upTeethCrv_le))
 
 
         lips_layB = qtLib.createHLayout(faceInfo_lay)
+
+
+        self.lowerTeethCrvBt =  QtWidgets.QPushButton('low Teeth crv')
+        lips_layB.addWidget(self.lowerTeethCrvBt)
+        self.lowTeethCrv_le = QtWidgets.QLineEdit()
+        lips_layB.addWidget(self.lowTeethCrv_le)
+        self.lowtTeethEdgeData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'lowerTeethEdge')
+        if self.lowtTeethEdgeData:
+            self.lowTeethCrv_le.setText(str(self.lowtTeethEdgeData))
+        self.lowerTeethCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'lowerTeethEdge',
+                                                                        lineedit = self.lowTeethCrv_le))
+
 
         self.zipperCrvBt =  QtWidgets.QPushButton('zipper crv')
         lips_layB.addWidget(self.zipperCrvBt)
         self.zipperCrv_le = QtWidgets.QLineEdit()
         lips_layB.addWidget(self.zipperCrv_le)
-        self.zipperCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'zipperCrvEdge', lineedit = self.zipperCrv_le))
+        self.zipperCrvEdgeData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'zipperCrvEdge')
+        if self.zipperCrvEdgeData:
+            self.zipperCrv_le.setText(str(self.zipperCrvEdgeData))
+        self.zipperCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'zipperCrvEdge',
+                                                                    lineedit = self.zipperCrv_le))
 
 
         self.uplipLowrezCrvBt =  QtWidgets.QPushButton('uplipLowRez crv')
         lips_layB.addWidget(self.uplipLowrezCrvBt)
         self.uplipLowrezCrv_le = QtWidgets.QLineEdit()
         lips_layB.addWidget(self.uplipLowrezCrv_le)
-        self.uplipLowrezCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'uplipLowRezEdge', lineedit = self.uplipLowrezCrv_le))
+        self.uplipLowRezEdgeData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'uplipLowRezEdge')
+        if self.uplipLowRezEdgeData:
+            self.uplipLowrezCrv_le.setText(str(self.uplipLowRezEdgeData))
+        self.uplipLowrezCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'uplipLowRezEdge',
+                                                                         lineedit = self.uplipLowrezCrv_le))
 
+        lips_layC = qtLib.createHLayout(faceInfo_lay)
 
         self.uplipMedrezCrvBt =  QtWidgets.QPushButton('uplipMedRez crv')
-        lips_layB.addWidget(self.uplipMedrezCrvBt)
+        lips_layC.addWidget(self.uplipMedrezCrvBt)
         self.uplipMedrezCrv_le = QtWidgets.QLineEdit()
-        lips_layB.addWidget(self.uplipMedrezCrv_le)
-        self.uplipMedrezCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'uplipMedRezEdge', lineedit = self.uplipMedrezCrv_le))
+        lips_layC.addWidget(self.uplipMedrezCrv_le)
+        self.uplipMedRezEdgeData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'uplipMedRezEdge')
+        if self.uplipMedRezEdgeData:
+            self.uplipMedrezCrv_le.setText(str(self.uplipMedRezEdgeData))
+        self.uplipMedrezCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'uplipMedRezEdge',
+                                                                         lineedit = self.uplipMedrezCrv_le))
 
 
         self.uplipHirezCrvBt =  QtWidgets.QPushButton('uplipHiRez crv')
-        lips_layB.addWidget(self.uplipHirezCrvBt)
+        lips_layC.addWidget(self.uplipHirezCrvBt)
         self.uplipHirezCrv_le = QtWidgets.QLineEdit()
-        lips_layB.addWidget(self.uplipHirezCrv_le)
-        self.uplipHirezCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'uplipHirezEdge', lineedit = self.uplipHirezCrv_le))
+        lips_layC.addWidget(self.uplipHirezCrv_le)
+        self.uplipHirezEdgeData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'uplipHirezEdge')
+        if self.uplipHirezEdgeData:
+            self.uplipHirezCrv_le.setText(str(self.uplipHirezEdgeData))
+        self.uplipHirezCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'uplipHirezEdge',
+                                                                        lineedit = self.uplipHirezCrv_le))
 
 
-        lips_layC = qtLib.createHLayout(faceInfo_lay)
 
         self.uplipzipperCrvBt =  QtWidgets.QPushButton('uplipZipper crv')
         lips_layC.addWidget(self.uplipzipperCrvBt)
         self.uplipZipperCrv_le = QtWidgets.QLineEdit()
         lips_layC.addWidget(self.uplipZipperCrv_le)
-        self.uplipzipperCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'uplipZipperEdge', lineedit = self.uplipZipperCrv_le))
-
-
-        self.lowlipLowrezCrvBt =  QtWidgets.QPushButton('lowlipLowRez crv')
-        lips_layC.addWidget(self.lowlipLowrezCrvBt)
-        self.lowlipLowrezCrv_le = QtWidgets.QLineEdit()
-        lips_layC.addWidget(self.lowlipLowrezCrv_le)
-        self.lowlipLowrezCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'lowLipLowRezEdge', lineedit = self.lowlipLowrezCrv_le))
-
-
-        self.lowlipMedrezCrvBt =  QtWidgets.QPushButton('lowlipMedRez crv')
-        lips_layC.addWidget(self.lowlipMedrezCrvBt)
-        self.lowlipMedrezCrv_le = QtWidgets.QLineEdit()
-        lips_layC.addWidget(self.lowlipMedrezCrv_le)
-        self.lowlipMedrezCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'lowLipMedRezEdge', lineedit = self.lowlipMedrezCrv_le))
-
-
-        self.lowlipHirezCrvBt =  QtWidgets.QPushButton('lowlipHiRez crv')
-        lips_layC.addWidget(self.lowlipHirezCrvBt)
-        self.lowlipHirezCrv_le = QtWidgets.QLineEdit()
-        lips_layC.addWidget(self.lowlipHirezCrv_le)
-        self.lowlipHirezCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'lowLipHirezEdge', lineedit = self.lowlipHirezCrv_le))
+        self.uplipZipperEdgeData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'uplipZipperEdge')
+        if self.uplipZipperEdgeData:
+            self.uplipZipperCrv_le.setText(str(self.uplipZipperEdgeData))
+        self.uplipzipperCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'uplipZipperEdge',
+                                                                         lineedit = self.uplipZipperCrv_le))
 
         lips_layD = qtLib.createHLayout(faceInfo_lay)
 
+        self.lowlipLowrezCrvBt =  QtWidgets.QPushButton('lowlipLowRez crv')
+        lips_layD.addWidget(self.lowlipLowrezCrvBt)
+        self.lowlipLowrezCrv_le = QtWidgets.QLineEdit()
+        lips_layD.addWidget(self.lowlipLowrezCrv_le)
+        self.lowlipLowRezEdgeData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'lowLipLowRezEdge')
+        if self.lowlipLowRezEdgeData:
+            self.lowlipLowrezCrv_le.setText(str(self.lowlipLowRezEdgeData))
+        self.lowlipLowrezCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'lowLipLowRezEdge',
+                                                                          lineedit = self.lowlipLowrezCrv_le))
+
+
+        self.lowlipMedrezCrvBt =  QtWidgets.QPushButton('lowlipMedRez crv')
+        lips_layD.addWidget(self.lowlipMedrezCrvBt)
+        self.lowlipMedrezCrv_le = QtWidgets.QLineEdit()
+        lips_layD.addWidget(self.lowlipMedrezCrv_le)
+        self.lowlipMedRezEdgeData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'lowLipMedRezEdge')
+        if self.lowlipMedRezEdgeData:
+            self.lowlipMedrezCrv_le.setText(str(self.lowlipMedRezEdgeData))
+        self.lowlipMedrezCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'lowLipMedRezEdge',
+                                                                          lineedit = self.lowlipMedrezCrv_le))
+
+
+        self.lowlipHirezCrvBt =  QtWidgets.QPushButton('lowlipHiRez crv')
+        lips_layD.addWidget(self.lowlipHirezCrvBt)
+        self.lowlipHirezCrv_le = QtWidgets.QLineEdit()
+        lips_layD.addWidget(self.lowlipHirezCrv_le)
+        self.lowlipHirezEdgeData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'lowLipHirezEdge')
+        if self.lowlipHirezEdgeData:
+            self.lowlipHirezCrv_le.setText(str(self.lowlipHirezEdgeData))
+        self.lowlipHirezCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'lowLipHirezEdge',
+                                                                         lineedit = self.lowlipHirezCrv_le))
+
+        lips_layE = qtLib.createHLayout(faceInfo_lay)
+
         self.lowlipZipperCrvBt =  QtWidgets.QPushButton('lowlipZipper crv')
-        lips_layD.addWidget(self.lowlipZipperCrvBt)
+        lips_layE.addWidget(self.lowlipZipperCrvBt)
         self.lowlipZipperCrv_le = QtWidgets.QLineEdit()
-        lips_layD.addWidget(self.lowlipZipperCrv_le)
-        self.lowlipZipperCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'lowLipZipperEdge', lineedit = self.lowlipZipperCrv_le))
+        lips_layE.addWidget(self.lowlipZipperCrv_le)
+        self.lowlipZipperEdgeData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'lowLipZipperEdge')
+        if self.lowlipZipperEdgeData:
+            self.lowlipZipperCrv_le.setText(str(self.lowlipZipperEdgeData))
+        self.lowlipZipperCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'lowLipZipperEdge',
+                                                                          lineedit = self.lowlipZipperCrv_le))
 
 
         self.upBindJntsBt =  QtWidgets.QPushButton('up bind joints')
-        lips_layD.addWidget(self.upBindJntsBt)
-
+        lips_layE.addWidget(self.upBindJntsBt)
         self.upBindJnts_le = QtWidgets.QLineEdit()
-        lips_layD.addWidget(self.upBindJnts_le)
+        lips_layE.addWidget(self.upBindJnts_le)
+        self.uplipBindJntsData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'upLipBindJnts')
+        if self.uplipBindJntsData:
+            self.upBindJnts_le.setText(str(self.uplipBindJntsData))
+        self.upBindJntsBt.clicked.connect(lambda: self.saveUpBindJntList(name = 'upLipBindJnts',
+                                                                         lineedit = self.upBindJnts_le))
 
         self.lowBindJntsBt =  QtWidgets.QPushButton('low bind joints')
-        lips_layD.addWidget(self.lowBindJntsBt)
-
+        lips_layE.addWidget(self.lowBindJntsBt)
         self.lowBindJnts_le = QtWidgets.QLineEdit()
-        lips_layD.addWidget(self.lowBindJnts_le)
+        lips_layE.addWidget(self.lowBindJnts_le)
+        self.lowlipBindJntsData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'lowLipBindJnts')
+        if self.lowlipBindJntsData:
+            self.lowBindJnts_le.setText(str(self.lowlipBindJntsData))
+        self.lowBindJntsBt.clicked.connect(lambda: self.saveUpBindJntList(name = 'lowLipBindJnts',
+                                                                          lineedit = self.lowBindJnts_le))
+
+        lips_layF = qtLib.createHLayout(faceInfo_lay)
 
         self.numJnts_lb = QtWidgets.QLabel('num joints')
-        lips_layD.addWidget(self.numJnts_lb)
+        lips_layF.addWidget(self.numJnts_lb)
         self.numJnts_le = QtWidgets.QLineEdit()
-        lips_layD.addWidget(self.numJnts_le)
+        lips_layF.addWidget(self.numJnts_le)
         self.numJnts_le.setText(str(6))
         self.numJnts_le.textChanged.connect(lambda : self.checkNumJnts())
 
+        self.lipsEnd_lb = QtWidgets.QLabel('                                                                           lips information')
+        qtLib.setColor(self.lipsEnd_lb, qtLib.SILVER_LIGHT)
+        lips_layF.addWidget(self.lipsEnd_lb)
+        self.lipsEnd_lb.setMinimumSize(500,0)
+
 
         eyelids_lb_lay = qtLib.createVLayout(faceInfo_lay)
+
         self.eyelids_lb = QtWidgets.QLabel('eyelids info')
         qtLib.setColor(self.eyelids_lb, qtLib.SILVER_LIGHT)
         eyelids_lb_lay.addWidget(self.eyelids_lb)
-        self.eyelids_lb.setMinimumSize(0,30)
+        self.eyelids_lb.setMinimumSize(0,10)
+
         eyelids_lay = qtLib.createHLayout(eyelids_lb_lay)
 
         self.upLidHdCrvBt =  QtWidgets.QPushButton('uplidHd crv')
         eyelids_lay.addWidget(self.upLidHdCrvBt)
         self.upLidHdCrv_le = QtWidgets.QLineEdit()
         eyelids_lay.addWidget(self.upLidHdCrv_le)
-        self.upLidHdCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'upLidHdEdge', lineedit = self.upLidHdCrv_le))
+        self.uplidHdEdgeData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'upLidHdEdge')
+        if self.uplidHdEdgeData:
+            self.upLidHdCrv_le.setText(str(self.uplidHdEdgeData))
+        self.upLidHdCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'upLidHdEdge',
+                                                                     lineedit = self.upLidHdCrv_le))
 
 
         self.lowLidHdCrvBt =  QtWidgets.QPushButton('lowlidHd crv')
         eyelids_lay.addWidget(self.lowLidHdCrvBt)
         self.lowLidHdCrv_le = QtWidgets.QLineEdit()
         eyelids_lay.addWidget(self.lowLidHdCrv_le)
-        self.lowLidHdCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'lowLidHdEdge', lineedit = self.lowLidHdCrv_le))
+        self.lowlidHdEdgeData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'lowLidHdEdge')
+        if self.lowlidHdEdgeData:
+            self.lowLidHdCrv_le.setText(str(self.lowlidHdEdgeData))
+        self.lowLidHdCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'lowLidHdEdge',
+                                                                      lineedit = self.lowLidHdCrv_le))
 
 
         self.upLidLdCrvBt =  QtWidgets.QPushButton('upLidLd crv')
         eyelids_lay.addWidget(self.upLidLdCrvBt)
         self.upLidLdCrv_le = QtWidgets.QLineEdit()
         eyelids_lay.addWidget(self.upLidLdCrv_le)
-        self.upLidLdCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'upLidLdEdge', lineedit = self.upLidLdCrv_le))
-
-
-        self.lowLidLdCrvBt =  QtWidgets.QPushButton('lowLidLd crv')
-        eyelids_lay.addWidget(self.lowLidLdCrvBt)
-        self.lowLidLdCrv_le = QtWidgets.QLineEdit()
-        eyelids_lay.addWidget(self.lowLidLdCrv_le)
-        self.lowLidLdCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'lowLidLdEdge', lineedit = self.lowLidLdCrv_le))
-
+        self.uplidLdEdgeData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'upLidLdEdge')
+        if self.uplidLdEdgeData:
+            self.upLidLdCrv_le.setText(str(self.uplidLdEdgeData))
+        self.upLidLdCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'upLidLdEdge',
+                                                                     lineedit = self.upLidLdCrv_le))
 
         eyelids_layB = qtLib.createHLayout(eyelids_lb_lay)
+
+        self.lowLidLdCrvBt =  QtWidgets.QPushButton('lowLidLd crv')
+        eyelids_layB.addWidget(self.lowLidLdCrvBt)
+        self.lowLidLdCrv_le = QtWidgets.QLineEdit()
+        eyelids_layB.addWidget(self.lowLidLdCrv_le)
+        self.lowlidLdEdgeData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'lowLidLdEdge')
+        if self.lowlidLdEdgeData:
+            self.lowLidLdCrv_le.setText(str(self.lowlidLdEdgeData))
+        self.lowLidLdCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'lowLidLdEdge',
+                                                                      lineedit = self.lowLidLdCrv_le))
 
         self.lidBlinkCrvBt =  QtWidgets.QPushButton('lidBlink crv')
         eyelids_layB.addWidget(self.lidBlinkCrvBt)
         self.lidBlinkCrv_le = QtWidgets.QLineEdit()
         eyelids_layB.addWidget(self.lidBlinkCrv_le)
-        self.lidBlinkCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'lidBlinkEdge', lineedit = self.lidBlinkCrv_le))
+        self.lidBlinkEdgeData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'lidBlinkEdge')
+        if self.lidBlinkEdgeData:
+            self.lidBlinkCrv_le.setText(str(self.lidBlinkEdgeData))
+        self.lidBlinkCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'lidBlinkEdge',
+                                                                      lineedit = self.lidBlinkCrv_le))
 
 
         self.uplidBlinkBt =  QtWidgets.QPushButton('uplidBlink crv')
         eyelids_layB.addWidget(self.uplidBlinkBt)
         self.uplidBlink_le = QtWidgets.QLineEdit()
         eyelids_layB.addWidget(self.uplidBlink_le)
-        self.uplidBlinkBt.clicked.connect(lambda : self.saveEdgeData(name = 'uplidBlinkEdge', lineedit = self.uplidBlink_le))
-
-
-        self.lowlidBlinkBt =  QtWidgets.QPushButton('lowlidBlink crv')
-        eyelids_layB.addWidget(self.lowlidBlinkBt)
-        self.lowlidBlink_le = QtWidgets.QLineEdit()
-        eyelids_layB.addWidget(self.lowlidBlink_le)
-        self.lowlidBlinkBt.clicked.connect(lambda : self.saveEdgeData(name = 'lowlidBlinkEdge', lineedit = self.lowlidBlink_le))
-
-
-        self.upCreaseHdBt =  QtWidgets.QPushButton('upCreaseHd crv')
-        eyelids_layB.addWidget(self.upCreaseHdBt)
-        self.upCreaseHd_le = QtWidgets.QLineEdit()
-        eyelids_layB.addWidget(self.upCreaseHd_le)
-        self.upCreaseHdBt.clicked.connect(lambda : self.saveEdgeData(name = 'upCreaseHdEdge', lineedit = self.upCreaseHd_le))
-
+        self.uplidBlinkEdgeData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'uplidBlinkEdge')
+        if self.uplidBlinkEdgeData:
+            self.uplidBlink_le.setText(str(self.uplidBlinkEdgeData))
+        self.uplidBlinkBt.clicked.connect(lambda : self.saveEdgeData(name = 'uplidBlinkEdge',
+                                                                     lineedit = self.uplidBlink_le))
 
         eyelids_layC = qtLib.createHLayout(eyelids_lb_lay)
 
+        self.lowlidBlinkBt =  QtWidgets.QPushButton('lowlidBlink crv')
+        eyelids_layC.addWidget(self.lowlidBlinkBt)
+        self.lowlidBlink_le = QtWidgets.QLineEdit()
+        eyelids_layC.addWidget(self.lowlidBlink_le)
+        self.lowlidBlinkEdgeData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'lowlidBlinkEdge')
+        if self.lowlidBlinkEdgeData:
+            self.lowlidBlink_le.setText(str(self.lowlidBlinkEdgeData))
+        self.lowlidBlinkBt.clicked.connect(lambda : self.saveEdgeData(name = 'lowlidBlinkEdge',
+                                                                      lineedit = self.lowlidBlink_le))
+
+
+        self.upCreaseHdBt =  QtWidgets.QPushButton('upCreaseHd crv')
+        eyelids_layC.addWidget(self.upCreaseHdBt)
+        self.upCreaseHd_le = QtWidgets.QLineEdit()
+        eyelids_layC.addWidget(self.upCreaseHd_le)
+        self.upCreaseHdEdgeData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'upCreaseHdEdge')
+        if self.upCreaseHdEdgeData:
+            self.upCreaseHd_le.setText(str(self.upCreaseHdEdgeData))
+        self.upCreaseHdBt.clicked.connect(lambda : self.saveEdgeData(name = 'upCreaseHdEdge',
+                                                                     lineedit = self.upCreaseHd_le))
+
+        self.lowCreaseHdBt =  QtWidgets.QPushButton('lowCreaseHd crv')
+        eyelids_layC.addWidget(self.lowCreaseHdBt)
+        self.lowCreaseHd_le = QtWidgets.QLineEdit()
+        eyelids_layC.addWidget(self.lowCreaseHd_le)
+        self.lowCreaseHdEdgeData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'lowCreaseHdEdge')
+        if self.lowCreaseHdEdgeData:
+            self.lowCreaseHd_le.setText(str(self.lowCreaseHdEdgeData))
+        self.lowCreaseHdBt.clicked.connect(lambda : self.saveEdgeData(name = 'lowCreaseHdEdge',
+                                                                      lineedit = self.lowCreaseHd_le))
+
+
+        eyelids_layD = qtLib.createHLayout(eyelids_lb_lay)
+
         self.upCreaseLdBt =  QtWidgets.QPushButton('upCreaseLd crv')
-        eyelids_layC.addWidget(self.upCreaseLdBt)
+        eyelids_layD.addWidget(self.upCreaseLdBt)
         self.upCreaseLd_le = QtWidgets.QLineEdit()
-        eyelids_layC.addWidget(self.upCreaseLd_le)
-        self.upCreaseLdBt.clicked.connect(lambda : self.saveEdgeData(name = 'upCreaseLdEdge', lineedit = self.upCreaseLd_le))
+        eyelids_layD.addWidget(self.upCreaseLd_le)
+        self.upCreaseLdEdgeData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'upCreaseLdEdge')
+        if self.upCreaseLdEdgeData:
+            self.upCreaseLd_le.setText(str(self.upCreaseLdEdgeData))
+        self.upCreaseLdBt.clicked.connect(lambda : self.saveEdgeData(name = 'upCreaseLdEdge',
+                                                                     lineedit = self.upCreaseLd_le))
 
 
         self.lowCreaseLdBt =  QtWidgets.QPushButton('lowCreaseLd crv')
-        eyelids_layC.addWidget(self.lowCreaseLdBt)
+        eyelids_layD.addWidget(self.lowCreaseLdBt)
         self.lowCreaseLd_le = QtWidgets.QLineEdit()
-        eyelids_layC.addWidget(self.lowCreaseLd_le)
-        self.lowCreaseLdBt.clicked.connect(lambda : self.saveEdgeData(name = 'lowCreaseLdEdge', lineedit = self.lowCreaseLd_le))
+        eyelids_layD.addWidget(self.lowCreaseLd_le)
+        self.lowCreaseLdEdgeData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'lowCreaseLdEdge')
+        if self.lowCreaseLdEdgeData:
+            self.lowCreaseLd_le.setText(str(self.lowCreaseLdEdgeData))
+        self.lowCreaseLdBt.clicked.connect(lambda : self.saveEdgeData(name = 'lowCreaseLdEdge',
+                                                                      lineedit = self.lowCreaseLd_le))
 
+        self.eyelidEnd_lb = QtWidgets.QLabel('                                          eyelid information')
+        qtLib.setColor(self.eyelidEnd_lb, qtLib.SILVER_LIGHT)
+        eyelids_layD.addWidget(self.eyelidEnd_lb)
+        self.eyelidEnd_lb.setMinimumSize(250,0)
 
         # ======================================================================
         # buildTree frame
@@ -701,6 +830,43 @@ class UI(QtWidgets.QDialog):
         item = self.blueprints_tw.topLevelItem(0)
         self.blueprints_tw.setCurrentItem(item)
 
+    def loadFaceData(self,faceDataPath,keyData):
+        if not os.path.lexists(faceDataPath):
+            return
+        faceData = fileLib.loadJson(faceDataPath, ordered = True)
+        return [v for k ,v in faceData.items() if keyData in k]
+
+    def saveUpBindJntList(self, name,lineedit):
+        data = {name:[]}
+        sel = mc.ls(sl=True, fl=True)
+        joints = []
+        for i in sel:
+            type = mc.nodeType(i)
+            if type != 'joint':
+                mc.error('you should select joint')
+            joints.append(i)
+        data[name] = joints
+        fileLib.appendToJson(path = faceDataPath, data = data)
+        lineedit.setText(str(joints))
+        selectedBlu = qtLib.getSelectedItemAsText(self.blueprints_tw)
+        bluGrp = selectedBlu.split(' ')[0] + '_blueprint_GRP'
+        if not selectedBlu:
+            return
+        attrAndValues = self.getAttrsAndValuesForSelectedBluGrp()
+        print(attrAndValues)
+        print(bluGrp)
+        attrs = []
+        for key, val in attrAndValues.items():
+            att = 'blu_' + str(key)
+            attrs.append(att)
+        for i in attrs:
+            j = i.split('blu_')[-1]
+            if j in data.keys():
+                if j in name:
+                    at = 'blu_' + j
+                    mc.setAttr(bluGrp + '.' + at , data[j], type = 'string')
+
+
     def checkNumJnts(self):
         self.countJnt = self.numJnts_le.text()
     def checkHeadMovement(self):
@@ -715,7 +881,7 @@ class UI(QtWidgets.QDialog):
         if type != 'mesh':
             if type!= 'mesh':
                 mc.error('you should select a mesh')
-        data['geo'] = sel
+        data[name] = sel
         fileLib.appendToJson(path = faceDataPath, data = data)
         lineedit.setText(sel)
 

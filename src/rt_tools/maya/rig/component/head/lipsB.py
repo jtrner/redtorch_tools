@@ -983,8 +983,8 @@ class LipsB(buildLip.BuildLip):
         attrLib.addString(self.blueprintGrp, 'blu_lowLipHiRezcrv', v=self.lowLipHiRezcrv )
         attrLib.addString(self.blueprintGrp, 'blu_lowLipMedRezcrv', v=self.lowLipMedRezcrv )
         attrLib.addString(self.blueprintGrp, 'blu_lowLipZippercrv', v=self.lowLipZippercrv )
-        attrLib.addString(self.blueprintGrp, 'blu_upBindJnts', v=self.upBindJnts )
-        attrLib.addString(self.blueprintGrp, 'blu_lowBindJnts', v=self.lowBindJnts )
+        attrLib.addString(self.blueprintGrp, 'blu_upLipBindJnts', v=self.upBindJnts )
+        attrLib.addString(self.blueprintGrp, 'blu_lowLipBindJnts', v=self.lowBindJnts )
         attrLib.addString(self.blueprintGrp, 'blu_numJnts', v=self.numJnts )
 
 
