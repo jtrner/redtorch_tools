@@ -44,6 +44,7 @@ from ..general import workspace
 from ..general import utils as generalUtils
 from rt_tools import package
 
+
 from .component.head import head, lipsB, eyelids,eyebrows,eyeB,misc
 
 
@@ -447,7 +448,7 @@ class UI(QtWidgets.QDialog):
         self.headMove_le = QtWidgets.QLineEdit()
         head_lay.addWidget(self.headMove_le)
         self.headMove_le.setText(str(40))
-        self.headMove_le.textChanged.connect(lambda : self.checkHeadMovement())
+        self.headMove_le.textChanged.connect(lambda : self.checkHeadMovement(name = 'headMovement', lineedit = self.headMove_le))
 
         lips_lb_lay = qtLib.createVLayout(faceInfo_lay)
         self.lips_lb = QtWidgets.QLabel('lips info')
@@ -467,7 +468,6 @@ class UI(QtWidgets.QDialog):
         self.upperTeethBt.clicked.connect(lambda : self.saveGeoData(name = 'upperteeth',
                                                                     lineedit=self.upperTeeth_le))
 
-
         self.lowerTeethBt =  QtWidgets.QPushButton('lower Teeth')
         lips_lay.addWidget(self.lowerTeethBt)
         self.lowerTeeth_le = QtWidgets.QLineEdit()
@@ -477,7 +477,6 @@ class UI(QtWidgets.QDialog):
             self.lowerTeeth_le.setText(str(self.lowerTeethData))
         self.lowerTeethBt.clicked.connect(lambda : self.saveGeoData(name = 'lowerteeth',
                                                                     lineedit=self.lowerTeeth_le))
-
 
         self.upperTeethCrvBt =  QtWidgets.QPushButton('up Teeth crv')
         lips_lay.addWidget(self.upperTeethCrvBt)
@@ -492,7 +491,6 @@ class UI(QtWidgets.QDialog):
 
         lips_layB = qtLib.createHLayout(faceInfo_lay)
 
-
         self.lowerTeethCrvBt =  QtWidgets.QPushButton('low Teeth crv')
         lips_layB.addWidget(self.lowerTeethCrvBt)
         self.lowTeethCrv_le = QtWidgets.QLineEdit()
@@ -503,7 +501,6 @@ class UI(QtWidgets.QDialog):
         self.lowerTeethCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'lowerTeethEdge',
                                                                         lineedit = self.lowTeethCrv_le))
 
-
         self.zipperCrvBt =  QtWidgets.QPushButton('zipper crv')
         lips_layB.addWidget(self.zipperCrvBt)
         self.zipperCrv_le = QtWidgets.QLineEdit()
@@ -513,7 +510,6 @@ class UI(QtWidgets.QDialog):
             self.zipperCrv_le.setText(str(self.zipperCrvEdgeData))
         self.zipperCrvBt.clicked.connect(lambda : self.saveEdgeData(name = 'zipperCrvEdge',
                                                                     lineedit = self.zipperCrv_le))
-
 
         self.uplipLowrezCrvBt =  QtWidgets.QPushButton('uplipLowRez crv')
         lips_layB.addWidget(self.uplipLowrezCrvBt)
@@ -614,7 +610,7 @@ class UI(QtWidgets.QDialog):
         self.uplipBindJntsData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'upLipBindJnts')
         if self.uplipBindJntsData:
             self.upBindJnts_le.setText(str(self.uplipBindJntsData))
-        self.upBindJntsBt.clicked.connect(lambda: self.saveUpBindJntList(name = 'upLipBindJnts',
+        self.upBindJntsBt.clicked.connect(lambda: self.saveBindJntList(name = 'upLipBindJnts',
                                                                          lineedit = self.upBindJnts_le))
 
         self.lowBindJntsBt =  QtWidgets.QPushButton('low bind joints')
@@ -624,7 +620,7 @@ class UI(QtWidgets.QDialog):
         self.lowlipBindJntsData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'lowLipBindJnts')
         if self.lowlipBindJntsData:
             self.lowBindJnts_le.setText(str(self.lowlipBindJntsData))
-        self.lowBindJntsBt.clicked.connect(lambda: self.saveUpBindJntList(name = 'lowLipBindJnts',
+        self.lowBindJntsBt.clicked.connect(lambda: self.saveBindJntList(name = 'lowLipBindJnts',
                                                                           lineedit = self.lowBindJnts_le))
 
         lips_layF = qtLib.createHLayout(faceInfo_lay)
@@ -634,7 +630,10 @@ class UI(QtWidgets.QDialog):
         self.numJnts_le = QtWidgets.QLineEdit()
         lips_layF.addWidget(self.numJnts_le)
         self.numJnts_le.setText(str(6))
-        self.numJnts_le.textChanged.connect(lambda : self.checkNumJnts())
+        # To allow only int
+        self.onlyInt = QtGui.QIntValidator()
+        self.numJnts_le.setValidator(self.onlyInt)
+        self.numJnts_le.textChanged.connect(lambda : self.checkNumJnts(name = 'lipNumJnts', lineedit = self.numJnts_le))
 
         self.lipsEnd_lb = QtWidgets.QLabel('                                                                           lips information')
         qtLib.setColor(self.lipsEnd_lb, qtLib.SILVER_LIGHT)
@@ -749,7 +748,6 @@ class UI(QtWidgets.QDialog):
         self.lowCreaseHdBt.clicked.connect(lambda : self.saveEdgeData(name = 'lowCreaseHdEdge',
                                                                       lineedit = self.lowCreaseHd_le))
 
-
         eyelids_layD = qtLib.createHLayout(eyelids_lb_lay)
 
         self.upCreaseLdBt =  QtWidgets.QPushButton('upCreaseLd crv')
@@ -761,7 +759,6 @@ class UI(QtWidgets.QDialog):
             self.upCreaseLd_le.setText(str(self.upCreaseLdEdgeData))
         self.upCreaseLdBt.clicked.connect(lambda : self.saveEdgeData(name = 'upCreaseLdEdge',
                                                                      lineedit = self.upCreaseLd_le))
-
 
         self.lowCreaseLdBt =  QtWidgets.QPushButton('lowCreaseLd crv')
         eyelids_layD.addWidget(self.lowCreaseLdBt)
@@ -836,7 +833,7 @@ class UI(QtWidgets.QDialog):
         faceData = fileLib.loadJson(faceDataPath, ordered = True)
         return [v for k ,v in faceData.items() if keyData in k]
 
-    def saveUpBindJntList(self, name,lineedit):
+    def saveBindJntList(self, name,lineedit):
         data = {name:[]}
         sel = mc.ls(sl=True, fl=True)
         joints = []
@@ -848,29 +845,21 @@ class UI(QtWidgets.QDialog):
         data[name] = joints
         fileLib.appendToJson(path = faceDataPath, data = data)
         lineedit.setText(str(joints))
-        selectedBlu = qtLib.getSelectedItemAsText(self.blueprints_tw)
-        bluGrp = selectedBlu.split(' ')[0] + '_blueprint_GRP'
-        if not selectedBlu:
-            return
-        attrAndValues = self.getAttrsAndValuesForSelectedBluGrp()
-        print(attrAndValues)
-        print(bluGrp)
-        attrs = []
-        for key, val in attrAndValues.items():
-            att = 'blu_' + str(key)
-            attrs.append(att)
-        for i in attrs:
-            j = i.split('blu_')[-1]
-            if j in data.keys():
-                if j in name:
-                    at = 'blu_' + j
-                    mc.setAttr(bluGrp + '.' + at , data[j], type = 'string')
+        self.setDataOnBluGrps(name = name ,data = data)
 
-
-    def checkNumJnts(self):
+    def checkNumJnts(self, name,lineedit):
+        data = {name : []}
         self.countJnt = self.numJnts_le.text()
-    def checkHeadMovement(self):
+        data[name] = self.countJnt
+        fileLib.appendToJson(path = faceDataPath, data = data)
+        self.setDataOnBluGrps(name = name, data = data)
+
+    def checkHeadMovement(self,name, lineedit):
+        data = {name : []}
         self.headMovement = self.headMove_le.text()
+        data[name] = self.headMovement
+        fileLib.appendToJson(path = faceDataPath, data = data)
+        self.setDataOnBluGrps(name = name,data = data)
 
 
     def saveGeoData(self,name,lineedit):
@@ -884,6 +873,7 @@ class UI(QtWidgets.QDialog):
         data[name] = sel
         fileLib.appendToJson(path = faceDataPath, data = data)
         lineedit.setText(sel)
+        self.setDataOnBluGrps(name = name,data = data)
 
     def saveEdgeData(self, name, lineedit):
         data = {name:[]}
@@ -898,7 +888,33 @@ class UI(QtWidgets.QDialog):
         data[name] = edges
         fileLib.appendToJson(path = faceDataPath, data = data)
         lineedit.setText(str(edges))
+        self.setDataOnBluGrps(name = name,data = data)
 
+    def setDataOnBluGrps(self,name,data):
+        items = self.getAllItems(self.blueprints_tw)
+        attrAndValues = self.getAttrsAndValuesFromAllBluGrps()
+        allItem = []
+        if items:
+            for i in items:
+                item = i.text(0)
+                allItem.append(item)
+        if not allItem:
+            return
+        for i in allItem:
+            bluGrp = i.split(' ')[0] + '_blueprint_GRP'
+            attrs = []
+            for key in attrAndValues[bluGrp]:
+                att = 'blu_' + str(key)
+                attrs.append(att)
+            for i in attrs:
+                j = i.split('blu_')[-1]
+                if j in data.keys():
+                    if j in name:
+                        at = 'blu_' + j
+                        userDifinedAttrs = mc.listAttr(bluGrp, ud=True)
+                        if not at in userDifinedAttrs:
+                            continue
+                        mc.setAttr(bluGrp + '.' + at, data[j], type='string')
 
 
     def populateSettingsTab(self):
@@ -938,6 +954,35 @@ class UI(QtWidgets.QDialog):
             classArgName = attr.replace('blu_', '')
             attrsAndValues[classArgName] = mc.getAttr(bluGrp + '.' + attr)
         return attrsAndValues
+
+    def getAttrsAndValuesFromAllBluGrps(self):
+        items = self.getAllItems(tree=self.blueprints_tw)
+        ignoreAttrs = ['blu_inputs', 'blu_type']
+        allItem = []
+        if items:
+            for i in items:
+                item = i.text(0)
+                allItem.append(item)
+        if not allItem:
+            return
+        lastDict = {}
+        for i in allItem:
+            bluGrp = i.split(' ')[0] + '_blueprint_GRP'
+            tempDict = {}
+            attrs = mc.listAttr(bluGrp, st='blu_*')
+            attrs = [a for a in attrs if a not in ignoreAttrs]
+            attrsAndValues = OrderedDict()
+            for attr in attrs:
+                classArgName = attr.replace('blu_', '')
+                attrsAndValues[classArgName] = mc.getAttr(bluGrp + '.' + attr)
+            tempDict[bluGrp] = attrsAndValues
+            lastDict.update(tempDict)
+
+        print(lastDict)
+        return lastDict
+
+
+
 
     def handleNewComponentSelected(self):
         qtLib.clearLayout(self.args_w)
