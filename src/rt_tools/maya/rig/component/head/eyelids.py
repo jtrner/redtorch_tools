@@ -75,6 +75,19 @@ class Eyelids(buildEyelid.BuildEyelid):
 
     def build(self):
         super(Eyelids, self).build()
+        # connect edge datas to the curves
+        self.upLidHdCrv = crvLib.edgeToCurve(geo = self.geo, edges = self.upLidHdCrv, name = 'upLidHd_CRV')
+        self.lowLidHdCrv = crvLib.edgeToCurve(geo = self.geo, edges = self.lowLidHdCrv, name = 'lowLidHd_CRV')
+        self.upLidLdCrv = crvLib.edgeToCurve(geo = self.geo, edges = self.upLidLdCrv, name = 'upLidLd_CRV')
+        self.lowLidLdCrv = crvLib.edgeToCurve(geo = self.geo, edges = self.lowLidLdCrv, name = 'lowLidLd_CRV')
+        self.lidBlinkCrv = crvLib.edgeToCurve(geo = self.geo, edges = self.lidBlinkCrv, name = 'lidBlink_CRV')
+        self.upLidBlink = crvLib.edgeToCurve(geo = self.geo, edges = self.upLidBlink, name = 'upLidBlink_CRV')
+        self.lowLidBlink = crvLib.edgeToCurve(geo = self.geo, edges = self.lowLidBlink, name = 'lowLidBlink_CRV')
+        self.upCreaseHd = crvLib.edgeToCurve(geo = self.geo, edges = self.upCreaseHd, name = 'upCreaseHd_CRV')
+        self.lowCreaseHd = crvLib.edgeToCurve(geo = self.geo, edges = self.lowCreaseHd, name = 'lowCreaseHd_CRV')
+        self.upCreaseLd = crvLib.edgeToCurve(geo = self.geo, edges = self.upCreaseLd, name = 'upCreaseLd_CRV')
+        self.lowCreaseLd = crvLib.edgeToCurve(geo = self.geo, edges = self.lowCreaseLd, name = 'lowCreaseLd_CRV')
+
         # create wire for up and low blink curve
         for i in [self.upLidBlink ,self.lowLidBlink ]:
             mc.select(i, r=True)

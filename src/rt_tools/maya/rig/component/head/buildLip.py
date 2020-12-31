@@ -302,7 +302,21 @@ class BuildLip(lipsTemplate.LipsTemplate):
 
     def build(self):
         super(BuildLip, self).build()
-        self.tempCurve = mc.duplicate(self.upLipLowRezcrv)[0]
+
+        # connect edge datas to the curves
+        self.upperTeethEdge = crvLib.edgeToCurve(geo = self.upperteeth, edges =self.upperTeethEdge, name ='localupTeeth')
+        self.lowerTeethEdge = crvLib.edgeToCurve(geo = self.lowerteeth, edges = self.lowerTeethEdge, name ='locallowTeeth')
+        self.zipperCrvEdge = crvLib.edgeToCurve(geo = self.geo, edges = self.zipperCrvEdge, name ='localzipper')
+        self.uplipLowRezEdge = crvLib.edgeToCurve(geo = self.geo, edges = self.uplipLowRezEdge, name ='localupLipLowRez')
+        self.uplipMedRezEdge = crvLib.edgeToCurve(geo = self.geo, edges = self.uplipMedRezEdge, name ='localupLipMedRez')
+        self.uplipHirezEdge = crvLib.edgeToCurve(geo = self.geo, edges = self.uplipHirezEdge, name ='localupLipHiRez')
+        self.uplipZipperEdge = crvLib.edgeToCurve(geo = self.geo, edges = self.uplipZipperEdge, name ='localupLipZipper')
+        self.lowLipLowRezEdge = crvLib.edgeToCurve(geo = self.geo, edges = self.lowLipLowRezEdge, name ='locallowLipLowRez')
+        self.lowLipHirezEdge = crvLib.edgeToCurve(geo = self.geo, edges = self.lowLipHirezEdge, name ='locallowLipHiRez')
+        self.lowLipMedRezEdge = crvLib.edgeToCurve(geo = self.geo, edges = self.lowLipMedRezEdge, name ='locallowLipMedRez')
+        self.lowLipZipperEdge = crvLib.edgeToCurve(geo = self.geo, edges = self.lowLipZipperEdge, name = 'locallowLipZipper')
+
+        self.tempCurve = mc.duplicate(self.lowLipLowRezEdge)[0]
         [mc.setAttr(self.tempCurve + '.{}{}'.format(a,v), lock = False) for a in 'trs' for v in 'xyz']
         mc.setAttr(self.tempCurve + '.ty', 2)
 
@@ -318,7 +332,7 @@ class BuildLip(lipsTemplate.LipsTemplate):
         mc.move(0, 0.5,-2, self.jntRollModupGrp, r=True, ws=True)
         self.jntUpRollLoc, self.upLipJntMidLoc = funcs.createRollMod(name = 'localUpLip', parent = self.jntRollModupGrp,up = True)
 
-        self.upLipLowRezBindJnts = jntLib.create_on_curve(self.upLipLowRezcrv, numOfJoints = 3, parent = False, description='C_base', radius = 0.2)
+        self.upLipLowRezBindJnts = jntLib.create_on_curve(self.uplipLowRezEdge, numOfJoints = 3, parent = False, description='C_base', radius = 0.2)
 
 
         self.upmedRezBindJnts = []
@@ -369,8 +383,8 @@ class BuildLip(lipsTemplate.LipsTemplate):
         self.upmedRezBindJnts.append(self.M_upLipOutJnt)
 
         # create some nodes on upLowRez
-        tempList = funcs.locOnCrv(name = 'result', parent = self.upLipJntLocLowGrp, numLocs = 3, crv = self.upLipLowRezcrv,
-                     upCurve = self.tempCurve, paramStart = 0.8,paramEnd = 0.3, upAxis = 'y', posJnts = self.upLipLowRezBindJnts)
+        tempList = funcs.locOnCrv(name = 'result', parent = self.upLipJntLocLowGrp, numLocs = 3, crv = self.uplipLowRezEdge,
+                                  upCurve = self.tempCurve, paramStart = 0.8, paramEnd = 0.3, upAxis = 'y', posJnts = self.upLipLowRezBindJnts)
 
         # rename transfomrs that driven by uplowRezCrv
         self.l_localUpLipDriverOutMod = mc.rename(tempList[0], 'L_localUpLipDriverOutModify_LOC')
@@ -381,9 +395,9 @@ class BuildLip(lipsTemplate.LipsTemplate):
         trsLib.match(self.m_localUpLipOutOrient_GRP, t = self.m_localUpLipDriverOutMod,r = self.m_localUpLipDriverOutMod)
 
         # create some nodes on medRez
-        tempJnts = jntLib.create_on_curve(self.upLipMedRezcrv, numOfJoints = 7, parent = False, description='C_base', radius= 0.2)
-        tempList = funcs.locOnCrv(name = 'result', parent = self.jntLocMedUp, numLocs = 7, crv = self.upLipMedRezcrv,
-                     upCurve = self.tempCurve, paramStart = 0.95,paramEnd = 0.15, upAxis = 'y', posJnts = tempJnts)
+        tempJnts = jntLib.create_on_curve(self.uplipMedRezEdge, numOfJoints = 7, parent = False, description='C_base', radius= 0.2)
+        tempList = funcs.locOnCrv(name = 'result', parent = self.jntLocMedUp, numLocs = 7, crv = self.uplipMedRezEdge,
+                                  upCurve = self.tempCurve, paramStart = 0.95, paramEnd = 0.15, upAxis = 'y', posJnts = tempJnts)
         mc.delete(tempJnts)
         self.upSecMod = mc.rename(tempList[0],'L_localUpLipMicroOutSecondaryModify_LOC')
         self.upmicroOutMod = mc.rename(tempList[1],'L_localUpLipMicroOutModify_LOC')
@@ -394,9 +408,9 @@ class BuildLip(lipsTemplate.LipsTemplate):
         self.microOutSecMod = mc.rename(tempList[6],'R_localUpLipMicroOutSecondaryModify_LOC')
 
         # create some nodes on HiRez
-        tempJnts = jntLib.create_on_curve(self.upLipMedRezcrv, numOfJoints = 2, parent = False, description='C_base', radius= 0.2)
-        tempList = funcs.locOnCrv(name = 'result', parent = self.jntLocHiUp, numLocs = 2, crv = self.upLipHiRezcrv,
-                     upCurve = self.tempCurve, paramStart = 0.97,paramEnd = 0.95, upAxis = 'y', posJnts = tempJnts)
+        tempJnts = jntLib.create_on_curve(self.uplipMedRezEdge, numOfJoints = 2, parent = False, description='C_base', radius= 0.2)
+        tempList = funcs.locOnCrv(name = 'result', parent = self.jntLocHiUp, numLocs = 2, crv = self.uplipHirezEdge,
+                                  upCurve = self.tempCurve, paramStart = 0.97, paramEnd = 0.95, upAxis = 'y', posJnts = tempJnts)
         mc.delete(tempJnts)
         self.l_outUpTerModLocHi = mc.rename(tempList[0], 'L_localUpLipMicroOutTertiaryModify_LOC')
         self.r_outUpTerModLocHi = mc.rename(tempList[1], 'R_localUpLipMicroOutTertiaryModify_LOC')
@@ -488,17 +502,16 @@ class BuildLip(lipsTemplate.LipsTemplate):
         self.upLipCtlRoll, self.upRoll_loc, self.upMidRollLoc = funcs.createRollHirarchy(name = 'localUpLip', parent = self.upLipCtlGrp, up = True)
 
         # create secondary zip joints
-        zipUpSecJnts = jntLib.create_on_curve(self.upLipZippercrv, numOfJoints = 9, parent = False, description='C_base', radius = 0.1)
+        zipUpSecJnts = jntLib.create_on_curve(self.uplipZipperEdge, numOfJoints = 9, parent = False, description='C_base', radius = 0.1)
 
         # create zipper joints
         self.upMicroJnts,self.upTerLocs,self.upTerOrientGrp,self.upZipOutBndGrp,self.upLocMod,self.microUpCtls,self.upZipJnts =  funcs.createZipperJnts(name='localUpLip',
-                                                                                                         crv=self.upLipZippercrv,
-                                                                                        upCurve=self.tempCurve,posJnts=zipUpSecJnts,
-                                                                                  parent = self.noTuchyUp, jntParent = self.upMicroJntCtlGrp,
-                                                                                  up = True)
-
+                                                                                                                                                        crv=self.uplipZipperEdge,
+                                                                                                                                                        upCurve=self.tempCurve, posJnts=zipUpSecJnts,
+                                                                                                                                                        parent = self.noTuchyUp, jntParent = self.upMicroJntCtlGrp,
+                                                                                                                                                        up = True)
         self.upLipMidLoc, self.r_upmidSecOr,self.r_upoutOrLoc,self.r_upcornerOr =  funcs.createLocsJntDriver(name = 'R_localUpLip',
-                                                                            parent =self.upJntDrvr,  jntSnap = self.upBindJnts[0])
+                                                                                                             parent =self.upJntDrvr, jntSnap = self.upLipBindJnts[0])
 
         #****************************************************lowPart******************************************
 
@@ -510,7 +523,7 @@ class BuildLip(lipsTemplate.LipsTemplate):
         mc.move(0, 0, 0, self.lowjntCtlPlace, r=True, ws=True)
         self.lowJntCtlLoc, self.lowSquashMak = funcs.createCtlPlaceMent(name = 'localLowLip', parent = self.lowjntCtlPlace)
 
-        self.lowLipLowRezBindJnts = jntLib.create_on_curve(self.lowLipLowRezcrv, numOfJoints = 3, parent = False, description='C_base', radius= 0.2)
+        self.lowLipLowRezBindJnts = jntLib.create_on_curve(self.lowLipLowRezEdge, numOfJoints = 3, parent = False, description='C_base', radius= 0.2)
 
         self.lowmedRezBindJnts = []
         self.lowLipLowRezBindJnts[0] = mc.rename(self.lowLipLowRezBindJnts[0],'R_localLowLipcorner_JNT')
@@ -549,8 +562,8 @@ class BuildLip(lipsTemplate.LipsTemplate):
         self.lowmedRezBindJnts.append(self.M_lowLipOutJnt)
 
         # create some nodes on LowRez
-        tempList = funcs.locOnCrv(name = 'result', parent = self.lowLipJntLocLowGrp, numLocs = 3, crv = self.lowLipLowRezcrv,
-                     upCurve = self.tempCurve, paramStart = 0.8,paramEnd = 0.3, upAxis = 'y', posJnts = self.lowLipLowRezBindJnts)
+        tempList = funcs.locOnCrv(name = 'result', parent = self.lowLipJntLocLowGrp, numLocs = 3, crv = self.lowLipLowRezEdge,
+                                  upCurve = self.tempCurve, paramStart = 0.8, paramEnd = 0.3, upAxis = 'y', posJnts = self.lowLipLowRezBindJnts)
 
         # rename transfomrs that driven by lowRezCrv
         self.l_localLowLipDriverOutMod = mc.rename(tempList[0], 'L_localLowLipDriverOutModify_LOC')
@@ -562,9 +575,9 @@ class BuildLip(lipsTemplate.LipsTemplate):
         trsLib.match(self.m_localLowLipOutOrient_GRP, t = self.m_localLowLipDriverOutMod,r = self.m_localLowLipDriverOutMod)
 
         # create some nodes on medRez
-        tempJnts = jntLib.create_on_curve(self.lowLipMedRezcrv, numOfJoints = 7, parent = False, description='C_base', radius= 0.2)
-        tempList = funcs.locOnCrv(name = 'result', parent = self.jntLocMedLow, numLocs = 7, crv = self.lowLipMedRezcrv,
-                     upCurve = self.tempCurve, paramStart = 0.95,paramEnd = 0.15, upAxis = 'y', posJnts = tempJnts)
+        tempJnts = jntLib.create_on_curve(self.lowLipMedRezEdge, numOfJoints = 7, parent = False, description='C_base', radius= 0.2)
+        tempList = funcs.locOnCrv(name = 'result', parent = self.jntLocMedLow, numLocs = 7, crv = self.lowLipMedRezEdge,
+                                  upCurve = self.tempCurve, paramStart = 0.95, paramEnd = 0.15, upAxis = 'y', posJnts = tempJnts)
         mc.delete(tempJnts)
         self.lowSecMod = mc.rename(tempList[0],'L_localLowLipMicroOutSecondaryModify_LOC')
         self.lowmicroOutMod = mc.rename(tempList[1],'L_localLowLipMicroOutModify_LOC')
@@ -575,9 +588,9 @@ class BuildLip(lipsTemplate.LipsTemplate):
         self.lowmicroOutSecMod = mc.rename(tempList[6],'R_localLowLipMicroOutSecondaryModify_LOC')
 
         # create some nodes on HiRez
-        tempJnts = jntLib.create_on_curve(self.lowLipMedRezcrv, numOfJoints = 2, parent = False, description='C_base', radius= 0.2)
-        tempList = funcs.locOnCrv(name = 'result', parent = self.jntLocHiLow, numLocs = 2, crv = self.lowLipHiRezcrv,
-                     upCurve = self.tempCurve, paramStart = 0.97,paramEnd = 0.95, upAxis = 'y', posJnts = tempJnts)
+        tempJnts = jntLib.create_on_curve(self.lowLipMedRezEdge, numOfJoints = 2, parent = False, description='C_base', radius= 0.2)
+        tempList = funcs.locOnCrv(name = 'result', parent = self.jntLocHiLow, numLocs = 2, crv = self.lowLipHirezEdge,
+                                  upCurve = self.tempCurve, paramStart = 0.97, paramEnd = 0.95, upAxis = 'y', posJnts = tempJnts)
         mc.delete(tempJnts)
         self.l_outLowTerModLocHi = mc.rename(tempList[0], 'L_localLowLipMicroOutTertiaryModify_LOC')
         self.r_outLowTerModLocHi = mc.rename(tempList[1], 'R_localLowLipMicroOutTertiaryModify_LOC')
@@ -664,14 +677,14 @@ class BuildLip(lipsTemplate.LipsTemplate):
         self.lowLipCtlRoll, self.lowRoll_loc, self.lowMidRollLoc = funcs.createRollHirarchy(name = 'localLowLip', parent = self.lowLipCtlGrp, up = False)
 
         # create zipper joints
-        zipLowSecJnts = jntLib.create_on_curve(self.upLipZippercrv, numOfJoints = 9, parent = False, description='C_base', radius = 0.1)
+        zipLowSecJnts = jntLib.create_on_curve(self.uplipZipperEdge, numOfJoints = 9, parent = False, description='C_base', radius = 0.1)
 
         self.lowMicroJnts, self.lowTerLocs,self.lowTerOrientGrp,self.lowZipOutBndGrp,self.lowLocMod ,self.microLowCtls,self.lowZipJnts = funcs.createZipperJnts(name='localLowLip',
-                                                                                                              crv=self.lowLipZippercrv, upCurve=self.tempCurve,
+                                                                                                              crv=self.lowLipZipperEdge, upCurve=self.tempCurve,
                          posJnts=zipLowSecJnts, parent = self.noTuchyLow, jntParent = self.lowMicroJntCtlGrp, up = False)
         # create locators under jntDriver
         self.lowLipMidLoc, self.r_lowmidSecOr,self.r_lowoutOrLoc,self.r_lowcornerOr = funcs.createLocsJntDriver(name = 'R_localLowLip',
-                                                                                 parent =self.lowJntDrvr,  jntSnap = self.lowBindJnts[0])
+                                                                                                                parent =self.lowJntDrvr, jntSnap = self.lowLipBindJnts[0])
 
 
 
@@ -745,14 +758,14 @@ class BuildLip(lipsTemplate.LipsTemplate):
                                    scale=[1, 1, 1],prefix = 'low',leftPos= self.lowTeethWire[1], rightPos = self.lowTeethWire[2])
 
         # wire curves to the gums
-        mc.select(self.upGum, r=True)
-        mc.wire(gw=False, en=1.000000, ce=0.000000, li=0.000000, w= self.upTeethCurve)
-        shape = mc.listRelatives(self.upGum, shapes=True)[0]
+        mc.select(self.upperteeth, r=True)
+        mc.wire(gw=False, en=1.000000, ce=0.000000, li=0.000000, w= self.upperTeethEdge)
+        shape = mc.listRelatives(self.upperteeth, shapes=True)[0]
         wire = mc.listConnections(shape + '.inMesh', d=False, s=True)[0]
         mc.setAttr(wire + '.dropoffDistance[0]', 20)
-        mc.select(self.lowGum, r=True)
-        mc.wire(gw=False, en=1.000000, ce=0.000000, li=0.000000, w= self.lowTeethCurve)
-        shape = mc.listRelatives(self.lowGum, shapes=True)[0]
+        mc.select(self.lowerteeth, r=True)
+        mc.wire(gw=False, en=1.000000, ce=0.000000, li=0.000000, w= self.lowerTeethEdge)
+        shape = mc.listRelatives(self.lowerteeth, shapes=True)[0]
         wire = mc.listConnections(shape + '.inMesh', d=False, s=True)[0]
         mc.setAttr(wire + '.dropoffDistance[0]', 20)
 
@@ -790,8 +803,8 @@ class BuildLip(lipsTemplate.LipsTemplate):
         mc.parent(self.lowMouthGrp ,self.jaw2ndFollowLoc )
 
         # skin wire joints to the teeth curve
-        deformLib.bind_geo(geos = self.upTeethCurve, joints = self.upTeethWire)
-        deformLib.bind_geo(geos = self.lowTeethCurve, joints = self.lowTeethWire)
+        deformLib.bind_geo(geos = self.upperTeethEdge, joints = self.upTeethWire)
+        deformLib.bind_geo(geos = self.lowerTeethEdge, joints = self.lowTeethWire)
 
 
         # parent wire joints under hierarchy

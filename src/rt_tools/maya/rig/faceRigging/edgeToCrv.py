@@ -1,4 +1,4 @@
-def run(geo,edges,name):
+def edgeToCurve(geo,edges,name):
     # create curve
     mc.select(None)
     for edge in edges:

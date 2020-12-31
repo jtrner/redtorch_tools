@@ -28,8 +28,11 @@ class LipsTemplate(template.Template):
 
     def build(self):
         super(LipsTemplate, self).build()
+        self.createGroups()
+        self.matches()
 
     def createGroups(self):
+
         self.localLipRigGrp = mc.createNode('transform', name = 'localLips_Rig')
         self.rigGrp = mc.createNode('transform', name='lipRig_GRP', p = self.localLipRigGrp)
         self.noseCtlGrp = mc.createNode('transform', name = 'noseCtlGrp')
@@ -194,16 +197,16 @@ class LipsTemplate(template.Template):
 
         # cleaning outliner
         self.uplocalMidZipBaseModGrp = mc.createNode('transform', name = 'localUpLipMidZipBaseMod_GRP',p = self.upJntDrvr)
-        trsLib.match(self.uplocalMidZipBaseModGrp, t = self.upBindJnts[1],r =  self.upBindJnts[1])
+        trsLib.match(self.uplocalMidZipBaseModGrp, t = self.upLipBindJnts[1],r =  self.upLipBindJnts[1])
         self.uplocalMidZipBasePlaceModGrp = mc.createNode('transform', name = 'localUpLipMidZipplaceMod_GRP',p = self.upJntDrvr)
-        trsLib.match(self.uplocalMidZipBasePlaceModGrp, t = self.upBindJnts[0],r = self.upBindJnts[0])
+        trsLib.match(self.uplocalMidZipBasePlaceModGrp, t = self.upLipBindJnts[0],r = self.upLipBindJnts[0])
         self.lowlocalMidZipBaseModGrp = mc.createNode('transform', name='localLowLipMidZipBaseMod_GRP', p=self.lowJntDrvr)
-        trsLib.match(self.lowlocalMidZipBaseModGrp, t = self.lowBindJnts[1], r = self.lowBindJnts[1])
+        trsLib.match(self.lowlocalMidZipBaseModGrp, t = self.lowLipBindJnts[1], r = self.lowLipBindJnts[1])
         self.lowlocalMidZipBasePlaceModGrp = mc.createNode('transform', name='localLowLipMidZipplaceMod_GRP', p=self.lowJntDrvr)
-        trsLib.match(self.lowlocalMidZipBasePlaceModGrp, t = self.lowBindJnts[0],r = self.lowBindJnts[0])
+        trsLib.match(self.lowlocalMidZipBasePlaceModGrp, t = self.lowLipBindJnts[0],r = self.lowLipBindJnts[0])
 
     def matches(self):
-        trsLib.match(self.mouthPiv, t = self.upBindJnts[0],r = self.upBindJnts[0])
+        trsLib.match(self.mouthPiv, t = self.upLipBindJnts[0],r = self.upLipBindJnts[0])
         trsLib.match(self.upJntDrvr, t = self.mouthPiv,r = self.mouthPiv)
         trsLib.match(self.lowJntDrvr, t = self.mouthPiv,r = self.mouthPiv)
         trsLib.match(self.mainJawGrp,t = self.mouthAndJawMain[1],r =  self.mouthAndJawMain[1])
@@ -243,18 +246,18 @@ class LipsTemplate(template.Template):
         trsLib.match(self.l_nostrilFlareMod , t = self.leftnostrils[1],r = self.leftnostrils[1])
 
         # upPart
-        trsLib.match(self.upLipCtlGrp, t = self.upBindJnts[1], r = self.upBindJnts[1])
-        trsLib.match(self.upMicroJntCtlGrp, t = self.upBindJnts[1], r = self.upBindJnts[1])
-        trsLib.match(self.upjntCtlPlace, t = self.upBindJnts[1], r = self.upBindJnts[1])
-        trsLib.match(self.jntRollModupGrp,t = self.upBindJnts[1], r = self.upBindJnts[1])
-        trsLib.match(self.upLipMakroJntCtl,t = self.upBindJnts[1], r = self.upBindJnts[1])
+        trsLib.match(self.upLipCtlGrp, t = self.upLipBindJnts[1], r = self.upLipBindJnts[1])
+        trsLib.match(self.upMicroJntCtlGrp, t = self.upLipBindJnts[1], r = self.upLipBindJnts[1])
+        trsLib.match(self.upjntCtlPlace, t = self.upLipBindJnts[1], r = self.upLipBindJnts[1])
+        trsLib.match(self.jntRollModupGrp,t = self.upLipBindJnts[1], r = self.upLipBindJnts[1])
+        trsLib.match(self.upLipMakroJntCtl,t = self.upLipBindJnts[1], r = self.upLipBindJnts[1])
 
         # lowPart
-        trsLib.match(self.lowLipCtlGrp, t = self.lowBindJnts[1], r =  self.lowBindJnts[1])
-        trsLib.match(self.lowLipMakroJntCtl, t = self.lowBindJnts[1], r =  self.lowBindJnts[1])
-        trsLib.match(self.lowMicroJntCtlGrp, t = self.lowBindJnts[1], r =  self.lowBindJnts[1])
-        trsLib.match(self.jntRollModlowGrp, t = self.lowBindJnts[1], r =  self.lowBindJnts[1])
-        trsLib.match(self.lowjntCtlPlace,t = self.lowBindJnts[1], r =  self.lowBindJnts[1])
+        trsLib.match(self.lowLipCtlGrp, t = self.lowLipBindJnts[1], r =  self.lowLipBindJnts[1])
+        trsLib.match(self.lowLipMakroJntCtl, t = self.lowLipBindJnts[1], r =  self.lowLipBindJnts[1])
+        trsLib.match(self.lowMicroJntCtlGrp, t = self.lowLipBindJnts[1], r =  self.lowLipBindJnts[1])
+        trsLib.match(self.jntRollModlowGrp, t = self.lowLipBindJnts[1], r =  self.lowLipBindJnts[1])
+        trsLib.match(self.lowjntCtlPlace,t = self.lowLipBindJnts[1], r =  self.lowLipBindJnts[1])
 
         # global part
         trsLib.match(self.mouthAncFollowLoc,t = self.mouthPiv,r = self.mouthPiv)

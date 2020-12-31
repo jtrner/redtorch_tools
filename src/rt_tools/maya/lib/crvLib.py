@@ -23,11 +23,13 @@ from . import display
 reload(trsLib)
 reload(attrLib)
 
-# def nodeOnCrv(crv = '', numOfNodes = 3):
-#
-#
-#
-
+def edgeToCurve(geo,edges,name):
+    # create curve
+    mc.select(None)
+    for edge in edges:
+        mc.select('{}.e[{}]'.format(geo, edge),add = True)
+    crv = mc.polyToCurve(form = 2, degree = 3, name = '{}_CRV'.format(name), ch = False)[0]
+    return crv
 
 def fromPoses(poses, degree=1, fit=False, name='newCurve'):
     """

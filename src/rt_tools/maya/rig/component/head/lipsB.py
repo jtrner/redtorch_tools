@@ -11,9 +11,11 @@ from ....lib import deformLib
 from ....lib import keyLib
 from ....lib import jntLib
 from ....lib import connect
+from ....lib import crvLib
 from . import buildLip
 from . import funcs
 
+reload(crvLib)
 reload(jntLib)
 reload(connect)
 reload(funcs)
@@ -33,38 +35,41 @@ class LipsB(buildLip.BuildLip):
     """
     base class for lip template
     """
-    def __init__(self, side='C', prefix='lip',geo = '',upGum = '',lowGum = '',upTeethCurve = '',lowTeethCurve = '',
-                 zippercrv = '',upLipLowRezcrv = '',upLipMedRezcrv= '', upLipHiRezcrv = '',
-                 upLipZippercrv = '',lowLipLowRezcrv = '',lowLipHiRezcrv = '',lowLipMedRezcrv= '',
-                 lowLipZippercrv = '',upBindJnts =[],lowBindJnts = [],numJnts=20,**kwargs):
+    def __init__(self, side='C', prefix='lip',geo = '',upperteeth = '',lowerteeth = '',upperTeethEdge = [],lowerTeethEdge = [],
+                 zipperCrvEdge = [],uplipLowRezEdge = [],uplipMedRezEdge= [], uplipHirezEdge = [],
+                 uplipZipperEdge = [],lowLipLowRezEdge = [],lowLipHirezEdge = [],lowLipMedRezEdge= [],
+                 lowLipZipperEdge = [],upLipBindJnts =[],lowLipBindJnts = [],lipNumJnts=20,**kwargs):
         kwargs['side'] = side
         kwargs['prefix'] = prefix
         self.geo = geo
-        self.upGum = upGum
-        self.lowGum = lowGum
-        self.upTeethCurve = upTeethCurve
-        self.lowTeethCurve = lowTeethCurve
-        self.zippercrv = zippercrv
-        self.upLipLowRezcrv = upLipLowRezcrv
-        self.upLipMedRezcrv = upLipMedRezcrv
-        self.upLipHiRezcrv = upLipHiRezcrv
-        self.upLipZippercrv = upLipZippercrv
-        self.lowLipLowRezcrv = lowLipLowRezcrv
-        self.lowLipHiRezcrv = lowLipHiRezcrv
-        self.lowLipMedRezcrv = lowLipMedRezcrv
-        self.lowLipZippercrv  = lowLipZippercrv
-        self.upBindJnts = upBindJnts
-        self.lowBindJnts = lowBindJnts
-        self.numJnts = numJnts
+        self.upperteeth = upperteeth
+        self.lowerteeth = lowerteeth
+        self.upperTeethEdge = upperTeethEdge
+        self.lowerTeethEdge = lowerTeethEdge
+        self.zipperCrvEdge = zipperCrvEdge
+        self.uplipLowRezEdge = uplipLowRezEdge
+        self.uplipMedRezEdge = uplipMedRezEdge
+        self.uplipHirezEdge = uplipHirezEdge
+        self.uplipZipperEdge = uplipZipperEdge
+        self.lowLipLowRezEdge = lowLipLowRezEdge
+        self.lowLipHirezEdge = lowLipHirezEdge
+        self.lowLipMedRezEdge = lowLipMedRezEdge
+        self.lowLipZipperEdge  = lowLipZipperEdge
+        self.upLipBindJnts = upLipBindJnts
+        self.lowLipBindJnts = lowLipBindJnts
+        self.lipNumJnts = lipNumJnts
+
 
         super(LipsB, self).__init__(**kwargs)
 
     def build(self):
         super(LipsB, self).build()
+
         # duplicate some stuff
         # duplicateCurves
-        todup = [self.upLipLowRezcrv,self.upLipMedRezcrv,self.upLipHiRezcrv,self.upLipZippercrv,
-                                self.lowLipLowRezcrv,self.lowLipMedRezcrv,self.lowLipHiRezcrv,self.lowLipZippercrv]
+
+        todup = [self.uplipLowRezEdge, self.uplipMedRezEdge, self.uplipHirezEdge, self.uplipZipperEdge,
+                 self.lowLipLowRezEdge, self.lowLipMedRezEdge, self.lowLipHirezEdge, self.lowLipZipperEdge]
 
         for i in todup:
             attrLib.lockHideAttrs(i,['t','r','s'],lock = False)
@@ -73,10 +78,10 @@ class LipsB(buildLip.BuildLip):
 
         # duplicateZipBindJoints
         for i in range(2):
-            output = trsLib.duplicate(self.upBindJnts[i-1], search = 'local',replace = '' )
+            output = trsLib.duplicate(self.upLipBindJnts[i - 1], search ='local', replace ='')
             mc.move(0,-20, 0, output, r = True, ws = True)
         for i in range(2):
-            output = trsLib.duplicate(self.lowBindJnts[i-1], search = 'local',replace = '')
+            output = trsLib.duplicate(self.lowLipBindJnts[i - 1], search ='local', replace ='')
             mc.move(0,-20, 0, output, r = True, ws = True)
 
         # delete stuf under notuchy
@@ -88,14 +93,14 @@ class LipsB(buildLip.BuildLip):
             mc.delete(children)
 
         # create wire for up and low zip curves
-        for i in [self.upLipZippercrv ,self.lowLipZippercrv ]:
+        for i in [self.uplipZipperEdge , self.lowLipZipperEdge]:
             mc.select(i, r=True)
-            mc.wire(gw=False, en=1.000000, ce=0.000000, li=0.000000, w= self.zippercrv)
+            mc.wire(gw=False, en=1.000000, ce=0.000000, li=0.000000, w= self.zipperCrvEdge)
 
         # blend shape med rez curves to the zipper curve
-        self.upLipMedRezcrv = self.upLipMedRezcrv.split('|')[-1]
-        self.lowLipLowRezcrv = self.lowLipLowRezcrv.split('|')[-1]
-        mc.blendShape(self.upLipMedRezcrv , self.lowLipMedRezcrv, self.zippercrv, tc=False, automatic=True, name='zipper_BLS' )
+        self.uplipMedRezEdge = self.uplipMedRezEdge.split('|')[-1]
+        self.lowLipLowRezEdge = self.lowLipLowRezEdge.split('|')[-1]
+        mc.blendShape(self.uplipMedRezEdge, self.lowLipMedRezEdge, self.zipperCrvEdge, tc=False, automatic=True, name='zipper_BLS')
         mc.blendShape('zipper_BLS', edit=True, w=[(0, 0.5), (1, 0.5)])
 
         # connect mouth ctrl to the mouth pivot joint
@@ -201,16 +206,16 @@ class LipsB(buildLip.BuildLip):
         mc.parentConstraint(self.r_outLowTerModLocHi,self.lowTerOrientGrp[5], mo = True)
 
         # bind joints to the up Zipper Curves
-        deformLib.bind_geo(geos=self.upLipZippercrv, joints=self.upBindJnts)
+        deformLib.bind_geo(geos=self.uplipZipperEdge, joints=self.upLipBindJnts)
         # bind joints to the low zipper Curves
-        deformLib.bind_geo(geos=self.lowLipZippercrv, joints=self.lowBindJnts)
+        deformLib.bind_geo(geos=self.lowLipZipperEdge, joints=self.lowLipBindJnts)
         #bind joints to up lowrez and medrez curves
-        deformLib.bind_geo(geos = self.upLipLowRezcrv, joints = self.upLipLowRezBindJnts)
-        deformLib.bind_geo(geos = self.upLipMedRezcrv, joints = self.upmedRezBindJnts)
+        deformLib.bind_geo(geos = self.uplipLowRezEdge, joints = self.upLipLowRezBindJnts)
+        deformLib.bind_geo(geos = self.uplipMedRezEdge, joints = self.upmedRezBindJnts)
 
         #bind joints to low lowrez and medrez curves
-        deformLib.bind_geo(geos = self.lowLipLowRezcrv, joints = self.lowLipLowRezBindJnts)
-        deformLib.bind_geo(geos = self.lowLipMedRezcrv, joints = self.lowmedRezBindJnts)
+        deformLib.bind_geo(geos = self.lowLipLowRezEdge, joints = self.lowLipLowRezBindJnts)
+        deformLib.bind_geo(geos = self.lowLipMedRezEdge, joints = self.lowmedRezBindJnts)
 
         # bind joints to the up highrez Curves
         for index,value in enumerate(self.upMicroJnts):
@@ -218,14 +223,14 @@ class LipsB(buildLip.BuildLip):
                 continue
             self.upHirzBndJnts.append(value)
 
-        deformLib.bind_geo(geos = self.upLipHiRezcrv, joints = self.upHirzBndJnts)
+        deformLib.bind_geo(geos = self.uplipHirezEdge, joints = self.upHirzBndJnts)
         # bind joints to the low highrez Curves
         for index,value in enumerate(self.lowMicroJnts):
             if index in [0,5]:
                 continue
             self.lowHirzBndJnts.append(value)
 
-        deformLib.bind_geo(geos = self.lowLipHiRezcrv, joints = self.lowHirzBndJnts)
+        deformLib.bind_geo(geos = self.lowLipHirezEdge, joints = self.lowHirzBndJnts)
 
         # bind the mouth joint to the up curve temp(thouth not sure about it)
 
@@ -543,7 +548,7 @@ class LipsB(buildLip.BuildLip):
 
         poses = [self.cln(i)for i in self.upLipLowRezBindJnts]
         tempList = funcs.locOnCrv(name = 'result', parent = self.cln(self.upLipJntLocLowGrp), numLocs = 3,
-                                  crv = self.cln(self.upLipLowRezcrv), upCurve = self.tempCurve, paramStart = 0.8,paramEnd = 0.3,
+                                  crv = self.cln(self.uplipLowRezEdge), upCurve = self.tempCurve, paramStart = 0.8, paramEnd = 0.3,
                                   upAxis = 'y', posJnts = poses)
         # rename transfomrs that driven by uplowRezCrv
         self.l_UpLipDriverOutMod = mc.rename(tempList[0], 'L_UpLipDriverOutModify_LOC')
@@ -552,7 +557,7 @@ class LipsB(buildLip.BuildLip):
 
         poses = [self.cln(i)for i in self.lowLipLowRezBindJnts]
         tempList = funcs.locOnCrv(name = 'result', parent = self.cln(self.lowLipJntLocLowGrp), numLocs = 3,
-                                  crv = self.cln(self.lowLipLowRezcrv), upCurve = self.tempCurve, paramStart = 0.8,paramEnd = 0.3,
+                                  crv = self.cln(self.lowLipLowRezEdge), upCurve = self.tempCurve, paramStart = 0.8, paramEnd = 0.3,
                                   upAxis = 'y', posJnts = poses)
 
         # rename transfomrs that driven by lowlowRezCrv
@@ -560,9 +565,9 @@ class LipsB(buildLip.BuildLip):
         self.m_LowLipDriverOutMod = mc.rename(tempList[1], 'm_LowLipDriverOutModify_LOC')
         self.r_LowLipDriverOutMod = mc.rename(tempList[2], 'r_LowLipDriverOutModify_LOC')
 
-        tempJnts = jntLib.create_on_curve(self.cln(self.upLipMedRezcrv), numOfJoints = 7, parent = False, description='C_base', radius= 0.2)
-        tempList = funcs.locOnCrv(name = 'result', parent = self.cln(self.jntLocMedUp), numLocs = 7, crv = self.cln(self.upLipMedRezcrv),
-                     upCurve = self.tempCurve, paramStart = 0.95,paramEnd = 0.15, upAxis = 'y', posJnts = tempJnts)
+        tempJnts = jntLib.create_on_curve(self.cln(self.uplipMedRezEdge), numOfJoints = 7, parent = False, description='C_base', radius= 0.2)
+        tempList = funcs.locOnCrv(name = 'result', parent = self.cln(self.jntLocMedUp), numLocs = 7, crv = self.cln(self.uplipMedRezEdge),
+                                  upCurve = self.tempCurve, paramStart = 0.95, paramEnd = 0.15, upAxis = 'y', posJnts = tempJnts)
         mc.delete(tempJnts)
         self.upSecModGlob = mc.rename(tempList[0],'L_UpLipMicroOutSecondaryModify_LOC')
         self.upmicroOutModGlob = mc.rename(tempList[1],'L_UpLipMicroOutModify_LOC')
@@ -572,9 +577,9 @@ class LipsB(buildLip.BuildLip):
         self.microOutModLocUpGlob = mc.rename(tempList[5],'R_UpLipMicroOutModify_LOC')
         self.microOutSecModUpGlob = mc.rename(tempList[6],'R_UpLipMicroOutSecondaryModify_LOC')
 
-        tempJnts = jntLib.create_on_curve(self.cln(self.lowLipMedRezcrv), numOfJoints = 7, parent = False, description='C_base', radius= 0.2)
-        tempList = funcs.locOnCrv(name = 'result', parent = self.cln(self.jntLocMedLow), numLocs = 7, crv = self.cln(self.lowLipMedRezcrv),
-                     upCurve = self.tempCurve, paramStart = 0.95,paramEnd = 0.15, upAxis = 'y', posJnts = tempJnts)
+        tempJnts = jntLib.create_on_curve(self.cln(self.lowLipMedRezEdge), numOfJoints = 7, parent = False, description='C_base', radius= 0.2)
+        tempList = funcs.locOnCrv(name = 'result', parent = self.cln(self.jntLocMedLow), numLocs = 7, crv = self.cln(self.lowLipMedRezEdge),
+                                  upCurve = self.tempCurve, paramStart = 0.95, paramEnd = 0.15, upAxis = 'y', posJnts = tempJnts)
         mc.delete(tempJnts)
         self.lowSecModGlob = mc.rename(tempList[0],'L_LowLipMicroOutSecondaryModify_LOC')
         self.lowmicroOutModGlob = mc.rename(tempList[1],'L_LowLipMicroOutModify_LOC')
@@ -585,24 +590,24 @@ class LipsB(buildLip.BuildLip):
         self.microOutSecModLowGlob = mc.rename(tempList[6],'R_LowLipMicroOutSecondaryModify_LOC')
 
 
-        tempJnts = jntLib.create_on_curve(self.cln(self.upLipHiRezcrv), numOfJoints = 2, parent = False, description='C_base', radius= 0.2)
-        tempList = funcs.locOnCrv(name = 'result', parent = self.cln(self.jntLocHiUp), numLocs = 2, crv = self.cln(self.upLipHiRezcrv),
-                     upCurve = self.tempCurve, paramStart = 0.97,paramEnd = 0.95, upAxis = 'y', posJnts = tempJnts)
+        tempJnts = jntLib.create_on_curve(self.cln(self.uplipHirezEdge), numOfJoints = 2, parent = False, description='C_base', radius= 0.2)
+        tempList = funcs.locOnCrv(name = 'result', parent = self.cln(self.jntLocHiUp), numLocs = 2, crv = self.cln(self.uplipHirezEdge),
+                                  upCurve = self.tempCurve, paramStart = 0.97, paramEnd = 0.95, upAxis = 'y', posJnts = tempJnts)
         mc.delete(tempJnts)
         self.l_outUpTerModLocHiGlob = mc.rename(tempList[0], 'L_UpLipMicroOutTertiaryModify_LOC')
         self.r_outUpTerModLocHiGlob = mc.rename(tempList[1], 'R_UpLipMicroOutTertiaryModify_LOC')
 
-        tempJnts = jntLib.create_on_curve(self.cln(self.lowLipHiRezcrv), numOfJoints = 2, parent = False, description='C_base', radius= 0.2)
-        tempList = funcs.locOnCrv(name = 'result', parent = self.cln(self.jntLocHiLow), numLocs = 2, crv = self.cln(self.lowLipHiRezcrv),
-                     upCurve = self.tempCurve, paramStart = 0.97,paramEnd = 0.95, upAxis = 'y', posJnts = tempJnts)
+        tempJnts = jntLib.create_on_curve(self.cln(self.lowLipHirezEdge), numOfJoints = 2, parent = False, description='C_base', radius= 0.2)
+        tempList = funcs.locOnCrv(name = 'result', parent = self.cln(self.jntLocHiLow), numLocs = 2, crv = self.cln(self.lowLipHirezEdge),
+                                  upCurve = self.tempCurve, paramStart = 0.97, paramEnd = 0.95, upAxis = 'y', posJnts = tempJnts)
         mc.delete(tempJnts)
         self.l_outLowTerModLocHiGlob = mc.rename(tempList[0], 'L_LowLipMicroOutTertiaryModify_LOC')
         self.r_outLowTerModLocHiGlob = mc.rename(tempList[1], 'R_LowLipMicroOutTertiaryModify_LOC')
 
 
-        tempJnts = jntLib.create_on_curve(self.cln(self.upLipZippercrv), numOfJoints = 9, parent = False, description='C_base', radius = 0.1)
-        upTargets = funcs.locOnCrv(name='result', parent='UpLipZipperTargetloc_GRP', numLocs=9, crv=self.cln(self.upLipZippercrv),
-                            upCurve=self.tempCurve, paramStart=0.97, paramEnd=0.118, upAxis='y', posJnts=tempJnts)
+        tempJnts = jntLib.create_on_curve(self.cln(self.uplipZipperEdge), numOfJoints = 9, parent = False, description='C_base', radius = 0.1)
+        upTargets = funcs.locOnCrv(name='result', parent='UpLipZipperTargetloc_GRP', numLocs=9, crv=self.cln(self.uplipZipperEdge),
+                                   upCurve=self.tempCurve, paramStart=0.97, paramEnd=0.118, upAxis='y', posJnts=tempJnts)
         mc.delete(tempJnts)
         upZipJnts = [self.cln(i)for i in self.upZipJnts]
         for i,j in zip(upTargets,upZipJnts):
@@ -617,9 +622,9 @@ class LipsB(buildLip.BuildLip):
         self.upLipZipOutSecLocRight = mc.rename(upTargets[7], 'R_UpLipZipOutSecondary_LOC')
         self.upLipZipOutTerLocRight = mc.rename(upTargets[8], 'R_UpLipZipOutTertiary_LOC')
 
-        tempJnts = jntLib.create_on_curve(self.cln(self.lowLipZippercrv), numOfJoints = 9, parent = False, description='C_base', radius = 0.1)
-        lowTargets = funcs.locOnCrv(name='result', parent='LowLipZipperTargetloc_GRP', numLocs=9, crv=self.cln(self.lowLipZippercrv),
-                            upCurve=self.tempCurve, paramStart=0.97, paramEnd=0.118, upAxis='y', posJnts=tempJnts)
+        tempJnts = jntLib.create_on_curve(self.cln(self.lowLipZipperEdge), numOfJoints = 9, parent = False, description='C_base', radius = 0.1)
+        lowTargets = funcs.locOnCrv(name='result', parent='LowLipZipperTargetloc_GRP', numLocs=9, crv=self.cln(self.lowLipZipperEdge),
+                                    upCurve=self.tempCurve, paramStart=0.97, paramEnd=0.118, upAxis='y', posJnts=tempJnts)
         mc.delete(tempJnts)
         lowZipJnts = [self.cln(i)for i in self.lowZipJnts]
         for i,j in zip(lowTargets,lowZipJnts):
@@ -672,18 +677,18 @@ class LipsB(buildLip.BuildLip):
         lowmedrezBindJnts = [self.cln(i)for i in self.lowmedRezBindJnts]
         uphirezBindJnts = [self.cln(i)for i in self.upHirzBndJnts]
         lowhirezBindJnts = [self.cln(i)for i in self.lowHirzBndJnts]
-        upZipperBindJnts = [self.cln(i)for i in self.upBindJnts]
-        lowZipperBindJnts = [self.cln(i)for i in self.lowBindJnts]
+        upZipperBindJnts = [self.cln(i) for i in self.upLipBindJnts]
+        lowZipperBindJnts = [self.cln(i) for i in self.lowLipBindJnts]
 
-        deformLib.bind_geo(geos = self.cln(self.upLipLowRezcrv), joints = uplowrezBindJnts)
-        deformLib.bind_geo(geos = self.cln(self.upLipMedRezcrv), joints = upmedrezBindJnts)
+        deformLib.bind_geo(geos = self.cln(self.uplipLowRezEdge), joints = uplowrezBindJnts)
+        deformLib.bind_geo(geos = self.cln(self.uplipMedRezEdge), joints = upmedrezBindJnts)
         #bind joints to low lowrez and medrez curves
-        deformLib.bind_geo(geos = self.cln(self.lowLipLowRezcrv), joints = lowlowrezBindJnts)
-        deformLib.bind_geo(geos = self.cln(self.lowLipMedRezcrv), joints = lowmedrezBindJnts)
+        deformLib.bind_geo(geos = self.cln(self.lowLipLowRezEdge), joints = lowlowrezBindJnts)
+        deformLib.bind_geo(geos = self.cln(self.lowLipMedRezEdge), joints = lowmedrezBindJnts)
         # bind joints to the up highrez Curves
-        deformLib.bind_geo(geos = self.cln(self.upLipHiRezcrv), joints = uphirezBindJnts)
+        deformLib.bind_geo(geos = self.cln(self.uplipHirezEdge), joints = uphirezBindJnts)
         # bind joints to the low highrez Curves
-        deformLib.bind_geo(geos = self.cln(self.lowLipHiRezcrv), joints = lowhirezBindJnts)
+        deformLib.bind_geo(geos = self.cln(self.lowLipHirezEdge), joints = lowhirezBindJnts)
 
 
         # connect up micro controls to the locator above the bind jnts
@@ -840,8 +845,12 @@ class LipsB(buildLip.BuildLip):
 
         # clean out the outliner
         self.lowwireModGrp, self.upwireModGrp
-        mc.parent(self.upTeethCurve,'aa_topTeethWire_CRV1BaseWire', self.upwireModGrp)
-        mc.parent(self.lowTeethCurve,'aa_lowTeethWire_CRV1BaseWire', self.lowwireModGrp)
+        self.upperTeethCrvGrp = mc.createNode('transform', name = 'upperTeethCurve')
+        self.lowerTeethCrvGrp = mc.createNode('transform', name = 'lowerTeethCurve')
+        mc.parent(self.upperTeethEdge, 'localupTeeth_CRVBaseWire', self.upperTeethCrvGrp)
+        mc.parent(self.upperTeethCrvGrp, self.upwireModGrp)
+        mc.parent(self.lowerTeethEdge, 'locallowTeeth_CRVBaseWire', self.lowerTeethCrvGrp)
+        mc.parent(self.lowerTeethCrvGrp, self.lowwireModGrp)
 
         # connect transform above up bind joints to the transform above low bind joints
         mc.parentConstraint(self.uplocalMidZipBaseModGrp,self.lowlocalMidZipBaseModGrp,  mo = True)[0]
@@ -855,64 +864,60 @@ class LipsB(buildLip.BuildLip):
                   'upLipRollFwdCorr60','upLipRollBackCorr60','lowLipRollBackCorr60',]:
             deformLib.blendShapeTarget(self.geo, i, mouthbls)
 
-        upLowRezbls = mc.blendShape(self.upLipLowRezcrv, frontOfChain=True, n='upLowRezCrv_correcriveSneer_bShp')[0]
-        lowLowRezbls = mc.blendShape(self.lowLipLowRezcrv, frontOfChain=True, n='lowLowRezCrv_correcriveSneer_bShp')[0]
-        upLowRezblsGlob = mc.blendShape(self.cln(self.upLipLowRezcrv), frontOfChain=True, n='upGlobLowRezCrv_correcriveSneer_bShp')[0]
-        lowLowRezblsGlob = mc.blendShape(self.cln(self.lowLipLowRezcrv), frontOfChain=True, n='lowGlobLowRezCrv_correcriveSneer_bShp')[0]
+        upLowRezbls = mc.blendShape(self.uplipLowRezEdge, frontOfChain=True, n='upLowRezCrv_correcriveSneer_bShp')[0]
+        lowLowRezbls = mc.blendShape(self.lowLipLowRezEdge, frontOfChain=True, n='lowLowRezCrv_correcriveSneer_bShp')[0]
+        upLowRezblsGlob = mc.blendShape(self.cln(self.uplipLowRezEdge), frontOfChain=True, n='upGlobLowRezCrv_correcriveSneer_bShp')[0]
+        lowLowRezblsGlob = mc.blendShape(self.cln(self.lowLipLowRezEdge), frontOfChain=True, n='lowGlobLowRezCrv_correcriveSneer_bShp')[0]
 
         for i in ['L_CornerIn6','R_CornerIn6','L_CornerOut10','R_CornerOut10']:
-            deformLib.blendShapeTarget(self.upLipLowRezcrv, i, upLowRezbls)
-            deformLib.blendShapeTarget(self.lowLipLowRezcrv, i, lowLowRezbls)
-            deformLib.blendShapeTarget(self.cln(self.upLipLowRezcrv), i, upLowRezblsGlob)
-            deformLib.blendShapeTarget(self.cln(self.lowLipLowRezcrv), i, lowLowRezblsGlob)
+            deformLib.blendShapeTarget(self.uplipLowRezEdge, i, upLowRezbls)
+            deformLib.blendShapeTarget(self.lowLipLowRezEdge, i, lowLowRezbls)
+            deformLib.blendShapeTarget(self.cln(self.uplipLowRezEdge), i, upLowRezblsGlob)
+            deformLib.blendShapeTarget(self.cln(self.lowLipLowRezEdge), i, lowLowRezblsGlob)
 
-        upMedRezbls = mc.blendShape(self.upLipMedRezcrv, frontOfChain=True, n='upMedRezCrv_correcriveSneer_bShp')[0]
-        lowMedRezbls = mc.blendShape(self.lowLipMedRezcrv, frontOfChain=True, n='lowMedRezCrv_correcriveSneer_bShp')[0]
-        upMedRezblsGlob = mc.blendShape(self.cln(self.upLipMedRezcrv), frontOfChain=True, n='upGlobMedRezCrv_correcriveSneer_bShp')[0]
-        lowMedRezblsGlob = mc.blendShape(self.cln(self.lowLipMedRezcrv), frontOfChain=True, n='lowGlobMedRezCrv_correcriveSneer_bShp')[0]
+        upMedRezbls = mc.blendShape(self.uplipMedRezEdge, frontOfChain=True, n='upMedRezCrv_correcriveSneer_bShp')[0]
+        lowMedRezbls = mc.blendShape(self.lowLipMedRezEdge, frontOfChain=True, n='lowMedRezCrv_correcriveSneer_bShp')[0]
+        upMedRezblsGlob = mc.blendShape(self.cln(self.uplipMedRezEdge), frontOfChain=True, n='upGlobMedRezCrv_correcriveSneer_bShp')[0]
+        lowMedRezblsGlob = mc.blendShape(self.cln(self.lowLipMedRezEdge), frontOfChain=True, n='lowGlobMedRezCrv_correcriveSneer_bShp')[0]
 
         for i in ['L_MedCornerIn6','R_MedCornerIn6','L_MedCornerOut20','R_MedCornerOut20']:
-            deformLib.blendShapeTarget(self.upLipMedRezcrv, i, upMedRezbls)
-            deformLib.blendShapeTarget(self.lowLipMedRezcrv, i, lowMedRezbls)
-            deformLib.blendShapeTarget(self.cln(self.upLipMedRezcrv), i, upMedRezblsGlob)
-            deformLib.blendShapeTarget(self.cln(self.lowLipMedRezcrv), i, lowMedRezblsGlob)
+            deformLib.blendShapeTarget(self.uplipMedRezEdge, i, upMedRezbls)
+            deformLib.blendShapeTarget(self.lowLipMedRezEdge, i, lowMedRezbls)
+            deformLib.blendShapeTarget(self.cln(self.uplipMedRezEdge), i, upMedRezblsGlob)
+            deformLib.blendShapeTarget(self.cln(self.lowLipMedRezEdge), i, lowMedRezblsGlob)
 
         # clean outliner
         self.noTuchyUp = self.noTuchyUp.split('|')[-1]
         self.noTuchyLow = self.noTuchyLow.split('|')[-1]
-        for i in [self.cln(self.upLipLowRezcrv),self.cln(self.upLipMedRezcrv),self.cln(self.upLipHiRezcrv),
-                  self.cln(self.upLipZippercrv),]:
+        for i in [self.cln(self.uplipLowRezEdge), self.cln(self.uplipMedRezEdge), self.cln(self.uplipHirezEdge),
+                  self.cln(self.uplipZipperEdge), ]:
             mc.parent(i,self.cln(self.noTuchyUp))
-        for i in [self.upLipLowRezcrv,self.upLipMedRezcrv,self.upLipHiRezcrv,self.upLipZippercrv]:
+        for i in [self.uplipLowRezEdge, self.uplipMedRezEdge, self.uplipHirezEdge, self.uplipZipperEdge]:
             mc.parent(i,self.noTuchyUp)
 
-        for i in [self.cln(self.lowLipLowRezcrv),self.cln(self.lowLipMedRezcrv),self.cln(self.lowLipHiRezcrv),self.cln(self.lowLipZippercrv)]:
+        for i in [self.cln(self.lowLipLowRezEdge), self.cln(self.lowLipMedRezEdge), self.cln(self.lowLipHirezEdge), self.cln(self.lowLipZipperEdge)]:
             mc.parent(i, self.cln(self.noTuchyLow))
-        for i in [self.lowLipLowRezcrv,self.lowLipMedRezcrv,self.lowLipHiRezcrv,self.lowLipZippercrv]:
+        for i in [self.lowLipLowRezEdge, self.lowLipMedRezEdge, self.lowLipHirezEdge, self.lowLipZipperEdge]:
             mc.parent(i, self.noTuchyLow)
 
-        for i,j in zip([self.zippercrv,self.upBindJnts[1],self.upBindJnts[0],self.lowBindJnts[1],self.lowBindJnts[0]],
+        for i,j in zip([self.zipperCrvEdge, self.upLipBindJnts[1], self.upLipBindJnts[0], self.lowLipBindJnts[1], self.lowLipBindJnts[0]],
                      [self.localLipRigGrp,self.uplocalMidZipBaseModGrp,self.uplocalMidZipBasePlaceModGrp,
                      self.lowlocalMidZipBaseModGrp,self.lowlocalMidZipBasePlaceModGrp]):
             mc.parent(i,j)
-        for i,j in zip([self.cln(self.upBindJnts[1]),self.cln(self.upBindJnts[0]),
-                        self.cln(self.lowBindJnts[1]),self.cln(self.lowBindJnts[0])],
+        for i,j in zip([self.cln(self.upLipBindJnts[1]), self.cln(self.upLipBindJnts[0]),
+                        self.cln(self.lowLipBindJnts[1]), self.cln(self.lowLipBindJnts[0])],
                         [self.cln(self.uplocalMidZipBaseModGrp),self.cln(self.uplocalMidZipBasePlaceModGrp),
                         self.cln(self.lowlocalMidZipBaseModGrp),self.cln(self.lowlocalMidZipBasePlaceModGrp)]):
             mc.parent(i,j)
 
-        mc.parent(self.tempCurve,'Zipper_CRV1BaseWire' , 'Zipper_CRV1BaseWire1',self.noTuchyUp)
+        mc.parent(self.tempCurve,'localzipper_CRVBaseWire' , 'localzipper_CRVBaseWire1',self.noTuchyUp)
 
         # bind joints to the up Zipper Curves
-        deformLib.bind_geo(geos=self.cln(self.upLipZippercrv), joints=upZipperBindJnts)
+        deformLib.bind_geo(geos=self.cln(self.uplipZipperEdge), joints=upZipperBindJnts)
         # bind joints to the low zipper Curves
-        deformLib.bind_geo(geos=self.cln(self.lowLipZippercrv), joints=lowZipperBindJnts)
+        deformLib.bind_geo(geos=self.cln(self.lowLipZipperEdge), joints=lowZipperBindJnts)
 
 
-        #parent stuf under squash head ctl
-        # mc.parent(self.mouthCtlOr,self.buttomJntSquash[1])
-        # mc.parent(self.lipFollowLocGrp, self.buttomJntSquash[1])
-        # mc.parent(self.noseCtlGrp, self.buttomJntSquash[0])
 
     def cln(self,node):
         node = node.replace('local', '')
@@ -970,22 +975,22 @@ class LipsB(buildLip.BuildLip):
         attrLib.addString(self.blueprintGrp, 'blu_teethParent', v='C_head.facialRigGrp')
         attrLib.addString(self.blueprintGrp, 'blu_teethStufParent', v='C_head.globalRigGrp')
         attrLib.addString(self.blueprintGrp, 'blu_geo', v=self.geo )
-        attrLib.addString(self.blueprintGrp, 'blu_upperteeth', v=self.upGum )
-        attrLib.addString(self.blueprintGrp, 'blu_lowerteeth', v=self.lowGum )
-        attrLib.addString(self.blueprintGrp, 'blu_upperTeethEdge', v=self.upTeethCurve )
-        attrLib.addString(self.blueprintGrp, 'blu_lowerTeethEdge', v=self.lowTeethCurve )
-        attrLib.addString(self.blueprintGrp, 'blu_zipperCrvEdge', v=self.zippercrv )
-        attrLib.addString(self.blueprintGrp, 'blu_uplipLowRezEdge', v=self.upLipLowRezcrv )
-        attrLib.addString(self.blueprintGrp, 'blu_uplipMedRezEdge', v=self.upLipMedRezcrv )
-        attrLib.addString(self.blueprintGrp, 'blu_uplipHirezEdge', v=self.upLipHiRezcrv )
-        attrLib.addString(self.blueprintGrp, 'blu_uplipZipperEdge', v=self.upLipZippercrv )
-        attrLib.addString(self.blueprintGrp, 'blu_lowLipLowRezEdge', v=self.lowLipLowRezcrv )
-        attrLib.addString(self.blueprintGrp, 'blu_lowLipHirezEdge', v=self.lowLipHiRezcrv )
-        attrLib.addString(self.blueprintGrp, 'blu_lowLipMedRezEdge', v=self.lowLipMedRezcrv )
-        attrLib.addString(self.blueprintGrp, 'blu_lowLipZipperEdge', v=self.lowLipZippercrv )
-        attrLib.addString(self.blueprintGrp, 'blu_upLipBindJnts', v=self.upBindJnts )
-        attrLib.addString(self.blueprintGrp, 'blu_lowLipBindJnts', v=self.lowBindJnts )
-        attrLib.addString(self.blueprintGrp, 'blu_lipNumJnts', v=self.numJnts )
+        attrLib.addString(self.blueprintGrp, 'blu_upperteeth', v=self.upperteeth )
+        attrLib.addString(self.blueprintGrp, 'blu_lowerteeth', v=self.lowerteeth )
+        attrLib.addString(self.blueprintGrp, 'blu_upperTeethEdge', v=self.upperTeethEdge )
+        attrLib.addString(self.blueprintGrp, 'blu_lowerTeethEdge', v=self.lowerTeethEdge )
+        attrLib.addString(self.blueprintGrp, 'blu_zipperCrvEdge', v=self.zipperCrvEdge )
+        attrLib.addString(self.blueprintGrp, 'blu_uplipLowRezEdge', v=self.uplipLowRezEdge )
+        attrLib.addString(self.blueprintGrp, 'blu_uplipMedRezEdge', v=self.uplipMedRezEdge )
+        attrLib.addString(self.blueprintGrp, 'blu_uplipHirezEdge', v=self.uplipHirezEdge )
+        attrLib.addString(self.blueprintGrp, 'blu_uplipZipperEdge', v=self.uplipZipperEdge )
+        attrLib.addString(self.blueprintGrp, 'blu_lowLipLowRezEdge', v=self.lowLipLowRezEdge )
+        attrLib.addString(self.blueprintGrp, 'blu_lowLipHirezEdge', v=self.lowLipHirezEdge )
+        attrLib.addString(self.blueprintGrp, 'blu_lowLipMedRezEdge', v=self.lowLipMedRezEdge )
+        attrLib.addString(self.blueprintGrp, 'blu_lowLipZipperEdge', v=self.lowLipZipperEdge )
+        attrLib.addString(self.blueprintGrp, 'blu_upLipBindJnts', v=self.upLipBindJnts )
+        attrLib.addString(self.blueprintGrp, 'blu_lowLipBindJnts', v=self.lowLipBindJnts )
+        attrLib.addString(self.blueprintGrp, 'blu_lipNumJnts', v=self.lipNumJnts )
 
 
 
