@@ -28,9 +28,14 @@ class EyebrowsTemplate(template.Template):
 
     def build(self):
         super(EyebrowsTemplate, self).build()
+        self.createGroups()
+        self.matches()
 
     def createGroups(self):
-        self.localBrowsGrp = mc.createNode('transform', name = 'localBrows_GRP')
+        if self.side == 'L':
+            self.localBrowsGrp = mc.createNode('transform', name = 'localBrows_GRP')
+        else:
+            self.localBrowsGrp =  'localBrows_GRP'
         self.browJntGrp = mc.createNode('transform', name = 'browJnt_GRP',p = self.localBrowsGrp)
         self.browInOrientGrp = mc.createNode('transform', name = self.side + '_browInOrient_GRP', p = self.browJntGrp)
         self.browMidOrientGrp = mc.createNode('transform', name = self.side + '_browMidOrient_GRP', p = self.browJntGrp)
@@ -39,7 +44,10 @@ class EyebrowsTemplate(template.Template):
         self.browMidModGrp = mc.createNode('transform', name = self.side + '_browMidModify_GRP', p = self.browMidOrientGrp)
         self.browOutModGrp = mc.createNode('transform', name = self.side + '_browOutModify_GRP', p = self.browOutOrientGrp)
 
-        self.browCtlGrp = mc.createNode('transform', name = 'browCtrl_GRP')
+        if self.side == 'L':
+            self.browCtlGrp = mc.createNode('transform', name = 'browCtrl_GRP')
+        else:
+            self.browCtlGrp = 'browCtrl_GRP'
         self.browOutCtlOrientGrp = mc.createNode('transform', name = self.side + '_browOutCtrlOrient_GRP', p = self.browCtlGrp)
         self.browInCtlOrientGrp = mc.createNode('transform', name = self.side + '_browInCtrlOrient_GRP', p = self.browCtlGrp)
         self.browMidCtlOrientGrp = mc.createNode('transform', name = self.side + '_browMidCtrlOrient_GRP', p = self.browCtlGrp)

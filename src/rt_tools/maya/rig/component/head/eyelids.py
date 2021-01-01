@@ -51,50 +51,38 @@ class Eyelids(buildEyelid.BuildEyelid):
     """
     base class for eyelids template
     """
-    def __init__(self, side='L', prefix='eyeLid',upLidHdCrv = '',lowLidHdCrv = '',
-                 upLidLdCrv = '',lowLidLdCrv = '',lidBlinkCrv = '',upLidBlink = '',
-                 lowLidBlink = '',upCreaseHd = '',lowCreaseHd = '',upCreaseLd = '',
-                 lowCreaseLd = '',**kwargs):
+    def __init__(self,geo = '', side='L', prefix='eyelid',upLidHdEdge = '',lowLidHdEdge = '',
+                 upLidLdEdge = '',lowLidLdEdge = '',lidBlinkEdge = '',uplidBlinkEdge = '',
+                 lowlidBlinkEdge = '',upCreaseHdEdge = '',lowCreaseHdEdge = '',upCreaseLdEdge = '',
+                 lowCreaseLdEdge = '',**kwargs):
         kwargs['side'] = side
         kwargs['prefix'] = prefix
-        self.upLidHdCrv = upLidHdCrv
-        self.lowLidHdCrv = lowLidHdCrv
-        self.upLidLdCrv = upLidLdCrv
-        self.lowLidLdCrv = lowLidLdCrv
-        self.lidBlinkCrv = lidBlinkCrv
-        self.upLidBlink = upLidBlink
-        self.lowLidBlink = lowLidBlink
-        self.upCreaseHd = upCreaseHd
-        self.upCreaseLd = upCreaseLd
-        self.lowCreaseHd = lowCreaseHd
-        self.lowCreaseLd = lowCreaseLd
-
+        self.geo = geo
+        self.upLidHdEdge = upLidHdEdge
+        self.lowLidHdEdge = lowLidHdEdge
+        self.upLidLdEdge = upLidLdEdge
+        self.lowLidLdEdge = lowLidLdEdge
+        self.lidBlinkEdge = lidBlinkEdge
+        self.uplidBlinkEdge = uplidBlinkEdge
+        self.lowlidBlinkEdge = lowlidBlinkEdge
+        self.upCreaseHdEdge = upCreaseHdEdge
+        self.upCreaseLdEdge = upCreaseLdEdge
+        self.lowCreaseHdEdge = lowCreaseHdEdge
+        self.lowCreaseLdEdge = lowCreaseLdEdge
 
 
         super(Eyelids, self).__init__(**kwargs)
 
     def build(self):
         super(Eyelids, self).build()
-        # connect edge datas to the curves
-        self.upLidHdCrv = crvLib.edgeToCurve(geo = self.geo, edges = self.upLidHdCrv, name = 'upLidHd_CRV')
-        self.lowLidHdCrv = crvLib.edgeToCurve(geo = self.geo, edges = self.lowLidHdCrv, name = 'lowLidHd_CRV')
-        self.upLidLdCrv = crvLib.edgeToCurve(geo = self.geo, edges = self.upLidLdCrv, name = 'upLidLd_CRV')
-        self.lowLidLdCrv = crvLib.edgeToCurve(geo = self.geo, edges = self.lowLidLdCrv, name = 'lowLidLd_CRV')
-        self.lidBlinkCrv = crvLib.edgeToCurve(geo = self.geo, edges = self.lidBlinkCrv, name = 'lidBlink_CRV')
-        self.upLidBlink = crvLib.edgeToCurve(geo = self.geo, edges = self.upLidBlink, name = 'upLidBlink_CRV')
-        self.lowLidBlink = crvLib.edgeToCurve(geo = self.geo, edges = self.lowLidBlink, name = 'lowLidBlink_CRV')
-        self.upCreaseHd = crvLib.edgeToCurve(geo = self.geo, edges = self.upCreaseHd, name = 'upCreaseHd_CRV')
-        self.lowCreaseHd = crvLib.edgeToCurve(geo = self.geo, edges = self.lowCreaseHd, name = 'lowCreaseHd_CRV')
-        self.upCreaseLd = crvLib.edgeToCurve(geo = self.geo, edges = self.upCreaseLd, name = 'upCreaseLd_CRV')
-        self.lowCreaseLd = crvLib.edgeToCurve(geo = self.geo, edges = self.lowCreaseLd, name = 'lowCreaseLd_CRV')
 
         # create wire for up and low blink curve
-        for i in [self.upLidBlink ,self.lowLidBlink ]:
+        for i in [self.uplidBlinkEdge , self.lowlidBlinkEdge]:
             mc.select(i, r=True)
-            mc.wire(gw=False, en=1.000000, ce=0.000000, li=0.000000, w= self.lidBlinkCrv)
+            mc.wire(gw=False, en=1.000000, ce=0.000000, li=0.000000, w= self.lidBlinkEdge)
 
         # blend shape up and low ld curves to lid blink
-        mc.blendShape(self.upLidLdCrv , self.lowLidLdCrv, self.lidBlinkCrv, tc=False, automatic=True, name=self.side + '_lidBlink_BLS' )
+        mc.blendShape(self.upLidLdEdge, self.lowLidLdEdge, self.lidBlinkEdge, tc=False, automatic=True, name=self.side + '_lidBlink_BLS')
         mc.blendShape(self.side + '_lidBlink_BLS' , edit=True, w=[(0, 0.15), (1, 0.85)])
 
 
@@ -113,7 +101,6 @@ class Eyelids(buildEyelid.BuildEyelid):
 
         [mc.connectAttr(self.upmidCtl + '.{}{}'.format(a,v), self.modUpOnJoints[2] + '.{}{}'.format(a,v))for a in 'trs' for v in 'xyz']
 
-        #TODO: connect the eye aim control to the makro mid transforms later
         units = []
         for i in range(2):
             unit = mc.shadingNode('unitConversion', asUtility = True )
@@ -139,7 +126,6 @@ class Eyelids(buildEyelid.BuildEyelid):
 
         [mc.connectAttr(self.lowmidCtl + '.{}{}'.format(a,v), self.modLowOnJoints[1] + '.{}{}'.format(a,v))for a in 'trs' for v in 'xyz']
 
-        #TODO: connect the eye aim control to the makro mid transforms later
         units = []
         for i in range(2):
             unit = mc.shadingNode('unitConversion', asUtility = True )
@@ -208,12 +194,9 @@ class Eyelids(buildEyelid.BuildEyelid):
         mc.connectAttr(self.lowCreaseMakroMult + '.output', self.makroCreaseLowJntGrp + '.translate')
 
         # create wire for up and low Crease curve
-        for i,j in zip([self.upCreaseLd ,self.lowCreaseLd],[self.upCreaseHd ,self.lowCreaseHd]):
+        for i,j in zip([self.upCreaseLdEdge , self.lowCreaseLdEdge], [self.upCreaseHdEdge , self.lowCreaseHdEdge]):
             mc.select(j, r=True)
             mc.wire(gw=False, en=1.000000, ce=0.000000, li=0.000000, w= i)
-
-        # connect stuf to the cheekRaise under placement
-        #TODO: connect cheek control to the stuf later
 
         # connect stuf to the locators under lid makro loc
         mc.pointConstraint(self.upEyelidBndJnts[6],self.upLidMakroLoc,mo = True)
@@ -229,15 +212,11 @@ class Eyelids(buildEyelid.BuildEyelid):
         # connect stuff to the groups under browMakro locGrp
         mc.pointConstraint(self.browOutLoc,self.browInLoc,self.browMidMakroDrvrOriGrp, mo = True)
 
-        #TODO: connect eyebrow  controls to the brow  locs  under brow makro loc later
-
         # connect controls to the neighbor transform above controls
         mc.parentConstraint(self.upmidCtl,self.upLdCtls[0],self.upLdCtlGrps[1],weight = 0.5 ,mo = True)
         mc.parentConstraint(self.upmidCtl,self.upLdCtls[-1],self.upLdCtlGrps[2],weight = 0.5 ,mo = True)
         mc.parentConstraint(self.lowmidCtl,self.upLdCtls[0],self.lowLdCtlGrps[0],weight = 0.5 ,mo = True)
         mc.parentConstraint(self.lowmidCtl,self.upLdCtls[-1],self.lowLdCtlGrps[1],weight = 0.5 ,mo = True)
-
-        #TODO: connect stuf to the makro group above mid eyelid ctls later
 
         # connect controls to the neighbor transform above crease controls
         mc.parentConstraint(self.upCreaseCtls[0],self.upCreaseCtls[2],self.upCreaseLdCtlGrps[1],skipRotate='x',weight = 0.5 ,mo = True)
@@ -251,11 +230,11 @@ class Eyelids(buildEyelid.BuildEyelid):
         # mc.parent(self.eyelidCtlGrp,self.topJntSquash[0])
 
         #clean outliner
-        for i in [self.upLidHdCrv,self.upLidLdCrv,self.upLidBlink,
-                  self.lowLidHdCrv,self.lowLidLdCrv,self.lowLidBlink,self.lidBlinkCrv,self.tempCurve,self.upCreaseHd,
-                  self.lowCreaseHd,self.upCreaseLd,self.lowCreaseLd,
-                  'localL_lidBlink_CRVBaseWire','localL_lidBlink_CRVBaseWire1',
-                  'localL_upCreaseLD_CRVBaseWire','localL_lowCreaseLD_CRVBaseWire']:
+        for i in [self.upLidHdEdge, self.upLidLdEdge, self.uplidBlinkEdge,
+                  self.lowLidHdEdge, self.lowLidLdEdge, self.lowlidBlinkEdge, self.lidBlinkEdge, self.tempCurve, self.upCreaseHdEdge,
+                  self.lowCreaseHdEdge, self.upCreaseLdEdge, self.lowCreaseLdEdge,
+                  self.side + '_lidBlink_CRVBaseWire',self.side + '_lidBlink_CRVBaseWire1',
+                  self.side + '_upCreaseLd_CRVBaseWire',self.side + '_lowCreaseLd_CRVBaseWire']:
             mc.parent(i,self.eyelidCrvGrp)
 
         mc.parent(self.eyelidCrvGrp, self.localEyelidRig)
@@ -272,6 +251,57 @@ class Eyelids(buildEyelid.BuildEyelid):
         if localPar:
             mc.parent(self.localEyelidRig, localPar)
 
+        eyeAimCtl = self.getOut('eyeAimCtl')
+        eyeMakroLoc = self.getOut('eyeMakroloc')
+        if eyeAimCtl and eyeMakroLoc:
+            self.lowFleshyEyesSwitchMult = mc.createNode('multiplyDivide', name = self.side + '_lowFleshyEyesSwitch_MDN')
+            self.upFleshyEyesSwitchMult = mc.createNode('multiplyDivide', name = self.side + '_upFleshyEyesSwitch_MDN')
+
+            for i in [self.lowFleshyEyesSwitchMult,self.upFleshyEyesSwitchMult]:
+                for j in ['input2X', 'input2Y', 'input2Z']:
+                    mc.connectAttr(eyeAimCtl + '.fleshyEyes', i + '.' + j)
+            units = []
+            fac = -0.800
+            for i in range(2):
+                unit = mc.shadingNode('unitConversion', asUtility=True)
+                mc.setAttr(unit + '.conversionFactor', fac)
+                units.append(unit)
+                fac = 1.200
+            mc.connectAttr(eyeMakroLoc + '.rx', units[0] + '.input')
+            mc.connectAttr(eyeMakroLoc + '.ry', units[1] + '.input')
+            mc.connectAttr(units[0] + '.output', self.lowFleshyEyesSwitchMult + '.input1X')
+            mc.connectAttr(units[1] + '.output', self.lowFleshyEyesSwitchMult + '.input1Y')
+
+            units = []
+            fac = -1.800
+            for i in range(2):
+                unit = mc.shadingNode('unitConversion', asUtility=True)
+                mc.setAttr(unit + '.conversionFactor', fac)
+                units.append(unit)
+                fac = 1.200
+            mc.connectAttr(eyeMakroLoc + '.rx', units[0] + '.input')
+            mc.connectAttr(eyeMakroLoc + '.ry', units[1] + '.input')
+            mc.connectAttr(units[0] + '.output', self.upFleshyEyesSwitchMult + '.input1X')
+            mc.connectAttr(units[1] + '.output', self.upFleshyEyesSwitchMult + '.input1Y')
+
+            for i in [self.upmidCtlGrp, self.makroUpJntGrp]:
+                mc.connectAttr(self.upFleshyEyesSwitchMult + '.outputX', i + '.ty')
+                mc.connectAttr(self.upFleshyEyesSwitchMult + '.outputY', i + '.tx')
+
+            for i in [self.lowmidCtlGrp, self.makroLowJntGrp]:
+                mc.connectAttr(self.lowFleshyEyesSwitchMult + '.outputX', i + '.ty')
+                mc.connectAttr(self.lowFleshyEyesSwitchMult + '.outputY', i + '.tx')
+
+        #TODO: connect eyebrow  controls to the brow  locs  under brow makro loc later
+        self.browMidMakroDrvrLoc
+        midBrowCtl = self.getOut('midBrowCtl')
+        if midBrowCtl:
+            [mc.connectAttr(midBrowCtl + '.{}{}'.format(a, v), self.browMidMakroDrvrLoc + '.{}{}'.format(a, v)) for a in 'tr' for v in 'xyz']
+
+        # connect stuf to the cheekRaise under placement
+        #TODO: connect cheek control to the stuf later
+
+
     def createSettings(self):
         """
         returns the list of attributes that will be displayed in the rigCreator UI
@@ -282,17 +312,22 @@ class Eyelids(buildEyelid.BuildEyelid):
         # attrLib.addString(self.blueprintGrp, 'blu_globalScale', v='C_neck.headCtl')
         attrLib.addString(self.blueprintGrp, 'blu_ctlParent', v='C_head.topSquashFirst')
         attrLib.addString(self.blueprintGrp, 'blu_localParent', v='C_head.localRigs')
-        attrLib.addString(self.blueprintGrp, 'blu_upLidHdEdge', v=self.upLidHdCrv)
-        attrLib.addString(self.blueprintGrp, 'blu_lowLidHdEdge', v=self.lowLidHdCrv)
-        attrLib.addString(self.blueprintGrp, 'blu_upLidLdEdge', v=self.upLidLdCrv)
-        attrLib.addString(self.blueprintGrp, 'blu_lowLidLdEdge', v=self.lowLidLdCrv)
-        attrLib.addString(self.blueprintGrp, 'blu_lidBlinkEdge', v=self.lidBlinkCrv)
-        attrLib.addString(self.blueprintGrp, 'blu_uplidBlinkEdge', v=self.upLidBlink)
-        attrLib.addString(self.blueprintGrp, 'blu_lowlidBlinkEdge', v=self.lowLidBlink)
-        attrLib.addString(self.blueprintGrp, 'blu_upCreaseHdEdge', v=self.upCreaseHd)
-        attrLib.addString(self.blueprintGrp, 'blu_upCreaseLdEdge', v=self.upCreaseLd)
-        attrLib.addString(self.blueprintGrp, 'blu_lowCreaseHdEdge', v=self.lowCreaseHd)
-        attrLib.addString(self.blueprintGrp, 'blu_lowCreaseLdEdge', v=self.lowCreaseLd)
+        attrLib.addString(self.blueprintGrp, 'blu_eyeAimCtl', v=self.side + '_eye.eyeAimCtl')
+        attrLib.addString(self.blueprintGrp, 'blu_eyeMakroloc', v=self.side + '_eye.eyeMakroloc')
+        attrLib.addString(self.blueprintGrp, 'blu_midBrowCtl', v=self.side + '_eyebrows.midBrowCtl')
+
+        attrLib.addString(self.blueprintGrp, 'blu_geo', v=self.geo )
+        attrLib.addString(self.blueprintGrp, 'blu_upLidHdEdge', v=self.upLidHdEdge)
+        attrLib.addString(self.blueprintGrp, 'blu_lowLidHdEdge', v=self.lowLidHdEdge)
+        attrLib.addString(self.blueprintGrp, 'blu_upLidLdEdge', v=self.upLidLdEdge)
+        attrLib.addString(self.blueprintGrp, 'blu_lowLidLdEdge', v=self.lowLidLdEdge)
+        attrLib.addString(self.blueprintGrp, 'blu_lidBlinkEdge', v=self.lidBlinkEdge)
+        attrLib.addString(self.blueprintGrp, 'blu_uplidBlinkEdge', v=self.uplidBlinkEdge)
+        attrLib.addString(self.blueprintGrp, 'blu_lowlidBlinkEdge', v=self.lowlidBlinkEdge)
+        attrLib.addString(self.blueprintGrp, 'blu_upCreaseHdEdge', v=self.upCreaseHdEdge)
+        attrLib.addString(self.blueprintGrp, 'blu_upCreaseLdEdge', v=self.upCreaseLdEdge)
+        attrLib.addString(self.blueprintGrp, 'blu_lowCreaseHdEdge', v=self.lowCreaseHdEdge)
+        attrLib.addString(self.blueprintGrp, 'blu_lowCreaseLdEdge', v=self.lowCreaseLdEdge)
 
 
 

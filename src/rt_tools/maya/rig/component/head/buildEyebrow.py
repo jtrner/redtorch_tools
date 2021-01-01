@@ -109,6 +109,8 @@ class BuildEyebrow(eyebrowsTemplate.EyebrowsTemplate):
             self.mainCtls.append(ctl)
             mc.parent(grp, orientGrps[i])
 
+        self.setOut('midBrowCtl', self.mainCtls[2])
+
         self.currogatorCtrlOrientGrp = mc.createNode('transform', name  = self.side + '_currogatorCtrlOrient_GRP', p = self.mainCtls[1])
         trsLib.match(self.currogatorCtrlOrientGrp,self.browJnts[2] )
 

@@ -48,6 +48,7 @@ class EyeB(buildEye.BuildEye):
 
         # aim stuf to the eyeMaster aim driver loc
         attrLib.addFloat(self.aimCtl, ln = 'aim', min = 0,max = 1,dv = 1)
+        attrLib.addFloat(self.aimCtl, ln = 'fleshyEyes', min = 0,max = 1,dv = 1)
 
         aimCons = mc.aimConstraint([self.eyeMasterAimTargetLoc,self.eyeMasterAimOffTargetLoc ], self.eyeMasterAimDrvrLoc, aimVector=[0,0,1],
                          upVector=[0, 1, 0], worldUpType="object",

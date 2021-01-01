@@ -182,8 +182,6 @@ class BulidMisc(miscTemplate.MiscTemplate):
 
         # create cheekRaise and cheekSub ctls
         self.cheekRaiseOriCtlGrp = mc.createNode('transform', name = self.side + '_cheekRaiseori_GRP', p = self.miscCtls[1])
-        mc.move(0,1,0,self.cheekRaiseOriCtlGrp, r = True, ws = True)
-        #TODO:cheekRaiseOriCtlGrp should be matched to the cheek joint which is in eyelid module
         self.cheekSubCtlOriGrp = mc.createNode('transform', name = self.side + '_cheekSubCtrlori_GRP', p = self.miscCtls[1])
 
         for i in [self.cheekRaiseOriCtlGrp,self.cheekSubCtlOriGrp]:
@@ -196,5 +194,4 @@ class BulidMisc(miscTemplate.MiscTemplate):
             newName = grp.replace('Mod_GRP', '_CTL')
             ctl = mc.rename(ctl,newName)
             self.miscCtls.append(ctl)
-
 

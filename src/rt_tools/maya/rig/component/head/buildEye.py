@@ -118,20 +118,27 @@ class BuildEye(eyeTemplate.EyeTemplate):
         mc.parent(self.irisCtlGrp, self.eyeMasterAimDrvrLoc)
 
         # create eye aim hierarchy
-        self.eyeAimCtlOriGrp = mc.createNode('transform', name = 'eyeAim_CtlOriGRP')
-        mc.delete(mc.parentConstraint(self.eyeJoints[2],self.eyeAimCtlOriGrp,mo = False ))
-        mc.move(0,0,21, self.eyeAimCtlOriGrp ,r= True, ws = True)
-        mc.setAttr(self.eyeAimCtlOriGrp + '.tx', 0)
-        ctl, grp = funcs.createCtl(parent = self.eyeAimCtlOriGrp ,side = self.side,
-                                   scale = [10, 4, 4],shape = 'square', orient = (0,0,1))
-        self.aimCtl = mc.rename(ctl, 'C_eyeAim_CTL')
-        self.aimCtlGrp = mc.rename(grp, 'C_eyeAim_ZRO')
-        mc.parent(self.aimCtlGrp, self.eyeAimCtlOriGrp)
+        if self.side == 'L':
+            self.eyeAimCtlOriGrp = mc.createNode('transform', name = 'eyeAim_CtlOriGRP')
+            mc.delete(mc.parentConstraint(self.eyeJoints[2],self.eyeAimCtlOriGrp,mo = False ))
+            mc.move(0,0,21, self.eyeAimCtlOriGrp ,r= True, ws = True)
+            mc.setAttr(self.eyeAimCtlOriGrp + '.tx', 0)
+            ctl, grp = funcs.createCtl(parent = self.eyeAimCtlOriGrp ,side = self.side,
+                                       scale = [10, 4, 4],shape = 'square', orient = (0,0,1))
+            self.aimCtl = mc.rename(ctl, 'C_eyeAim_CTL')
+            self.aimCtlGrp = mc.rename(grp, 'C_eyeAim_ZRO')
+            mc.parent(self.aimCtlGrp, self.eyeAimCtlOriGrp)
 
+        if self.side == 'R':
+            self.eyeAimCtlOriGrp = 'eyeAim_CtlOriGRP'
+            self.aimCtl = 'C_eyeAim_CTL'
+
+        self.setOut('eyeAimCtl', self.aimCtl)
+        mult = [-1, 1][self.side == 'L']
         ctl, grp = funcs.createCtl(parent = self.aimCtl,side = self.side,
                                    scale = [3, 3, 3],shape = 'circle', orient = (0,0,1))
         self.sideAimCtl = mc.rename(ctl, self.side + '_eyeAim_CTL')
-        mc.move(3,0,0,self.sideAimCtl,r = True, ws = True)
+        mc.move(mult * 3,0,0,self.sideAimCtl,r = True, ws = True)
         mc.parent(self.sideAimCtl, self.aimCtl)
         mc.delete(grp)
         # create locator under sideAim ctl

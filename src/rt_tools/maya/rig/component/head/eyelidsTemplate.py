@@ -26,19 +26,31 @@ class EyelidsTemplate(template.Template):
 
     def build(self):
         super(EyelidsTemplate, self).build()
+        self.createGroups()
+        self.matches()
 
     def createGroups(self):
-        self.eyelidCtlGrp = mc.createNode('transform', name = 'eyeLidsCtl_GRP')
+        if self.side == 'L':
+            self.eyelidCtlGrp = mc.createNode('transform', name = 'eyeLidsCtl_GRP')
+            self.localEyelidRig = mc.createNode('transform', name='localEyeLids_Rig')
+
+        else:
+            self.eyelidCtlGrp = 'eyeLidsCtl_GRP'
+            self.localEyelidRig = 'localEyeLids_Rig'
         self.eyelidSocketGrp = mc.createNode('transform', name = self.side + '_eyeLidCtrlSocket_GRP',p = self.eyelidCtlGrp)
         self.eyelidsideCtlGrp = mc.createNode('transform', name = self.side + '_eyeLidCtrl_GRP',p = self.eyelidSocketGrp)
 
-        self.localEyelidRig = mc.createNode('transform', name = 'localEyeLids_Rig')
-        self.eyeCreaseGrp = mc.createNode('transform', name = 'eyeCrease_Rig', p = self.localEyelidRig)
-        self.eyeCreaseCrvGrp = mc.createNode('transform', name = self.name + '_creaseCrv_GRP', p = self.eyeCreaseGrp)
+        if self.side == 'L':
+            self.eyeCreaseGrp = mc.createNode('transform', name = 'eyeCrease_Rig', p = self.localEyelidRig)
+        else:
+            self.eyeCreaseGrp = 'eyeCrease_Rig'
         self.upcreaseLocGrp = mc.createNode('transform', name = self.side + '_UpCreaseLOC_GRP', p = self.eyeCreaseGrp)
         self.lowcreaseLocGrp = mc.createNode('transform', name = self.side + '_LowCreaseLOC_GRP', p = self.eyeCreaseGrp)
         self.creaseSharperJnt = mc.createNode('transform', name = self.side + '_CreaseShpJnt_ShaperJnt_GRP', p = self.eyeCreaseGrp)
-        self.eyelidLocalRig = mc.createNode('transform', name = 'eyeLids_Rig_GRP',p = self.localEyelidRig)
+        if self.side == 'L':
+            self.eyelidLocalRig = mc.createNode('transform', name = 'eyeLids_Rig_GRP',p = self.localEyelidRig)
+        else:
+            self.eyelidLocalRig = 'eyeLids_Rig_GRP'
         self.eyelidSharperJntGrp = mc.createNode('transform', name = self.name + '_ShaperJnt_GRP', p = self.eyelidLocalRig)
         self.eyelidCrvGrp = mc.createNode('transform', name = self.name + '_Crv_GRP')
         self.upLidLocGrp = mc.createNode('transform',name = self.name + '_up_LOC', p = self.eyelidLocalRig  )

@@ -76,8 +76,8 @@ class Eyebrows(buildEyebrow.BuildEyebrow):
             mc.connectAttr(followInBrowMult + '.outputX', self.mainCtlGrps[0] + '.ty')
 
         if self.side == 'R':
-            mc.connectAttr(self.mainCtls[0] + '.followInerBrow' , followInBrowMult + '.input1y')
-            mc.connectAttr(self.mainCtls[1] + '.ty' , followInBrowMult + '.input2y')
+            mc.connectAttr(self.mainCtls[0] + '.followInerBrow' , followInBrowMult + '.input1Y')
+            mc.connectAttr(self.mainCtls[1] + '.ty' , followInBrowMult + '.input2Y')
             mc.connectAttr(followInBrowMult + '.outputY', self.mainCtlGrps[0] + '.ty')
 
         mc.connectAttr(self.mainCtls[0] + '.Z' , self.mainCtlGrps[0]+ '.tz')
@@ -88,18 +88,29 @@ class Eyebrows(buildEyebrow.BuildEyebrow):
 
         mc.connectAttr(self.mainCtls[2] + '.Z',self.mainCtlGrps[2] + '.translateZ')
         #**********************************************************blendShapes*********************************************************
+        if self.side == 'L':
+            browShapes = mc.blendShape(self.geo, frontOfChain=True, n= 'eyebrow_bShp')[0]
+            targets =  ['localBrows_browsJNT_TGT','brow_L_InUp','brow_R_InUp','brow_L_OutUp','brow_R_OutUp',
+                      'brow_L_OutDown','brow_R_OutDown','brow_L_InDown','brow_R_InDown','brow_L_In','brow_R_In',
+                      'bodyBrow_L_InUp','bodyBrow_R_InUp','bodyBrow_L_OutUp','bodyBrow_R_OutUp','bodyBrow_L_OutDown',
+                      'bodyBrow_R_OutDown','bodyBrow_L_InDown','bodyBrow_R_InDown','bodyBrow_L_In','bodyBrow_R_In',
+                      'localBrows_bodyJNT_TGT','L_browInUPCor','R_browInUPCor','L_browInINDOWNxtraCorr','R_browInINDOWNxtraCorrr',
+                      'L_browInINUP_Corr','R_browInINUP_Corr']
+            for i in targets:
+                deformLib.blendShapeTarget(self.geo, i, browShapes)
+            mc.combinationShape(bs='eyebrow_bShp', cti=25, cm=0, dti=[11, 19])
+            mc.combinationShape(bs='eyebrow_bShp', cti=26, cm=0, dti=[12, 20])
 
-        browShapes = mc.blendShape(self.geo, frontOfChain=True, n='eyebrow_bShp')[0]
-        targets =  ['localBrows_browsJNT_TGT','brow_L_InUp','brow_R_InUp','brow_L_OutUp','brow_R_OutUp',
-                  'brow_L_OutDown','brow_R_OutDown','brow_L_InDown','brow_R_InDown','brow_L_In','brow_R_In',
-                  'bodyBrow_L_InUp','bodyBrow_R_InUp','bodyBrow_L_OutUp','bodyBrow_R_OutUp','bodyBrow_L_OutDown',
-                  'bodyBrow_R_OutDown','bodyBrow_L_InDown','bodyBrow_R_InDown','bodyBrow_L_In','bodyBrow_R_In',
-                  'localBrows_bodyJNT_TGT','L_browInUPCor','R_browInUPCor','L_browInINDOWNxtraCorr','R_browInINDOWNxtraCorrr',
-                  'L_browInINUP_Corr','R_browInINUP_Corr']
-        for i in targets:
-            deformLib.blendShapeTarget(self.geo, i, browShapes)
-        mc.combinationShape(bs='eyebrow_bShp', cti=25, cm=0, dti=[11, 19])
-        mc.combinationShape(bs='eyebrow_bShp', cti=26, cm=0, dti=[12, 20])
+
+
+        if self.side == 'R':
+            browShapes = 'eyebrow_bShp'
+            targets =  ['localBrows_browsJNT_TGT','brow_L_InUp','brow_R_InUp','brow_L_OutUp','brow_R_OutUp',
+                      'brow_L_OutDown','brow_R_OutDown','brow_L_InDown','brow_R_InDown','brow_L_In','brow_R_In',
+                      'bodyBrow_L_InUp','bodyBrow_R_InUp','bodyBrow_L_OutUp','bodyBrow_R_OutUp','bodyBrow_L_OutDown',
+                      'bodyBrow_R_OutDown','bodyBrow_L_InDown','bodyBrow_R_InDown','bodyBrow_L_In','bodyBrow_R_In',
+                      'localBrows_bodyJNT_TGT','L_browInUPCor','R_browInUPCor','L_browInINDOWNxtraCorr','R_browInINDOWNxtraCorrr',
+                      'L_browInINUP_Corr','R_browInINUP_Corr']
 
         # connect stuf to the weight of blendShapes
         followInerBrowPma = mc.createNode('plusMinusAverage', name = 'followinnerBrow_PMA')
@@ -108,7 +119,7 @@ class Eyebrows(buildEyebrow.BuildEyebrow):
             mc.connectAttr(self.mainCtlGrps[0] + '.ty',followInerBrowPma + '.input2D[1].input2Dx')
             mc.connectAttr(self.mainCtls[0] + '.ty',followInerBrowPma + '.input2D[0].input2Dx')
         if self.side == 'R':
-            mc.connectAttr(self.mainCtlGrps[1] + '.Z',followInerBrowPma + '.input2D[1].input2Dy')
+            mc.connectAttr(self.mainCtlGrps[0] + '.ty',followInerBrowPma + '.input2D[1].input2Dy')
             mc.connectAttr(self.mainCtls[0] + '.ty',followInerBrowPma + '.input2D[0].input2Dy')
 
         if self.side == 'L':

@@ -28,9 +28,14 @@ class MiscTemplate(template.Template):
 
     def build(self):
         super(MiscTemplate, self).build()
+        self.createGroups()
+        self.matches()
 
     def createGroups(self):
-        self.localMiscJntGrp = mc.createNode('transform', name = 'localMiscjnt_GRP')
+        if self.side == 'L':
+            self.localMiscJntGrp = mc.createNode('transform', name = 'localMiscjnt_GRP')
+        else:
+            self.localMiscJntGrp = 'localMiscjnt_GRP'
         self.appleOriGrp = mc.createNode('transform', name = self.side + '_appleOri_GRP', p = self.localMiscJntGrp)
         self.appleModGrp = mc.createNode('transform', name = self.side + '_appleMod_GRP', p = self.appleOriGrp)
 

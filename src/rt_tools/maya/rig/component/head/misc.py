@@ -106,6 +106,35 @@ class Misc(buildMisc.BulidMisc):
         if localPar:
             mc.parent(self.localMiscJntGrp, localPar)
 
+        cheekMod = self.getOut('cheekJntMod')
+        cheekRaise = self.getOut('cheekRaiseJntZ')
+
+        if cheekMod and cheekRaise:
+            self.miscCtls[-2],self.miscCtls[1]
+            cheekRaisePma = mc.createNode('transform', name = self.side + '_cheekRaise_PMA')
+            mc.connectAttr(self.miscCtls[1] + '.tx', cheekRaisePma + '.input3D[0].input3Dx')
+            mc.connectAttr(self.miscCtls[1] + '.ty', cheekRaisePma + '.input3D[0].input3Dy')
+            mc.connectAttr(self.miscCtls[1] + '.z', cheekRaisePma + '.input3D[0].input3Dz')
+
+            mc.connectAttr(self.miscCtls[-2] + '.tx', cheekRaisePma + '.input3D[1].input3Dx')
+            mc.connectAttr(self.miscCtls[-2] + '.ty', cheekRaisePma + '.input3D[1].input3Dy')
+            mc.connectAttr(self.miscCtls[-2] + '.z', cheekRaisePma + '.input3D[1].input3Dz')
+            mc.connectAttr(cheekRaisePma + '.output3Dz', cheekRaise + '.translateZ')
+            unit = mc.shadingNode('unitConversion', asUtility=True)
+            mc.setAttr(unit + '.conversionFactor', -0.500)
+            mc.connectAttr(self.cheekRaisePma + '.output3Dy', unit + '.input')
+            mc.connectAttr(unit + '.output', cheekRaise + '.rotateX')
+
+            unit = mc.shadingNode('unitConversion', asUtility=True)
+            mc.setAttr(unit + '.conversionFactor', 0.400)
+            mc.connectAttr(self.cheekRaisePma + '.output3Dx', unit + '.input')
+            mc.connectAttr(unit + '.output', cheekMod + '.rotateZ')
+
+        #TODO:cheekRaiseOriCtlGrp should be matched to the cheek joint which is in eyelid module
+        cheekRiseEntJnt = self.getOut('cheekRiseEndJnt')
+        if cheekRiseEntJnt:
+            trsLib.match(self.cheekRaiseOriCtlGrp, t =cheekRiseEntJnt ,r =cheekRiseEntJnt )
+            mc.move(0, -20, 0.5, self.cheekRaiseOriCtlGrp, r=True, ws=True)
 
     def createSettings(self):
         """
@@ -120,4 +149,9 @@ class Misc(buildMisc.BulidMisc):
         attrLib.addString(self.blueprintGrp, 'blu_ctlParentD', v='C_head.squashThird')
         attrLib.addString(self.blueprintGrp, 'blu_appleParent', v='C_head.facialCtlGrp')
         attrLib.addString(self.blueprintGrp, 'blu_localParent', v='C_head.localRigs')
+        attrLib.addString(self.blueprintGrp, 'blu_cheekJntMod', v=self.side + '_eyelid.cheekJntMod')
+        attrLib.addString(self.blueprintGrp, 'blu_cheekRaiseJntZ', v=self.side + '_eyelid.cheekRaiseJntZ')
+        attrLib.addString(self.blueprintGrp, 'blu_cheekRiseEndJnt', v=self.side + '_eyelidscheekRiseEndJnt')
+
+
 
