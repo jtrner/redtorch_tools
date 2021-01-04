@@ -177,16 +177,17 @@ class BuildHead(headTemplate.HeadTemplate):
 
     def build(self):
         super(BuildHead, self).build()
-        # funcs.detachHead(geoName = self.geo,edge = self.headEdge,name = 'localEyeLid_GEO', movement = self.headMovement)
-        #
-        # self.localLipsGeo = mc.duplicate('localEyeLid_GEO', name = 'localLips_GEO')
-        # mc.move(0,50, 0,self.localLipsGeo ,r = True, ws = True )
-        #
-        # self.localBrowsGeo = mc.duplicate('localLips_GEO', name = 'localBrow_GEO')
-        # mc.move(0,50, 0,self.localBrowsGeo ,r = True, ws = True )
-        #
-        # self.localMiscGeo = mc.duplicate('localBrow_GEO', name = 'localMisc_GEO')
-        # mc.move(0,50, 0,self.localMiscGeo ,r = True, ws = True )
+        funcs.detachHead(geoName = self.geo,edge = self.headEdge,name = 'localEyeLid_GEO', movement = self.headMovement)
+
+        self.localLipsGeo = mc.duplicate('localEyeLid_GEO', name = 'localLips_GEO')
+        mc.move(0,self.headMovement, 0,self.localLipsGeo ,r = True, ws = True )
+        self.setOut('lipsGeo', self.localLipsGeo[0] )
+
+        self.localBrowsGeo = mc.duplicate('localLips_GEO', name = 'localBrow_GEO')
+        mc.move(0,self.headMovement, 0,self.localBrowsGeo ,r = True, ws = True )
+
+        self.localMiscGeo = mc.duplicate('localBrow_GEO', name = 'localMisc_GEO')
+        mc.move(0,self.headMovement, 0,self.localMiscGeo ,r = True, ws = True )
 
 
         # create head buttom ctl

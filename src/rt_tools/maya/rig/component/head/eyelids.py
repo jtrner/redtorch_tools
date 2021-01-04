@@ -292,14 +292,9 @@ class Eyelids(buildEyelid.BuildEyelid):
                 mc.connectAttr(self.lowFleshyEyesSwitchMult + '.outputX', i + '.ty')
                 mc.connectAttr(self.lowFleshyEyesSwitchMult + '.outputY', i + '.tx')
 
-        #TODO: connect eyebrow  controls to the brow  locs  under brow makro loc later
-        self.browMidMakroDrvrLoc
         midBrowCtl = self.getOut('midBrowCtl')
         if midBrowCtl:
             [mc.connectAttr(midBrowCtl + '.{}{}'.format(a, v), self.browMidMakroDrvrLoc + '.{}{}'.format(a, v)) for a in 'tr' for v in 'xyz']
-
-        # connect stuf to the cheekRaise under placement
-        #TODO: connect cheek control to the stuf later
 
 
     def createSettings(self):

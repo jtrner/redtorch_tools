@@ -265,7 +265,7 @@ class LipsTemplate(template.Template):
         trsLib.match(self.ctlPivotFollowOri, t = self.mouthPiv,r = self.mouthPiv)
 
         trsLib.match(self.lipCtlFollowLoc, t= self.mouthPiv,r = self.mouthPiv)
-        mc.move(0,-20, 0, self.lipCtlFollowLoc, r = True, ws = True)
+        mc.move(0,-1 *float(self.movement), 0, self.lipCtlFollowLoc, r = True, ws = True)
 
 
         self.parenting()

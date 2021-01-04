@@ -22,22 +22,26 @@ reload(strLib)
 reload(deformLib)
 
 def detachHead(geoName = '',edge = '',name = '', movement = 50):
+    mc.select(None)
     if edge:
-        mc.select(edge)
+        for i in edge:
+            mc.select(geoName + '.e[' + i + ']', add=True)
     else:
         mc.ls(sl = True)
     mc.DetachComponent()
     mc.select(geoName)
     mc.polySeparate(n = name , ch = False)
-    head = mc.duplicate(name)
+    head = mc.duplicate(name)[0]
+    print(head)
     mc.select(name, r = True)
     mc.select(name + '1', add = True)
-    mc.polyUnite(ch = False ,name = geoName, muv = 1)
-    mc.select(geoName +'.vtx[:]')
+    mc.polyUnite(ch = False ,name = 'newHead', muv = 1)
+    mc.select('newHead' +'.vtx[:]')
     mc.polyMergeVertex(d = 0.01, am = True, ch = False)
     mc.select(cl = True)
+    head = head.split('|')[-1]
+    mc.move(0,movement, 0, head, r = True, ws = True)
     newName = mc.rename(head, name)
-    mc.setAttr(newName + '.ty', movement)
     return newName
 
 def createCtl(parent = '',side = 'L',scale = [1, 1, 1],shape = 'square', orient = (0,1,0)):
@@ -55,7 +59,6 @@ def createCtl(parent = '',side = 'L',scale = [1, 1, 1],shape = 'square', orient 
 
     return ctl.name,ctl.zro
 
-
 def locOnCrv(name = '', parent = '', numLocs = 3, crv = '',
              upCurve = '', paramStart = 0.5,paramEnd = 0.5, upAxis = 'y', posJnts = '',translate = False):
     param = paramStart
@@ -64,7 +67,8 @@ def locOnCrv(name = '', parent = '', numLocs = 3, crv = '',
         loc = mc.createNode('transform', name = name + '{}'.format(i), p = parent)
         pos = mc.xform(posJnts[i-1], q=True, ws=True, t=True)
         mc.setAttr(loc + '.t', *pos)
-        crvLib.attach(node = loc, curve = crv, upCurve = upCurve,param = param, upAxis = upAxis,translate = translate)
+        crvLib.attachToCurve(node=loc, crv=crv, uParam=param, upObj=upCurve, translate = translate)
+        #crvLib.attach(node = loc, curve = crv, upCurve = upCurve,param = param, upAxis = upAxis,translate = translate)
         param -= paramEnd
         tempList.append(loc)
     return tempList
@@ -73,7 +77,7 @@ def cheekRaiseHierarchy(name = '',parent = '',side = 'L', position= ''):
     cheekJntZ = mc.createNode('transform', name = side + '_cheeckRaiseJntZ',p = parent)
     cheekJntOri = mc.createNode('transform', name = side + '_cheekRaiseJntOri', p = cheekJntZ)
     trsLib.match(cheekJntOri,t = position, r = position)
-    cheekJntMod = mc.createNode('transform', name = side + 'cheeckRaiseJntMod', p = cheekJntOri)
+    cheekJntMod = mc.createNode('transform', name = side + '_cheeckRaiseJntMod', p = cheekJntOri)
     return cheekJntMod,cheekJntZ
 
 def sharpJntsHierarchy(name = '', parent = '',joint = '',middle = False):
@@ -187,7 +191,7 @@ def createZipperJnts(name = '', crv = '',upCurve = '' ,posJnts = '', parent = ''
     ZipperTargetLoc = mc.createNode('transform', name = name + 'ZipperTargetloc_GRP', p = parent)
 
     tempList = locOnCrv(name = 'result', parent = ZipperTargetLoc, numLocs = 9, crv = crv,
-                 upCurve = upCurve, paramStart =0.97 ,paramEnd = 0.118, upAxis = 'y', posJnts = posJnts)
+                 upCurve = upCurve, paramStart=5.9, paramEnd=0.72, upAxis = 'y', posJnts = posJnts)
     for i in range(9):
         trsLib.match(posJnts[i-1], t = tempList[i-1],r = tempList[i-1])
         mc.makeIdentity(posJnts[i-1], apply = True, t = True, r = True, s = True)
@@ -425,7 +429,7 @@ def createMainHierarchyJnts(name = '', parent = '', middle = False):
         outModLocShape = mc.createNode('locator', name=name + 'ModifyShape_LOC', p=outModLocTrans)
         return  outModLocTrans, mainMod
 
-def createNoseCtls(name = '', parent = '',mainSnap = '', cummelaSnap = '', leftSnap = '', rightSnap = '',side = 'C'):
+def createNoseCtls(name = '', parent = '',mainSnap = '', cummelaSnap = '', leftSnap = '', rightSnap = '',side = 'C', movement = ''):
     noseCtlOri = mc.createNode('transform', name = 'noseCtrlBaseori_GRP', p = parent)
     trsLib.match(noseCtlOri, t = mainSnap, r = mainSnap)
     noseCtlMakro = mc.createNode('transform', name = 'noseCtrlMAKRO_GRP', p = noseCtlOri)
@@ -445,8 +449,7 @@ def createNoseCtls(name = '', parent = '',mainSnap = '', cummelaSnap = '', leftS
                                  matchRotate = noseCtlMakro)
         ctls.append(ctl.name)
         ctlGrp.append(ctl.zro)
-    print(ctls)
-    print(ctlGrp)
+
     noseCtl = mc.rename(ctls[0], 'nose_CTL')
     noseCtlModGrp = mc.rename(ctlGrp[0], 'noseCtlMod_GRP')
     mc.parent(noseCtlModGrp, noseCtlMakro)
@@ -485,7 +488,7 @@ def createNoseCtls(name = '', parent = '',mainSnap = '', cummelaSnap = '', leftS
     l_nostrilMakro = mc.createNode('transform', name = 'L_nostrilCtrlMAKRO_GRP' , p = l_nostrilCtlOri)
     trsLib.match(l_nostrilCtlGrp, t = l_nostrilMakro, r = l_nostrilMakro)
     mc.parent(l_nostrilCtlGrp,l_nostrilMakro)
-    mc.move(0, -18, 0, noseCtlOri, r=True, ws=True)
+    mc.move(0, -1 * float(movement), 0, noseCtlOri, r=True, ws=True)
 
     noseCtl = noseCtl.split('|')[-1]
     noseCtlBase = noseCtlBase.split('|')[-1]
@@ -771,7 +774,7 @@ def createTongueHierarchy(jnt = '',parent = '', name = '', side = '', scale = [1
 
     return ctl.name,ctl.zro
 
-def createTeethHierarchy(jnt = '', parent ='', side = '', scale = [1,1,1], prefix = '', leftPos = '', rightPos = ''):
+def createTeethHierarchy(jnt = '', parent ='', side = '', scale = [1,1,1], prefix = '', leftPos = '', rightPos = '', movement = ''):
     teethMouthSquashMakroGrp = mc.createNode('transform', name = prefix + '_TeethmouthSquashMAKRO_GRP', p = parent)
     teethMakroGrp = mc.createNode('transform', name =prefix + '_TeethMAKRO_GRP', p = teethMouthSquashMakroGrp)
     TeethCtlGrp = mc.createNode('transform', name =prefix + '_TeethCtrl_GRP', p = teethMakroGrp)
@@ -830,8 +833,8 @@ def createTeethHierarchy(jnt = '', parent ='', side = '', scale = [1,1,1], prefi
 
     trsLib.match(l_teethOri, t = leftPos, r = leftPos)
     trsLib.match(r_teethOri, t = rightPos, r = rightPos)
-    mc.move(0,-20,0, l_teethOri, r = True, ws = True)
-    mc.move(0,-20,0, r_teethOri, r = True, ws = True)
+    mc.move(0,-1 * float(movement),0, l_teethOri, r = True, ws = True)
+    mc.move(0,-1 * float(movement),0, r_teethOri, r = True, ws = True)
 
     controls.append(teethCtl)
     groups.append(teethGrp)

@@ -42,7 +42,7 @@ class Misc(buildMisc.BulidMisc):
     def build(self):
         super(Misc, self).build()
         # connect stuf to the transform above misc joints
-        for i in [self.miscCtls[-1],self.miscCtls[1]]:
+        for i in [self.miscCtls[-1],self.miscCtls[1], self.miscCtls[-2]]:
             attrLib.addFloat(i, ln = 'Z', dv = 0)
         self.miscCtls[-1],self.miscCtls[1],self.cheeckModGrp
         self.cheekSubPma = mc.createNode('plusMinusAverage', name = self.side + '_cheeksub_PMA')
@@ -111,29 +111,28 @@ class Misc(buildMisc.BulidMisc):
 
         if cheekMod and cheekRaise:
             self.miscCtls[-2],self.miscCtls[1]
-            cheekRaisePma = mc.createNode('transform', name = self.side + '_cheekRaise_PMA')
+            cheekRaisePma = mc.createNode('plusMinusAverage', name = self.side + '_cheekRaise_PMA')
             mc.connectAttr(self.miscCtls[1] + '.tx', cheekRaisePma + '.input3D[0].input3Dx')
             mc.connectAttr(self.miscCtls[1] + '.ty', cheekRaisePma + '.input3D[0].input3Dy')
-            mc.connectAttr(self.miscCtls[1] + '.z', cheekRaisePma + '.input3D[0].input3Dz')
+            mc.connectAttr(self.miscCtls[1] + '.Z', cheekRaisePma + '.input3D[0].input3Dz')
 
             mc.connectAttr(self.miscCtls[-2] + '.tx', cheekRaisePma + '.input3D[1].input3Dx')
             mc.connectAttr(self.miscCtls[-2] + '.ty', cheekRaisePma + '.input3D[1].input3Dy')
-            mc.connectAttr(self.miscCtls[-2] + '.z', cheekRaisePma + '.input3D[1].input3Dz')
+            mc.connectAttr(self.miscCtls[-2] + '.Z', cheekRaisePma + '.input3D[1].input3Dz')
             mc.connectAttr(cheekRaisePma + '.output3Dz', cheekRaise + '.translateZ')
             unit = mc.shadingNode('unitConversion', asUtility=True)
             mc.setAttr(unit + '.conversionFactor', -0.500)
-            mc.connectAttr(self.cheekRaisePma + '.output3Dy', unit + '.input')
+            mc.connectAttr(cheekRaisePma + '.output3Dy', unit + '.input')
             mc.connectAttr(unit + '.output', cheekRaise + '.rotateX')
 
             unit = mc.shadingNode('unitConversion', asUtility=True)
             mc.setAttr(unit + '.conversionFactor', 0.400)
-            mc.connectAttr(self.cheekRaisePma + '.output3Dx', unit + '.input')
+            mc.connectAttr(cheekRaisePma + '.output3Dx', unit + '.input')
             mc.connectAttr(unit + '.output', cheekMod + '.rotateZ')
 
-        #TODO:cheekRaiseOriCtlGrp should be matched to the cheek joint which is in eyelid module
         cheekRiseEntJnt = self.getOut('cheekRiseEndJnt')
         if cheekRiseEntJnt:
-            trsLib.match(self.cheekRaiseOriCtlGrp, t =cheekRiseEntJnt ,r =cheekRiseEntJnt )
+            trsLib.match(self.cheekRaiseOriCtlGrp, t =cheekRiseEntJnt )
             mc.move(0, -20, 0.5, self.cheekRaiseOriCtlGrp, r=True, ws=True)
 
     def createSettings(self):
@@ -151,7 +150,7 @@ class Misc(buildMisc.BulidMisc):
         attrLib.addString(self.blueprintGrp, 'blu_localParent', v='C_head.localRigs')
         attrLib.addString(self.blueprintGrp, 'blu_cheekJntMod', v=self.side + '_eyelid.cheekJntMod')
         attrLib.addString(self.blueprintGrp, 'blu_cheekRaiseJntZ', v=self.side + '_eyelid.cheekRaiseJntZ')
-        attrLib.addString(self.blueprintGrp, 'blu_cheekRiseEndJnt', v=self.side + '_eyelidscheekRiseEndJnt')
+        attrLib.addString(self.blueprintGrp, 'blu_cheekRiseEndJnt', v=self.side + '_eyelid.cheekRiseEndJnt')
 
 
 

@@ -36,7 +36,10 @@ class EyebrowsTemplate(template.Template):
             self.localBrowsGrp = mc.createNode('transform', name = 'localBrows_GRP')
         else:
             self.localBrowsGrp =  'localBrows_GRP'
-        self.browJntGrp = mc.createNode('transform', name = 'browJnt_GRP',p = self.localBrowsGrp)
+        if self.side == 'L':
+            self.browJntGrp = mc.createNode('transform', name = 'browJnt_GRP',p = self.localBrowsGrp)
+        else:
+            self.browJntGrp = 'browJnt_GRP'
         self.browInOrientGrp = mc.createNode('transform', name = self.side + '_browInOrient_GRP', p = self.browJntGrp)
         self.browMidOrientGrp = mc.createNode('transform', name = self.side + '_browMidOrient_GRP', p = self.browJntGrp)
         self.browOutOrientGrp = mc.createNode('transform', name = self.side + '_browOutOrient_GRP', p = self.browJntGrp)

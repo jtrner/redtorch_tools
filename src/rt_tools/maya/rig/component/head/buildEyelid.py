@@ -120,7 +120,7 @@ class BuildEyelid(eyelidsTemplate.EyelidsTemplate):
             self.cheeckJoints.append(jnt)
 
         self.orientJnts(self.cheeckJoints)
-        self.setOut('cheekRiseEndJnt',self.cheeckJoints)
+        self.setOut('cheekRiseEndJnt',self.cheeckJoints[-1])
 
     def orientJnts(self, jnts):
         upLoc = mc.createNode('transform')
