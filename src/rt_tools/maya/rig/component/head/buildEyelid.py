@@ -42,28 +42,28 @@ class BuildEyelid(eyelidsTemplate.EyelidsTemplate):
         self.blueprints['eyelidFlood'] = '{}_eyelidFlood_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['eyelidFlood']):
             mc.joint(self.blueprintGrp, name=self.blueprints['eyelidFlood'])
-            mc.xform(self.blueprints['eyelidFlood'], ws=True, t=(17.136, 222.148, -3))
+            mc.xform(self.blueprints['eyelidFlood'], ws=True, t=(0, self.movement + 180, -3))
 
 
         self.blueprints['eyelidStart'] = '{}_eyelidStart_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['eyelidStart']):
             mc.joint(self.blueprintGrp, name = self.blueprints['eyelidStart'])
-            mc.xform(self.blueprints['eyelidStart'], ws = True, t = (22.448, 222.628, 0.549))
+            mc.xform(self.blueprints['eyelidStart'], ws = True, t = (2.784, self.movement + 177.542, 0.549))
 
         self.blueprints['eyelidEnd'] = '{}_eyelidEnd_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['eyelidEnd']):
             mc.joint(self.blueprints['eyelidStart'], name = self.blueprints['eyelidEnd'])
-            mc.xform(self.blueprints['eyelidEnd'], ws = True, t = (22.448, 222.628, 2.135))
+            mc.xform(self.blueprints['eyelidEnd'], ws = True, t = (2.784, self.movement + 177.542, 2.135))
 
         self.blueprints['cheekRaiseStart'] = '{}_cheekRaiseStart_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['cheekRaiseStart']):
             mc.joint(self.blueprintGrp, name = self.blueprints['cheekRaiseStart'])
-            mc.xform(self.blueprints['cheekRaiseStart'], ws = True, t = (22.448, 222.628, -1))
+            mc.xform(self.blueprints['cheekRaiseStart'], ws = True, t = (2.86, self.movement  + 177.141, -1))
 
         self.blueprints['cheekRaiseEnd'] = '{}_cheekRaiseEnd_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['cheekRaiseEnd']):
             mc.joint(self.blueprints['cheekRaiseStart'] , name = self.blueprints['cheekRaiseEnd'])
-            mc.xform(self.blueprints['cheekRaiseEnd'], ws = True, t = (22.448,220.187, 2.059))
+            mc.xform(self.blueprints['cheekRaiseEnd'], ws = True, t = (2.86,self.movement + 174.7, 2.059))
 
     def createJoints(self):
         par = self.moduleGrp
@@ -135,17 +135,32 @@ class BuildEyelid(eyelidsTemplate.EyelidsTemplate):
         super(BuildEyelid, self).build()
         # connect edge datas to the curves
         if self.side == 'L':
-            self.upLidHdEdge = crvLib.edgeToCurve(geo = self.geo, edges = self.upLidHdEdge, name ='L_upLidHd')
-            self.lowLidHdEdge = crvLib.edgeToCurve(geo = self.geo, edges = self.lowLidHdEdge, name ='L_lowLidHd')
-            self.upLidLdEdge = crvLib.edgeToCurve(geo = self.geo, edges = self.upLidLdEdge, name ='L_upLidLd')
-            self.lowLidLdEdge = crvLib.edgeToCurve(geo = self.geo, edges = self.lowLidLdEdge, name ='L_lowLidLd')
-            self.lidBlinkEdge = crvLib.edgeToCurve(geo = self.geo, edges = self.lidBlinkEdge, name ='L_lidBlink')
-            self.uplidBlinkEdge = crvLib.edgeToCurve(geo = self.geo, edges = self.uplidBlinkEdge, name ='L_upLidBlink')
-            self.lowlidBlinkEdge = crvLib.edgeToCurve(geo = self.geo, edges = self.lowlidBlinkEdge, name ='L_lowLidBlink')
-            self.upCreaseHdEdge = crvLib.edgeToCurve(geo = self.geo, edges = self.upCreaseHdEdge, name ='L_upCreaseHd')
-            self.lowCreaseHdEdge = crvLib.edgeToCurve(geo = self.geo, edges = self.lowCreaseHdEdge, name ='L_lowCreaseHd')
-            self.upCreaseLdEdge = crvLib.edgeToCurve(geo = self.geo, edges = self.upCreaseLdEdge, name ='L_upCreaseLd')
-            self.lowCreaseLdEdge = crvLib.edgeToCurve(geo = self.geo, edges = self.lowCreaseLdEdge, name ='L_lowCreaseLd')
+            self.upLidHdEdge = crvLib.edgeToCurve(geo = self.eyelidsGeo, edges = self.upLidHdEdge, name ='L_upLidHd')
+            self.lowLidHdEdge = crvLib.edgeToCurve(geo = self.eyelidsGeo, edges = self.lowLidHdEdge, name ='L_lowLidHd')
+            self.upLidLdEdge = crvLib.edgeToCurve(geo = self.eyelidsGeo, edges = self.upLidLdEdge, name ='L_upLidLd')
+            self.lowLidLdEdge = crvLib.edgeToCurve(geo = self.eyelidsGeo, edges = self.lowLidLdEdge, name ='L_lowLidLd')
+            self.lidBlinkEdge = crvLib.edgeToCurve(geo = self.eyelidsGeo, edges = self.lidBlinkEdge, name ='L_lidBlink')
+            self.uplidBlinkEdge = crvLib.edgeToCurve(geo = self.eyelidsGeo, edges = self.uplidBlinkEdge, name ='L_upLidBlink')
+            self.lowlidBlinkEdge = crvLib.edgeToCurve(geo = self.eyelidsGeo, edges = self.lowlidBlinkEdge, name ='L_lowLidBlink')
+            self.upCreaseHdEdge = crvLib.edgeToCurve(geo = self.eyelidsGeo, edges = self.upCreaseHdEdge, name ='L_upCreaseHd')
+            self.lowCreaseHdEdge = crvLib.edgeToCurve(geo = self.eyelidsGeo, edges = self.lowCreaseHdEdge, name ='L_lowCreaseHd')
+            self.upCreaseLdEdge = crvLib.edgeToCurve(geo = self.eyelidsGeo, edges = self.upCreaseLdEdge, name ='L_upCreaseLd')
+            self.lowCreaseLdEdge = crvLib.edgeToCurve(geo = self.eyelidsGeo, edges = self.lowCreaseLdEdge, name ='L_lowCreaseLd')
+
+            for i in [self.upLidHdEdge, self.lowLidHdEdge, self.upLidLdEdge, self.lowLidLdEdge,
+                      self.lidBlinkEdge,self.uplidBlinkEdge, self.lowlidBlinkEdge, self.upCreaseHdEdge,
+                      self.lowCreaseHdEdge,self.upCreaseLdEdge, self.lowCreaseLdEdge]:
+                mc.select(i, r=True)
+                crv = mc.rebuildCurve(i, ch=False, rpo=1, rt=0, end=1, kr=2, kcp=0, kep=0, kt=1, s=6, d=3, tol=0.01)[0]
+                tempJnts = jntLib.create_on_curve(curve= crv, numOfJoints=3, parent=False, description='C_base', radius=1)
+                startTx = mc.getAttr(tempJnts[0] + '.tx')
+                endTx = mc.getAttr(tempJnts[-1] + '.tx')
+                if startTx > endTx:
+                    crv = mc.reverseCurve(crv, ch=1, rpo=1)[0]
+                i = crv
+                center = mc.objectCenter(i, gl=True)
+                mc.xform(i, pivots=center)
+                mc.delete(tempJnts)
         else:
             self.upLidHdEdge = trsLib.duplicate('L_upLidHd_CRV', 'L', 'R',hierarchy=True)
             self.upLidHdEdge = self.upLidHdEdge[0]
@@ -180,14 +195,15 @@ class BuildEyelid(eyelidsTemplate.EyelidsTemplate):
                 if isLock:
                     mc.setAttr(i + '.sx', lock=True)
 
+
         self.tempCurve = mc.duplicate(self.upLidHdEdge)[0]
         [mc.setAttr(self.tempCurve + '.{}{}'.format(a,v), lock = False) for a in 'trs' for v in 'xyz']
-        mc.setAttr(self.tempCurve + '.ty', 2)
+        mc.setAttr(self.tempCurve + '.ty', 10)
 
         # create some nodes on upLidHd
         tempJnts= jntLib.create_on_curve(self.upLidHdEdge, numOfJoints = 13, parent = False, description=self.name, radius= 0.2)
         tempList = funcs.locOnCrv(name = 'result', parent = self.upLidLocGrp, numLocs = 13, crv = self.upLidHdEdge,
-                                  upCurve = self.tempCurve, paramStart = 0.99, paramEnd = 0.082, upAxis = 'y', posJnts = tempJnts)
+                                  upCurve = self.tempCurve, paramStart = 5.99, paramEnd = 0.55, upAxis = 'y', posJnts = tempJnts)
         mc.delete(tempJnts)
         # renaming the locators
         self.upEyelidLocators = []
@@ -229,7 +245,7 @@ class BuildEyelid(eyelidsTemplate.EyelidsTemplate):
 
         self.tempOnLd = jntLib.create_on_curve(self.upLidHdEdge, numOfJoints = 5, parent = False, description=self.name, radius= 0.4)
         tempList = funcs.locOnCrv(name = 'result', parent = self.upLidLocGrp, numLocs = 5, crv = self.upLidHdEdge,
-                                  upCurve = self.tempCurve, paramStart = 0.99, paramEnd = 0.247, upAxis = 'y', posJnts = self.tempOnLd)
+                                  upCurve = self.tempCurve, paramStart = 5.99, paramEnd = 1.5, upAxis = 'y', posJnts = self.tempOnLd)
         for i,j in zip(tempList, self.tempOnLd):
             mc.delete(mc.parentConstraint(i,j, skipRotate = ['z', 'x'],mo = False))
             mc.makeIdentity(j, apply = True, r = True)
@@ -260,7 +276,7 @@ class BuildEyelid(eyelidsTemplate.EyelidsTemplate):
         # create stuf on the up crease hd curve
         self.tempupcrease= jntLib.create_on_curve(self.upCreaseHdEdge, numOfJoints = 13, parent = False, description=self.name, radius= 0.2)
         tempList = funcs.locOnCrv(name = 'result', parent = self.upcreaseLocGrp, numLocs = 13, crv = self.upCreaseHdEdge,
-                                  upCurve = self.tempCurve, paramStart = 0.99, paramEnd = 0.08, upAxis = 'y', posJnts = self.tempupcrease, translate = True)
+                                  upCurve = self.tempCurve, paramStart = 5.99, paramEnd = 0.5, upAxis = 'y', posJnts = self.tempupcrease, translate = True)
 
         self.uplidCreaseBndJnts = []
         count = 0
@@ -278,7 +294,7 @@ class BuildEyelid(eyelidsTemplate.EyelidsTemplate):
         # create joints on up craese ld curve
         self.tempOnLdCrease = jntLib.create_on_curve(self.upCreaseLdEdge, numOfJoints = 5, parent = False, description=self.name, radius= 0.4)
         tempList = funcs.locOnCrv(name = 'result', parent = self.upLidLocGrp, numLocs = 5, crv = self.upCreaseLdEdge,
-                                  upCurve = self.tempCurve, paramStart = 0.99, paramEnd = 0.247, upAxis = 'y', posJnts = self.tempOnLdCrease)
+                                  upCurve = self.tempCurve, paramStart = 5.99, paramEnd = 1.5, upAxis = 'y', posJnts = self.tempOnLdCrease)
         for i,j in zip(tempList, self.tempOnLdCrease):
             mc.delete(mc.parentConstraint(i,j, skipRotate = ['z', 'x'],mo = False))
             mc.makeIdentity(j, apply = True, r = True)
@@ -310,7 +326,7 @@ class BuildEyelid(eyelidsTemplate.EyelidsTemplate):
         # create some nodes on lowLidHd
         tempJnts= jntLib.create_on_curve(self.lowLidHdEdge, numOfJoints = 13, parent = False, description=self.name, radius= 0.2)
         tempList = funcs.locOnCrv(name = 'result', parent = self.lowLidLocGrp, numLocs = 13, crv = self.lowLidHdEdge,
-                                  upCurve = self.tempCurve, paramStart = 0.99, paramEnd = 0.082, upAxis = 'y', posJnts = tempJnts)
+                                  upCurve = self.tempCurve, paramStart = 5.99, paramEnd = 0.55, upAxis = 'y', posJnts = tempJnts)
         mc.delete(tempJnts)
         # renaming the locators
         self.lowEyelidLocators = []
@@ -363,7 +379,7 @@ class BuildEyelid(eyelidsTemplate.EyelidsTemplate):
 
         self.tempOnLd = jntLib.create_on_curve(self.lowLidHdEdge, numOfJoints = 3, parent = False, description=self.name, radius= 0.4)
         tempList = funcs.locOnCrv(name = 'result', parent = self.lowLidLocGrp, numLocs = 3, crv = self.lowLidHdEdge,
-                                  upCurve = self.tempCurve, paramStart = 0.7, paramEnd = 0.21, upAxis = 'y', posJnts = self.tempOnLd)
+                                  upCurve = self.tempCurve, paramStart = 4.5, paramEnd = 1.5, upAxis = 'y', posJnts = self.tempOnLd)
         for i,j in zip(tempList, self.tempOnLd):
             mc.delete(mc.parentConstraint(i,j, skipRotate = ['z', 'x'],mo = False))
             mc.makeIdentity(j, apply = True, r = True)
@@ -403,7 +419,7 @@ class BuildEyelid(eyelidsTemplate.EyelidsTemplate):
         # create stuf on the up crease hd curve
         self.templowcrease= jntLib.create_on_curve(self.lowCreaseHdEdge, numOfJoints = 13, parent = False, description=self.name, radius= 0.2)
         tempList = funcs.locOnCrv(name = 'result', parent = self.lowcreaseLocGrp, numLocs = 13, crv = self.lowCreaseHdEdge,
-                                  upCurve = self.tempCurve, paramStart = 0.99, paramEnd = 0.08, upAxis = 'y', posJnts = self.templowcrease, translate = True)
+                                  upCurve = self.tempCurve, paramStart = 5.99, paramEnd = 0.5, upAxis = 'y', posJnts = self.templowcrease, translate = True)
 
         self.lowlidCreaseBndJnts = []
         count = 0
@@ -421,7 +437,7 @@ class BuildEyelid(eyelidsTemplate.EyelidsTemplate):
         # create joints on low crease ld
         self.tempOnLdCrease = jntLib.create_on_curve(self.lowCreaseLdEdge, numOfJoints = 3, parent = False, description=self.name, radius= 0.4)
         tempList = funcs.locOnCrv(name = 'result', parent = self.lowLidLocGrp, numLocs = 3, crv = self.lowCreaseLdEdge,
-                                  upCurve = self.tempCurve, paramStart = 0.7, paramEnd = 0.21, upAxis = 'y', posJnts = self.tempOnLdCrease)
+                                  upCurve = self.tempCurve, paramStart = 4.5, paramEnd = 1.5, upAxis = 'y', posJnts = self.tempOnLdCrease)
         for i,j in zip(tempList, self.tempOnLdCrease):
             mc.delete(mc.parentConstraint(i,j, skipRotate = ['z', 'x'],mo = False))
             mc.makeIdentity(j, apply = True, r = True)

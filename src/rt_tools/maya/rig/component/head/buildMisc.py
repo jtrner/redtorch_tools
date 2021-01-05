@@ -48,62 +48,62 @@ class BulidMisc(miscTemplate.MiscTemplate):
         self.blueprints['Flood'] = '{}_Flood_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['Flood']):
             mc.joint(self.blueprintGrp, name=self.blueprints['Flood'])
-            mc.xform(self.blueprints['Flood'], ws=True, t=(48.471, 358.916, -5.011))
+            mc.xform(self.blueprints['Flood'], ws=True, t=(0, self.movement  + 179.044, -5.011))
 
         self.blueprints['Apple'] = '{}_Apple_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['Apple']):
             mc.joint(self.blueprintGrp, name=self.blueprints['Apple'])
-            mc.xform(self.blueprints['Apple'], ws=True, t=(48.484, 343.205, -0.802))
+            mc.xform(self.blueprints['Apple'], ws=True, t=(0, self.movement + 163.333, -0.802))
 
         self.blueprints['nasal'] = '{}_nasal_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['nasal']):
             mc.joint(self.blueprintGrp, name=self.blueprints['nasal'])
-            mc.xform(self.blueprints['nasal'], ws=True, t=(49.559, 356.724, 2.987))
+            mc.xform(self.blueprints['nasal'], ws=True, t=(1.084, self.movement + 176.852, 2.987))
 
         self.blueprints['browFlesh'] = '{}_browFlesh_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['browFlesh']):
             mc.joint(self.blueprintGrp, name=self.blueprints['browFlesh'])
-            mc.xform(self.blueprints['browFlesh'], ws=True, t=(50.793, 358.822, 2.976))
+            mc.xform(self.blueprints['browFlesh'], ws=True, t=(2.318, self.movement + 178.95, 2.976))
 
         self.blueprints['cheek'] = '{}_cheek_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['cheek']):
             mc.joint(self.blueprintGrp, name=self.blueprints['cheek'])
-            mc.xform(self.blueprints['cheek'], ws=True, t=(51.346, 354.757, 2.635))
+            mc.xform(self.blueprints['cheek'], ws=True, t=(2.871, self.movement + 174.885, 2.635))
 
         self.blueprints['nasalLabial'] = '{}_nasalLabial_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['nasalLabial']):
             mc.joint(self.blueprintGrp, name=self.blueprints['nasalLabial'])
-            mc.xform(self.blueprints['nasalLabial'], ws=True, t=(51.06, 352.676, 2.962))
+            mc.xform(self.blueprints['nasalLabial'], ws=True, t=(2.585, self.movement + 172.804, 2.962))
 
         self.blueprints['orbitalUpper'] = '{}_orbitalUpper_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['orbitalUpper']):
             mc.joint(self.blueprintGrp, name=self.blueprints['orbitalUpper'])
-            mc.xform(self.blueprints['orbitalUpper'], ws=True, t=(53.327,358.318, 0.899))
+            mc.xform(self.blueprints['orbitalUpper'], ws=True, t=(4.852,self.movement + 178.446, 0.899))
 
         self.blueprints['orbitalLower'] = '{}_orbitalLower_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['orbitalLower']):
             mc.joint(self.blueprintGrp, name=self.blueprints['orbitalLower'])
-            mc.xform(self.blueprints['orbitalLower'], ws=True, t=(53.357,356.045, 0.8))
+            mc.xform(self.blueprints['orbitalLower'], ws=True, t=(4.882,self.movement + 176.173, 0.8))
 
         self.blueprints['cheekLower'] = '{}_cheekLower_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['cheekLower']):
             mc.joint(self.blueprintGrp, name=self.blueprints['cheekLower'])
-            mc.xform(self.blueprints['cheekLower'], ws=True, t=(52.685,350.353, 0.718))
+            mc.xform(self.blueprints['cheekLower'], ws=True, t=(4.21,self.movement + 170.481, 0.718))
 
         self.blueprints['ear'] = '{}_ear_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['ear']):
             mc.joint(self.blueprintGrp, name=self.blueprints['ear'])
-            mc.xform(self.blueprints['ear'], ws=True, t=(53.838,355.788, -5.669))
+            mc.xform(self.blueprints['ear'], ws=True, t=(5.363,self.movement + 175.916, -5.669))
 
         self.blueprints['earUpper'] = '{}_earUpper_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['earUpper']):
             mc.joint(self.blueprintGrp, name=self.blueprints['earUpper'])
-            mc.xform(self.blueprints['earUpper'], ws=True, t=(54.056,356.514, -6.992))
+            mc.xform(self.blueprints['earUpper'], ws=True, t=(5.581,self.movement + 176.642, -6.992))
 
         self.blueprints['earLower'] = '{}_earLower_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['earLower']):
             mc.joint(self.blueprintGrp, name=self.blueprints['earLower'])
-            mc.xform(self.blueprints['earLower'], ws=True, t=(54.028,354.785, -6.376))
+            mc.xform(self.blueprints['earLower'], ws=True, t=(5.553,self.movement + 174.913, -6.376))
 
 
     def createJoints(self):
@@ -154,7 +154,7 @@ class BulidMisc(miscTemplate.MiscTemplate):
         for i in [self.nasalLabialCtlOriGrp,self.cheekCtlOriGrp,self.browFleshCtlOriGrp,self.orbitalUpperCtlOriGrp,
                   self.earCtlOriGrp,self.nasalCtlOriGrp,self.orbitalLowerCtlOriGrp,self.appleCtlOriGrp,self.cheekLowerCtlOriGrp]:
             i = i.split('|')[-1]
-            ctl, grp = funcs.createCtl(parent = i, side = self.side)
+            ctl, grp = funcs.createCtl(parent = i, side = self.side, orient = (0,0,1))
             newName = i.replace('CtlOri_GRP', 'Mod_GRP')
             grp = mc.rename(grp, newName)
             self.miscGrps.append(grp)
@@ -171,7 +171,7 @@ class BulidMisc(miscTemplate.MiscTemplate):
 
         for i in [self.earLowerCtlOriGrp,self.earUpperCtlOriGrp]:
             i = i.split('|')[-1]
-            ctl, grp = funcs.createCtl(parent = i, side = self.side)
+            ctl, grp = funcs.createCtl(parent = i, side = self.side, orient = (0,0,1))
             newName = i.replace('CtlOri_GRP', 'Mod_GRP')
             grp = mc.rename(grp, newName)
             self.miscGrps.append(grp)
@@ -186,7 +186,7 @@ class BulidMisc(miscTemplate.MiscTemplate):
 
         for i in [self.cheekRaiseOriCtlGrp,self.cheekSubCtlOriGrp]:
             i = i.split('|')[-1]
-            ctl, grp = funcs.createCtl(parent = i, side = self.side, scale = [0.5,0.5,0.5])
+            ctl, grp = funcs.createCtl(parent = i, side = self.side, scale = [0.5,0.5,0.5], orient = (0,0,1))
             newName = i.replace('ori_GRP', 'Mod_GRP')
             grp = mc.rename(grp, newName)
             self.miscGrps.append(grp)

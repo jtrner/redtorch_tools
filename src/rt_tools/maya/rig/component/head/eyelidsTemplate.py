@@ -60,11 +60,8 @@ class EyelidsTemplate(template.Template):
         self.lidMakroLocGrp = mc.createNode('transform', name = self.name + '_makroLoc_GRP',p = self.eyelidLocalRig)
         self.browMakroDrvrLocGrp = mc.createNode('transform', name = self.side + '_browMAKRO_DriverLoc_GRP', p = self.eyelidLocalRig)
         self.browInOriGrp = mc.createNode('transform', name = self.side + '_browInOri_GRP', p = self.browMakroDrvrLocGrp)
-        mc.move(21.079,314.49,4.322, self.browInOriGrp, r = True, ws = True)
         self.browMidMakroDrvrOriGrp = mc.createNode('transform', name = self.side + '_browMidMAKRO_DriverOri_GRP', p = self.browMakroDrvrLocGrp)
-        mc.move(22.636,314.498,3.885, self.browMidMakroDrvrOriGrp, r = True, ws = True)
         self.browOutOriGrp = mc.createNode('transform', name = self.side + '_browOutOri_GRP', p = self.browMakroDrvrLocGrp)
-        mc.move(23.636,314.498,3.885, self.browOutOriGrp, r = True, ws = True)
 
         # create locators under brow stuf
         self.browInLoc = mc.createNode('transform', name = self.side + '_browIn_LOC', p = self.browInOriGrp)
@@ -95,12 +92,12 @@ class EyelidsTemplate(template.Template):
         self.cheekRaiseMakro = mc.createNode('transform', name = self.side +'_lowCheekRaiseMakro_LOC', p = self.lidMakroLocGrp)
         self.cheekRaiseMakroShape = mc.createNode('locator', name = self.side +'_lowCheekMakroShape_LOC', p = self.cheekRaiseMakro)
 
-        mc.move(26.367,224.517,3.939,self.browMidMakroLoc,r = True, ws = True)
-        mc.move(25.996,220.046,2.006,self.cheekRaiseMakro,r = True, ws = True)
-        mc.move(25.877,220.954,2.092,self.lowCreaseMakroLoc,r = True, ws = True)
-        mc.move(25.736,221.92,2.221,self.lowLidMakroLoc,r = True, ws = True)
-        mc.move(25.726,223.427,2.455,self.upCreaseMakroLoc,r = True, ws = True)
-        mc.move(26.208,223.094,2.271,self.upLidMakroLoc,r = True, ws = True)
+        mc.move(26.367,self.movement + 184.517,3.939,self.browMidMakroLoc,r = True, ws = True)
+        mc.move(25.996,self.movement + 180.046,2.006,self.cheekRaiseMakro,r = True, ws = True)
+        mc.move(25.877,self.movement + 180.954,2.092,self.lowCreaseMakroLoc,r = True, ws = True)
+        mc.move(25.736,self.movement + 181.92,2.221,self.lowLidMakroLoc,r = True, ws = True)
+        mc.move(25.726,self.movement + 183.427,2.455,self.upCreaseMakroLoc,r = True, ws = True)
+        mc.move(26.208,self.movement + 183.094,2.271,self.upLidMakroLoc,r = True, ws = True)
         for i in [self.browMidMakroLoc,self.cheekRaiseMakro,self.lowCreaseMakroLoc,
                   self.lowLidMakroLoc,self.upCreaseMakroLoc,self.upLidMakroLoc]:
             mc.makeIdentity(i,apply = True,t = True, r = True, s = True)

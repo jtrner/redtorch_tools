@@ -51,13 +51,14 @@ class Eyelids(buildEyelid.BuildEyelid):
     """
     base class for eyelids template
     """
-    def __init__(self,geo = '', side='L', prefix='eyelid',upLidHdEdge = '',lowLidHdEdge = '',
-                 upLidLdEdge = '',lowLidLdEdge = '',lidBlinkEdge = '',uplidBlinkEdge = '',
-                 lowlidBlinkEdge = '',upCreaseHdEdge = '',lowCreaseHdEdge = '',upCreaseLdEdge = '',
-                 lowCreaseLdEdge = '',**kwargs):
+    def __init__(self,movement = 40, eyelidsGeo ='', side='L', prefix='eyelid', upLidHdEdge ='', lowLidHdEdge ='',
+                 upLidLdEdge = '', lowLidLdEdge = '', lidBlinkEdge = '', uplidBlinkEdge = '',
+                 lowlidBlinkEdge = '', upCreaseHdEdge = '', lowCreaseHdEdge = '', upCreaseLdEdge = '',
+                 lowCreaseLdEdge = '', **kwargs):
         kwargs['side'] = side
         kwargs['prefix'] = prefix
-        self.geo = geo
+        self.movement = movement
+        self.eyelidsGeo = eyelidsGeo
         self.upLidHdEdge = upLidHdEdge
         self.lowLidHdEdge = lowLidHdEdge
         self.upLidLdEdge = upLidLdEdge
@@ -295,6 +296,14 @@ class Eyelids(buildEyelid.BuildEyelid):
         midBrowCtl = self.getOut('midBrowCtl')
         if midBrowCtl:
             [mc.connectAttr(midBrowCtl + '.{}{}'.format(a, v), self.browMidMakroDrvrLoc + '.{}{}'.format(a, v)) for a in 'tr' for v in 'xyz']
+            trsLib.match(self.browMidMakroDrvrOriGrp,midBrowCtl )
+
+        inBrowCtl = self.getOut('inBrowCtl')
+        if inBrowCtl:
+            trsLib.match(self.browInOriGrp,inBrowCtl )
+        outBrowCtl = self.getOut('outBrowCtl')
+        if outBrowCtl:
+            trsLib.match(self.browOutOriGrp,outBrowCtl )
 
 
     def createSettings(self):
@@ -310,8 +319,9 @@ class Eyelids(buildEyelid.BuildEyelid):
         attrLib.addString(self.blueprintGrp, 'blu_eyeAimCtl', v=self.side + '_eye.eyeAimCtl')
         attrLib.addString(self.blueprintGrp, 'blu_eyeMakroloc', v=self.side + '_eye.eyeMakroloc')
         attrLib.addString(self.blueprintGrp, 'blu_midBrowCtl', v=self.side + '_eyebrows.midBrowCtl')
-
-        attrLib.addString(self.blueprintGrp, 'blu_geo', v=self.geo )
+        attrLib.addString(self.blueprintGrp, 'blu_outBrowCtl', v=self.side + '_eyebrows.outBrowCtl')
+        attrLib.addString(self.blueprintGrp, 'blu_inBrowCtl', v=self.side + '_eyebrows.inBrowCtl')
+        attrLib.addString(self.blueprintGrp, 'blu_eyelidsGeo', v='C_head.eyelidsGeo')
         attrLib.addString(self.blueprintGrp, 'blu_upLidHdEdge', v=self.upLidHdEdge)
         attrLib.addString(self.blueprintGrp, 'blu_lowLidHdEdge', v=self.lowLidHdEdge)
         attrLib.addString(self.blueprintGrp, 'blu_upLidLdEdge', v=self.upLidLdEdge)

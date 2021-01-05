@@ -178,6 +178,7 @@ class BuildHead(headTemplate.HeadTemplate):
     def build(self):
         super(BuildHead, self).build()
         funcs.detachHead(geoName = self.geo,edge = self.headEdge,name = 'localEyeLid_GEO', movement = self.headMovement)
+        self.setOut('eyelidsGeo', 'localEyeLid_GEO')
 
         self.localLipsGeo = mc.duplicate('localEyeLid_GEO', name = 'localLips_GEO')
         mc.move(0,self.headMovement, 0,self.localLipsGeo ,r = True, ws = True )
@@ -185,9 +186,11 @@ class BuildHead(headTemplate.HeadTemplate):
 
         self.localBrowsGeo = mc.duplicate('localLips_GEO', name = 'localBrow_GEO')
         mc.move(0,self.headMovement, 0,self.localBrowsGeo ,r = True, ws = True )
+        self.setOut('eyebrowsGeo', self.localBrowsGeo[0] )
 
         self.localMiscGeo = mc.duplicate('localBrow_GEO', name = 'localMisc_GEO')
         mc.move(0,self.headMovement, 0,self.localMiscGeo ,r = True, ws = True )
+        self.setOut('miscGeo', self.localMiscGeo[0] )
 
 
         # create head buttom ctl

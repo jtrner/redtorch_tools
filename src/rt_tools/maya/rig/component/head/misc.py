@@ -33,9 +33,11 @@ class Misc(buildMisc.BulidMisc):
     """
     base class for misc template
     """
-    def __init__(self, side='L', prefix='misc',**kwargs):
+    def __init__(self,movement = 40, side='L',miscGeo = '', prefix='misc',**kwargs):
         kwargs['side'] = side
         kwargs['prefix'] = prefix
+        self.miscGeo = miscGeo
+        self.movement = movement * 4
 
         super(Misc, self).__init__(**kwargs)
 
@@ -148,6 +150,7 @@ class Misc(buildMisc.BulidMisc):
         attrLib.addString(self.blueprintGrp, 'blu_ctlParentD', v='C_head.squashThird')
         attrLib.addString(self.blueprintGrp, 'blu_appleParent', v='C_head.facialCtlGrp')
         attrLib.addString(self.blueprintGrp, 'blu_localParent', v='C_head.localRigs')
+        attrLib.addString(self.blueprintGrp, 'blu_miscGeo', v='C_head.miscGeo')
         attrLib.addString(self.blueprintGrp, 'blu_cheekJntMod', v=self.side + '_eyelid.cheekJntMod')
         attrLib.addString(self.blueprintGrp, 'blu_cheekRaiseJntZ', v=self.side + '_eyelid.cheekRaiseJntZ')
         attrLib.addString(self.blueprintGrp, 'blu_cheekRiseEndJnt', v=self.side + '_eyelid.cheekRiseEndJnt')

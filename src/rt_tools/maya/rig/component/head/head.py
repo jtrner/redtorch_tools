@@ -33,7 +33,7 @@ class Head(buildHead.BuildHead):
     """
     base class for head template
     """
-    def __init__(self, side='C', prefix='head',geo = '', headEdge = '', headMovement = '50',**kwargs):
+    def __init__(self, side='C', prefix='head',geo = '', headEdge = '', headMovement = 40 ,**kwargs):
         kwargs['side'] = side
         kwargs['prefix'] = prefix
         self.geo = geo

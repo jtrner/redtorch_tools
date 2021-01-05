@@ -33,11 +33,11 @@ class Eyebrows(buildEyebrow.BuildEyebrow):
     """
     base class for eyebrows template
     """
-    def __init__(self, side='L', prefix='eyebrows',geo = '',**kwargs):
+    def __init__(self,movement = 40, side='L', prefix='eyebrows',eyebrowsGeo = '',**kwargs):
         kwargs['side'] = side
         kwargs['prefix'] = prefix
-        self.geo = geo
-
+        self.movement = movement * 3
+        self.eyebrowsGeo = eyebrowsGeo
         super(Eyebrows, self).__init__(**kwargs)
 
     def build(self):
@@ -89,7 +89,7 @@ class Eyebrows(buildEyebrow.BuildEyebrow):
         mc.connectAttr(self.mainCtls[2] + '.Z',self.mainCtlGrps[2] + '.translateZ')
         #**********************************************************blendShapes*********************************************************
         if self.side == 'L':
-            browShapes = mc.blendShape(self.geo, frontOfChain=True, n= 'eyebrow_bShp')[0]
+            browShapes = mc.blendShape(self.eyebrowsGeo, frontOfChain=True, n='eyebrow_bShp')[0]
             targets =  ['localBrows_browsJNT_TGT','brow_L_InUp','brow_R_InUp','brow_L_OutUp','brow_R_OutUp',
                       'brow_L_OutDown','brow_R_OutDown','brow_L_InDown','brow_R_InDown','brow_L_In','brow_R_In',
                       'bodyBrow_L_InUp','bodyBrow_R_InUp','bodyBrow_L_OutUp','bodyBrow_R_OutUp','bodyBrow_L_OutDown',
@@ -97,7 +97,7 @@ class Eyebrows(buildEyebrow.BuildEyebrow):
                       'localBrows_bodyJNT_TGT','L_browInUPCor','R_browInUPCor','L_browInINDOWNxtraCorr','R_browInINDOWNxtraCorrr',
                       'L_browInINUP_Corr','R_browInINUP_Corr']
             for i in targets:
-                deformLib.blendShapeTarget(self.geo, i, browShapes)
+                deformLib.blendShapeTarget(self.eyebrowsGeo, i, browShapes)
             mc.combinationShape(bs='eyebrow_bShp', cti=25, cm=0, dti=[11, 19])
             mc.combinationShape(bs='eyebrow_bShp', cti=26, cm=0, dti=[12, 20])
 
@@ -162,7 +162,8 @@ class Eyebrows(buildEyebrow.BuildEyebrow):
 
         attrLib.addString(self.blueprintGrp, 'blu_ctlParent', v='C_head.topSquashSecond')
         attrLib.addString(self.blueprintGrp, 'blu_localParent', v='C_head.localRigs')
-        attrLib.addString(self.blueprintGrp, 'blu_geo', v=self.geo)
+        attrLib.addString(self.blueprintGrp, 'blu_eyebrowsGeo', v='C_head.eyebrowsGeo')
+
 
 
 
