@@ -92,12 +92,13 @@ class EyelidsTemplate(template.Template):
         self.cheekRaiseMakro = mc.createNode('transform', name = self.side +'_lowCheekRaiseMakro_LOC', p = self.lidMakroLocGrp)
         self.cheekRaiseMakroShape = mc.createNode('locator', name = self.side +'_lowCheekMakroShape_LOC', p = self.cheekRaiseMakro)
 
-        mc.move(26.367,self.movement + 184.517,3.939,self.browMidMakroLoc,r = True, ws = True)
-        mc.move(25.996,self.movement + 180.046,2.006,self.cheekRaiseMakro,r = True, ws = True)
-        mc.move(25.877,self.movement + 180.954,2.092,self.lowCreaseMakroLoc,r = True, ws = True)
-        mc.move(25.736,self.movement + 181.92,2.221,self.lowLidMakroLoc,r = True, ws = True)
-        mc.move(25.726,self.movement + 183.427,2.455,self.upCreaseMakroLoc,r = True, ws = True)
-        mc.move(26.208,self.movement + 183.094,2.271,self.upLidMakroLoc,r = True, ws = True)
+        mult = [-1, 1][self.side == 'L']
+        mc.move(mult * 26.367,self.movement + 184.517,3.939,self.browMidMakroLoc,r = True, ws = True)
+        mc.move(mult * 25.996,self.movement + 180.046,2.006,self.cheekRaiseMakro,r = True, ws = True)
+        mc.move(mult * 25.877,self.movement + 180.954,2.092,self.lowCreaseMakroLoc,r = True, ws = True)
+        mc.move(mult * 25.736,self.movement + 181.92,2.221,self.lowLidMakroLoc,r = True, ws = True)
+        mc.move(mult * 25.726,self.movement + 183.427,2.455,self.upCreaseMakroLoc,r = True, ws = True)
+        mc.move(mult * 26.208,self.movement + 183.094,2.271,self.upLidMakroLoc,r = True, ws = True)
         for i in [self.browMidMakroLoc,self.cheekRaiseMakro,self.lowCreaseMakroLoc,
                   self.lowLidMakroLoc,self.upCreaseMakroLoc,self.upLidMakroLoc]:
             mc.makeIdentity(i,apply = True,t = True, r = True, s = True)
@@ -106,3 +107,4 @@ class EyelidsTemplate(template.Template):
     def matches(self):
         trsLib.match(self.eyelidSocketGrp, self.upeEyelidparent[0])
         mc.move(0,0,2,self.eyelidSocketGrp,r = True, ws = True)
+        mc.makeIdentity(self.eyelidSocketGrp, apply = True, t = True,r = True, s = True)

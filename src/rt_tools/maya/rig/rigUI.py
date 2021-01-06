@@ -773,10 +773,16 @@ class UI(QtWidgets.QDialog):
         self.lowCreaseLdBt.clicked.connect(lambda : self.saveEdgeData(name = 'lowCreaseLdEdge',
                                                                       lineedit = self.lowCreaseLd_le))
 
+        self.transferDataBt = QtWidgets.QPushButton(' Transfer Data')
+        eyelids_layD.addWidget(self.transferDataBt)
+        qtLib.setColor(self.transferDataBt, qtLib.GREEN_PASTAL)
+        self.transferDataBt.clicked.connect(lambda : self.transferData())
+
+
         self.eyelidEnd_lb = QtWidgets.QLabel('                                          eyelid information')
         qtLib.setColor(self.eyelidEnd_lb, qtLib.SILVER_LIGHT)
         eyelids_layD.addWidget(self.eyelidEnd_lb)
-        self.eyelidEnd_lb.setMinimumSize(250,0)
+        self.eyelidEnd_lb.setMinimumSize(100,0)
 
         # ======================================================================
         # buildTree frame
@@ -829,6 +835,30 @@ class UI(QtWidgets.QDialog):
         self.bluRefresh()
         item = self.blueprints_tw.topLevelItem(0)
         self.blueprints_tw.setCurrentItem(item)
+
+    def transferData(self):
+        names = ['geo', 'headEdge','headMovement','upperteeth','lowerteeth','upperTeethEdge', 'lowerTeethEdge',
+                  'zipperCrvEdge', 'uplipLowRezEdge', 'uplipMedRezEdge','uplipHirezEdge', 'uplipZipperEdge',
+                  'lowLipLowRezEdge', 'lowLipMedRezEdge', 'lowLipHirezEdge','lowLipZipperEdge','lipNumJnts',
+                  'upLidHdEdge', 'lowLidHdEdge','upLidLdEdge','lowLidLdEdge','lidBlinkEdge','uplidBlinkEdge',
+                  'lowlidBlinkEdge','upCreaseHdEdge','lowCreaseHdEdge','upCreaseLdEdge','lowCreaseLdEdge']
+
+        vals = [self.geo_le.text(), self.headEdge_le.text(), self.headMove_le.text(),
+                self.upperTeeth_le.text(),self.lowerTeeth_le.text(),self.upTeethCrv_le.text(),
+                self.lowTeethCrv_le.text(),self.zipperCrv_le.text(),self.uplipLowrezCrv_le.text(),
+                self.uplipMedrezCrv_le.text(),self.uplipHirezCrv_le.text(),self.uplipZipperCrv_le.text(),
+                self.lowlipLowrezCrv_le.text(),self.lowlipMedrezCrv_le.text(),self.lowlipHirezCrv_le.text(),
+                self.lowlipZipperCrv_le.text(),self.numJnts_le.text(),self.upLidHdCrv_le.text(),self.lowLidHdCrv_le.text(),
+                self.upLidLdCrv_le.text(),self.lowLidLdCrv_le.text(),self.lidBlinkCrv_le.text(),self.uplidBlink_le.text(),
+                self.lowlidBlink_le.text(),self.upCreaseHd_le.text(),self.lowCreaseHd_le.text(),self.upCreaseLd_le.text(),
+                self.lowCreaseLd_le.text(),]
+
+        data = {}
+        for i,j in zip(names,vals):
+            data[i] = j
+            self.setDataOnBluGrps(i, data)
+
+
 
     def loadFaceData(self,faceDataPath,keyData):
         if not os.path.lexists(faceDataPath):

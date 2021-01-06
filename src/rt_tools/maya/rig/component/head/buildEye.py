@@ -84,6 +84,7 @@ class BuildEye(eyeTemplate.EyeTemplate):
         newName = self.eyeSquashCtlOriGrp.replace('OriGRP', '_ZRO')
         self.squashCtlGrp = mc.rename(grp, newName)
         mc.parent(self.squashCtlGrp, self.eyeSquashCtlOriGrp)
+        self.setOut('eyeSquashCtl', self.squashCtl)
 
         # create stuf under socketOri grp
         self.socketModGrp = mc.createNode('transform', name = self.side + '_eyeMasterAimDrvrSocketMod_GRP', p = self.eyeMasterAimDrvrSocketOriGrp)

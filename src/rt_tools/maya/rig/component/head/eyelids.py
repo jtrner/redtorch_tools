@@ -166,7 +166,7 @@ class Eyelids(buildEyelid.BuildEyelid):
         for i in ['input2X', 'input2Y', 'input2Z']:
             mc.connectAttr(self.upmidCtl + '.creaseFollow', self.upCreaseMakroMult + '.' + i)
         mc.connectAttr(self.upCreaseMakroMult + '.output', self.makroCreaseUpJntGrp + '.translate')
-
+        mc.connectAttr(self.upCreaseMakroMult + '.output', self.upCreaseMakroGrp + '.translate')
 
 
         # connect low crease controls to the modGrp above shrp jnts
@@ -193,9 +193,15 @@ class Eyelids(buildEyelid.BuildEyelid):
         for i in ['input2X', 'input2Y', 'input2Z']:
             mc.connectAttr(self.lowmidCtl + '.creaseFollow', self.lowCreaseMakroMult + '.' + i)
         mc.connectAttr(self.lowCreaseMakroMult + '.output', self.makroCreaseLowJntGrp + '.translate')
+        mc.connectAttr(self.lowCreaseMakroMult + '.output', self.lowCreaseMakroGrp + '.translate')
 
         # create wire for up and low Crease curve
         for i,j in zip([self.upCreaseLdEdge , self.lowCreaseLdEdge], [self.upCreaseHdEdge , self.lowCreaseHdEdge]):
+            mc.select(j, r=True)
+            mc.wire(gw=False, en=1.000000, ce=0.000000, li=0.000000, w= i)
+
+        # create wire for up and low lids curve
+        for i,j in zip([self.upLidLdEdge , self.lowLidLdEdge], [self.upLidHdEdge , self.lowLidHdEdge]):
             mc.select(j, r=True)
             mc.wire(gw=False, en=1.000000, ce=0.000000, li=0.000000, w= i)
 
@@ -203,15 +209,12 @@ class Eyelids(buildEyelid.BuildEyelid):
         mc.pointConstraint(self.upEyelidBndJnts[6],self.upLidMakroLoc,mo = True)
         mc.pointConstraint(self.lowEyelidBndJnts[6],self.lowLidMakroLoc,mo = True)
 
-        mc.pointConstraint(self.browMidMakroLoc, self.upCreaseMakroLoc, mo = True)
+        mc.pointConstraint(self.browMidMakroLoc, self.upLidMakroLoc,self.upCreaseMakroLoc, mo = True)
 
         mc.pointConstraint(self.lowLidMakroLoc,self.cheekRaiseMakro, self.lowCreaseMakroLoc, mo = True)
 
-        mc.pointConstraint(self.browMidMakroDrvrLoc, self.browMidMakroLoc, mo = True)
         mc.pointConstraint(self.cheeckJoints[-1], self.cheekRaiseMakro, mo = True)
 
-        # connect stuff to the groups under browMakro locGrp
-        mc.pointConstraint(self.browOutLoc,self.browInLoc,self.browMidMakroDrvrOriGrp, mo = True)
 
         # connect controls to the neighbor transform above controls
         mc.parentConstraint(self.upmidCtl,self.upLdCtls[0],self.upLdCtlGrps[1],weight = 0.5 ,mo = True)
@@ -226,20 +229,19 @@ class Eyelids(buildEyelid.BuildEyelid):
         mc.parentConstraint(self.lowCreaseCtls[1],self.upCreaseCtls[-1],self.lowCreaseLdCtlGrps[2],skipRotate='x',weight = 0.5 ,mo = True)
 
 
-
-        #parent stuf under squash head joints
-        # mc.parent(self.eyelidCtlGrp,self.topJntSquash[0])
-
         #clean outliner
         for i in [self.upLidHdEdge, self.upLidLdEdge, self.uplidBlinkEdge,
                   self.lowLidHdEdge, self.lowLidLdEdge, self.lowlidBlinkEdge, self.lidBlinkEdge, self.tempCurve, self.upCreaseHdEdge,
                   self.lowCreaseHdEdge, self.upCreaseLdEdge, self.lowCreaseLdEdge,
                   self.side + '_lidBlink_CRVBaseWire',self.side + '_lidBlink_CRVBaseWire1',
-                  self.side + '_upCreaseLd_CRVBaseWire',self.side + '_lowCreaseLd_CRVBaseWire']:
+                  self.side + '_upCreaseLd_CRVBaseWire',self.side + '_lowCreaseLd_CRVBaseWire',
+                  self.side + '_upLidLd_CRVBaseWire', self.side + '_lowLidLd_CRVBaseWire']:
             mc.parent(i,self.eyelidCrvGrp)
 
         mc.parent(self.eyelidCrvGrp, self.localEyelidRig)
 
+        if self.side == 'R':
+            mc.setAttr(self.eyelidCtlGrp + '.ty', -1 * (self.movement))
 
     def connect(self):
         super(Eyelids, self).connect()
@@ -293,17 +295,29 @@ class Eyelids(buildEyelid.BuildEyelid):
                 mc.connectAttr(self.lowFleshyEyesSwitchMult + '.outputX', i + '.ty')
                 mc.connectAttr(self.lowFleshyEyesSwitchMult + '.outputY', i + '.tx')
 
-        midBrowCtl = self.getOut('midBrowCtl')
-        if midBrowCtl:
-            [mc.connectAttr(midBrowCtl + '.{}{}'.format(a, v), self.browMidMakroDrvrLoc + '.{}{}'.format(a, v)) for a in 'tr' for v in 'xyz']
-            trsLib.match(self.browMidMakroDrvrOriGrp,midBrowCtl )
 
         inBrowCtl = self.getOut('inBrowCtl')
         if inBrowCtl:
             trsLib.match(self.browInOriGrp,inBrowCtl )
+
         outBrowCtl = self.getOut('outBrowCtl')
         if outBrowCtl:
             trsLib.match(self.browOutOriGrp,outBrowCtl )
+
+        midBrowCtl = self.getOut('midBrowCtl')
+        if midBrowCtl:
+            trsLib.match(self.browMidMakroDrvrOriGrp,midBrowCtl )
+            [mc.connectAttr(midBrowCtl + '.{}{}'.format(a, v), self.browMidMakroDrvrLoc + '.{}{}'.format(a, v)) for a in 'tr' for v in 'xyz']
+        # connect stuff to the groups under browMakro locGrp
+        mc.pointConstraint(self.browOutLoc,self.browInLoc,self.browMidMakroDrvrOriGrp, mo = True)
+        mc.pointConstraint(self.browMidMakroDrvrLoc, self.browMidMakroLoc, mo = True)
+
+        eyeSquashCtl = self.getOut('eyeSquashCtl')
+        if eyeSquashCtl:
+            # connect squash ctl to the socket group
+            [mc.connectAttr(eyeSquashCtl + '.{}{}'.format(a, v), self.eyelidSocketGrp + '.{}{}'.format(a, v)) for a in 'trs' for v in 'xyz']
+
+
 
 
     def createSettings(self):
@@ -322,6 +336,7 @@ class Eyelids(buildEyelid.BuildEyelid):
         attrLib.addString(self.blueprintGrp, 'blu_outBrowCtl', v=self.side + '_eyebrows.outBrowCtl')
         attrLib.addString(self.blueprintGrp, 'blu_inBrowCtl', v=self.side + '_eyebrows.inBrowCtl')
         attrLib.addString(self.blueprintGrp, 'blu_eyelidsGeo', v='C_head.eyelidsGeo')
+        attrLib.addString(self.blueprintGrp, 'blu_eyeSquashCtl', v=self.side + '_eye.eyeSquashCtl')
         attrLib.addString(self.blueprintGrp, 'blu_upLidHdEdge', v=self.upLidHdEdge)
         attrLib.addString(self.blueprintGrp, 'blu_lowLidHdEdge', v=self.lowLidHdEdge)
         attrLib.addString(self.blueprintGrp, 'blu_upLidLdEdge', v=self.upLidLdEdge)

@@ -60,14 +60,14 @@ def createCtl(parent = '',side = 'L',scale = [1, 1, 1],shape = 'square', orient 
     return ctl.name,ctl.zro
 
 def locOnCrv(name = '', parent = '', numLocs = 3, crv = '',
-             upCurve = '', paramStart = 0.5,paramEnd = 0.5, upAxis = 'y', posJnts = '',translate = False):
+             upCurve = '', paramStart = 0.5,paramEnd = 0.5, upAxis = 'y', posJnts = '',translate = False, side = 'L'):
     param = paramStart
     tempList = []
     for i in range(numLocs):
         loc = mc.createNode('transform', name = name + '{}'.format(i), p = parent)
         pos = mc.xform(posJnts[i-1], q=True, ws=True, t=True)
         mc.setAttr(loc + '.t', *pos)
-        crvLib.attachToCurve(node=loc, crv=crv, uParam=param, upObj=upCurve, translate = translate)
+        crvLib.attachToCurve(node=loc, crv=crv, uParam=param, upObj=upCurve, translate = translate,  side = side)
         #crvLib.attach(node = loc, curve = crv, upCurve = upCurve,param = param, upAxis = upAxis,translate = translate)
         param -= paramEnd
         tempList.append(loc)

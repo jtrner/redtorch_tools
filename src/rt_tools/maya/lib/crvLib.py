@@ -747,7 +747,7 @@ def getUParam(pnt=None, curve=None):
     return param
 
 
-def attachToCurve(node=None, crv=None, uParam=None, upObj=None, translate = False):
+def attachToCurve(node=None, crv=None, uParam=None, upObj=None, translate = False, side = 'L'):
     """
     attaches node to curve using pointOnCurveInfo node
 
@@ -770,6 +770,9 @@ def attachToCurve(node=None, crv=None, uParam=None, upObj=None, translate = Fals
     mc.setAttr(mop + ".worldUpType", 2)
     mc.setAttr(mop + '.frontAxis', 0)
     mc.setAttr(mop + '.upAxis', 1)
+    if side =='R':
+        mc.setAttr(mop + '.inverseFront', 1)
+
     mc.connectAttr(upObj + '.worldMatrix', mop + ".worldUpMatrix")
     [mc.connectAttr("{}.{}Coordinate".format(mop, x), "{}.t{}".format(node, x)) for x in 'xyz']
     if not translate:
