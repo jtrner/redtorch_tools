@@ -4,14 +4,14 @@ from collections import OrderedDict
 
 import maya.cmds as mc
 
-from ....lib import trsLib
-from ....lib import attrLib
-from ....lib import container
-from ....lib import strLib
-from ....lib import deformLib
-from ....lib import keyLib
-from ....lib import jntLib
-from ....lib import connect
+from ...lib import trsLib
+from ...lib import attrLib
+from ...lib import container
+from ...lib import strLib
+from ...lib import deformLib
+from ...lib import keyLib
+from ...lib import jntLib
+from ...lib import connect
 from . import buildEye
 from . import funcs
 
@@ -74,14 +74,15 @@ class EyeB(buildEye.BuildEye):
     def connect(self):
         super(EyeB, self).connect()
 
-        rigPar = self.getOut('rigParent')
-        if rigPar:
-            mc.parent(self.eyeRigGrp, rigPar)
+        if self.side == 'R':
+            rigPar = self.getOut('rigParent')
+            if rigPar:
+                mc.parent(self.eyeRigGrp, rigPar)
 
 
-        aimPar = self.getOut('aimParent')
-        if aimPar:
-            mc.parent(self.eyeAimCtlOriGrp, aimPar)
+            aimPar = self.getOut('aimParent')
+            if aimPar:
+                mc.parent(self.eyeAimCtlOriGrp, aimPar)
 
 
 

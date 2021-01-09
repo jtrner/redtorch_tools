@@ -35,7 +35,6 @@ import maya.cmds as mc
 
 # RedTorch modules
 from ..lib import qtLib
-from ..lib import qtLib
 from ..lib import control
 from ..lib import fileLib
 from ..lib import attrLib
@@ -45,10 +44,8 @@ from ..general import utils as generalUtils
 from rt_tools import package
 
 
-from .component.head import head, lipsB, eyelids,eyebrows,eyeB,misc
 
-
-from .component import arm, chain, eye, eyes, finger, leg, \
+from .component import arm, chain, eye, eyes, finger, leg,head, lipsB, eyelids,eyebrows,eyeB,misc,\
     legQuad, lid, neck, piston, root, spine, spineB, tail,jaw, lid2, lips,birdArm,wingFeather,wingTail,template
 
 reload(head)
@@ -113,16 +110,12 @@ STEPS = OrderedDict([
     # ('Finalize', 'rigBuild.finalize()'),
 ])
 componentDir = os.path.abspath(os.path.join(__file__, '../component'))
-headComponentDir = os.path.abspath(os.path.join(__file__, '../component/head'))
 
 AVAILABLE_COMPONENTS = [x.replace('.py', '') for x in os.listdir(componentDir)
-                        if x.endswith('py') and x not in ('__init__.py', 'template.py')]
-
-AVAILABLE_HEADCOMPONENTS = [x.replace('.py', '') for x in os.listdir(headComponentDir)
                         if x.endswith('py') and x not in ('__init__.py', 'template.py', 'buildEye.py','buildEyebrow.py','buildEyelid.py',
-                                                          'buildHead.py','buildLip.py','buildMisc.py','eyeTemplate.py', 'headTemplate.py',
-                                                          'headTemplate.py', 'eyebrowsTemplate.py', 'miscTemplate.py',
-                                                          'lipsTemplate.py','eyelidsTemplate.py','funcs.py')]
+                                                        'buildHead.py','buildLip.py','buildMisc.py','eyeTemplate.py', 'headTemplate.py',
+                                                        'headTemplate.py', 'eyebrowsTemplate.py', 'miscTemplate.py',
+                                                            'lipsTemplate.py','eyelidsTemplate.py','funcs.py')]
 
 SETTINGS_PATH = os.path.join(os.getenv("HOME"), 'rigUI.uiconfig')
 os.environ['RIG_UI_VERSION'] = package.__version__
@@ -312,10 +305,6 @@ class UI(QtWidgets.QDialog):
         for availCmp in AVAILABLE_COMPONENTS:
             qtLib.addItemToTreeWidget(self.availableBlueprints_tw, availCmp)
 
-        for availCmp in AVAILABLE_HEADCOMPONENTS:
-            qtLib.addItemToTreeWidget(self.availableBlueprints_tw, availCmp)
-
-
 
         # Blueprints in Scene
         self.blueprints_tw = DeselectableTreeWidget()
@@ -435,6 +424,7 @@ class UI(QtWidgets.QDialog):
             self.geo_le.setText(str(self.geoData))
         self.geoBt.clicked.connect(lambda : self.saveGeoData(name = 'geo', lineedit=self.geo_le))
 
+
         self.headEdgeBt = QtWidgets.QPushButton('head edge')
         head_lay.addWidget(self.headEdgeBt)
         self.headEdge_le = QtWidgets.QLineEdit()
@@ -451,6 +441,33 @@ class UI(QtWidgets.QDialog):
         head_lay.addWidget(self.headMove_le)
         self.headMove_le.setText(str(40))
         self.headMove_le.textChanged.connect(lambda : self.checkHeadMovement(name = 'headMovement', lineedit = self.headMove_le))
+
+        head_layB = qtLib.createHLayout(head_lb_lay)
+
+        self.eyesBt = QtWidgets.QPushButton('eye')
+        head_layB.addWidget(self.eyesBt)
+        self.eyes_le = QtWidgets.QLineEdit()
+        head_layB.addWidget(self.eyes_le)
+        self.eyesData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'eye')
+        if self.eyesData:
+            self.eyesData = self.eyesData[0]
+            self.eyes_le.setText(str(self.eyesData))
+        self.eyesBt.clicked.connect(lambda : self.saveGeoData(name = 'eye', lineedit=self.eyes_le))
+
+        self.eyesbrowBt = QtWidgets.QPushButton('eyebrow')
+        head_layB.addWidget(self.eyesbrowBt)
+        self.eyebrow_le = QtWidgets.QLineEdit()
+        head_layB.addWidget(self.eyebrow_le)
+        self.eyebrowData = self.loadFaceData(faceDataPath= faceDataPath,keyData = 'eyebrow')
+        if self.eyebrowData:
+            self.eyebrowData = self.eyebrowData[0]
+            self.eyebrow_le.setText(str(self.eyebrowData))
+        self.eyesbrowBt.clicked.connect(lambda : self.saveGeoData(name = 'eyebrow', lineedit=self.eyebrow_le))
+
+        self.eyebrowInf_lb = QtWidgets.QLabel('                                                          head information')
+        qtLib.setColor(self.eyebrowInf_lb, qtLib.SILVER_LIGHT)
+        head_layB.addWidget(self.eyebrowInf_lb)
+        self.eyebrowInf_lb.setMinimumSize(0,0)
 
         lips_lb_lay = qtLib.createVLayout(faceInfo_lay)
         self.lips_lb = QtWidgets.QLabel('lips info')
@@ -837,13 +854,13 @@ class UI(QtWidgets.QDialog):
         self.blueprints_tw.setCurrentItem(item)
 
     def transferData(self):
-        names = ['geo', 'headEdge','headMovement','upperteeth','lowerteeth','upperTeethEdge', 'lowerTeethEdge',
+        names = ['geo','eye','eyebrow', 'headEdge','headMovement','upperteeth','lowerteeth','upperTeethEdge', 'lowerTeethEdge',
                   'zipperCrvEdge', 'uplipLowRezEdge', 'uplipMedRezEdge','uplipHirezEdge', 'uplipZipperEdge',
                   'lowLipLowRezEdge', 'lowLipMedRezEdge', 'lowLipHirezEdge','lowLipZipperEdge','lipNumJnts',
                   'upLidHdEdge', 'lowLidHdEdge','upLidLdEdge','lowLidLdEdge','lidBlinkEdge','uplidBlinkEdge',
                   'lowlidBlinkEdge','upCreaseHdEdge','lowCreaseHdEdge','upCreaseLdEdge','lowCreaseLdEdge']
 
-        vals = [self.geo_le.text(), self.headEdge_le.text(), self.headMove_le.text(),
+        vals = [self.geo_le.text(),self.eyes_le.text() ,self.eyebrow_le.text(),self.headEdge_le.text(), self.headMove_le.text(),
                 self.upperTeeth_le.text(),self.lowerTeeth_le.text(),self.upTeethCrv_le.text(),
                 self.lowTeethCrv_le.text(),self.zipperCrv_le.text(),self.uplipLowrezCrv_le.text(),
                 self.uplipMedrezCrv_le.text(),self.uplipHirezCrv_le.text(),self.uplipZipperCrv_le.text(),

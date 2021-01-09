@@ -105,6 +105,7 @@
         "8732", 
         "8736"
     ], 
+    "eye": "pSphere1", 
     "lowerTeethEdge": [
         "11", 
         "17", 
@@ -164,7 +165,7 @@
         "1370"
     ], 
     "lipNumJnts": "15", 
-    "geo": "newHead1", 
+    "geo": "C_body_GEO", 
     "uplidBlinkEdge": [
         "5025", 
         "5028", 
@@ -238,6 +239,7 @@
         "8734", 
         "8738"
     ], 
+    "eyes": "facialRigBust_GEO", 
     "lowlidBlinkEdge": [
         "4870", 
         "4873", 
@@ -459,6 +461,7 @@
         "4893", 
         "4894"
     ], 
+    "eyebrow": "aa_facialRig_brows_GEO1", 
     "lowLipMedRezEdge": [
         "3557", 
         "3561", 

@@ -2,14 +2,14 @@ import os
 
 import maya.cmds as mc
 
-from ....lib import crvLib
-from ....lib import jntLib
-from ....lib import connect
-from ....lib import attrLib
-from ....lib import trsLib
-from ....lib import strLib
-from ....lib import deformLib
-from ....lib import control
+from ...lib import crvLib
+from ...lib import jntLib
+from ...lib import connect
+from ...lib import attrLib
+from ...lib import trsLib
+from ...lib import strLib
+from ...lib import deformLib
+from ...lib import control
 from . import funcs
 from . import lipsTemplate
 
@@ -373,9 +373,14 @@ class BuildLip(lipsTemplate.LipsTemplate):
                   self.uplipHirezEdge,self.uplipZipperEdge,self.lowLipLowRezEdge,self.lowLipHirezEdge,
                   self.lowLipMedRezEdge,self.lowLipZipperEdge]:
             mc.select(i, r = True)
-            crv = mc.reverseCurve(i,ch = 1 ,rpo =  1)[0]
-            crv = mc.rebuildCurve(crv, ch= False, rpo=1, rt=0, end=1, kr=2, kcp=0, kep=0, kt=1, s=6, d=3, tol=0.01)[0]
+            crv = mc.rebuildCurve(i, ch= False, rpo=1, rt=0, end=1, kr=2, kcp=0, kep=0, kt=1, s=6, d=3, tol=0.01)[0]
+            tempJnts = jntLib.create_on_curve(curve=crv, numOfJoints=3, parent=False, description='C_base', radius=1)
+            startTx = mc.getAttr(tempJnts[0] + '.tx')
+            endTx = mc.getAttr(tempJnts[-1] + '.tx')
+            if startTx > endTx:
+                crv = mc.reverseCurve(crv, ch=1, rpo=1)[0]
             i = crv
+            mc.delete(tempJnts)
             center = mc.objectCenter(i, gl = True)
             mc.xform(i , pivots=center)
 
@@ -530,9 +535,8 @@ class BuildLip(lipsTemplate.LipsTemplate):
         self.upLipLowRezBindJnts[1] = self.upLipLowRezBindJnts[1].split('|')[-1]
 
         self.mouthCtlOr = mc.createNode('transform', name = 'mouthCtlOri_GRP')
-        trsLib.match( self.mouthCtlOr, t = self.mouthPiv, r = self.mouthPiv)
-        mc.setAttr(self.mouthCtlOr + '.tz', 6.5)
-        mc.setAttr(self.mouthCtlOr + '.ty', 240.8)
+        trsLib.match(self.mouthCtlOr, self.mouthPiv)
+        mc.move(0, -1 * float(self.movement) , 6.5, self.mouthCtlOr, r = True, ws = True)
         self.mouthCtl, self.mouthCtlGrp = funcs.createMouthCtl(name = 'mouthCtl', parent = self.mouthCtlOr,
                                                     snapJnt=self.mouthPiv, side = 'C')
 
@@ -753,13 +757,14 @@ class BuildLip(lipsTemplate.LipsTemplate):
 
 
         # create nose ctls
-        self.noseCtl, self.noseCtlBase, self.columellaCtl = funcs.createNoseCtls(name = 'noseCtl',
+        self.noseCtl, self.noseCtlBase, self.columellaCtl,self.r_nostrilCtl, self.l_nostrilCtl = funcs.createNoseCtls(name = 'noseCtl',
                                                                                  parent = self.noseCtlGrp,
                                                                                  mainSnap = self.mouthAndJawMain[3],
                                                                                  cummelaSnap = self.mouthAndJawMain[4],
                                                                                  leftSnap = self.leftnostrils[0] ,
                                                                                  rightSnap = self.rightnostrils[0],
                                                                                  movement = self.movement)
+
 
         # create jaw ctls
         self.jawCtlOriGrp = mc.createNode('transform' ,name = 'jawCtlOri_GRP')

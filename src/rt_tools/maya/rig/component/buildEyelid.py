@@ -2,14 +2,14 @@ import os
 
 import maya.cmds as mc
 
-from ....lib import crvLib
-from ....lib import jntLib
-from ....lib import connect
-from ....lib import attrLib
-from ....lib import trsLib
-from ....lib import strLib
-from ....lib import deformLib
-from ....lib import control
+from ...lib import crvLib
+from ...lib import jntLib
+from ...lib import connect
+from ...lib import attrLib
+from ...lib import trsLib
+from ...lib import strLib
+from ...lib import deformLib
+from ...lib import control
 from . import funcs
 from . import eyelidsTemplate
 
@@ -67,11 +67,13 @@ class BuildEyelid(eyelidsTemplate.EyelidsTemplate):
 
     def createJoints(self):
         par = self.moduleGrp
+        self.eyelidFloodJnt = []
         for alias, blu in self.blueprints.items():
             if not alias in ('eyelidFlood'):
                 continue
             jnt = '{}_{}_JNT'.format(self.name, self.aliases[alias])
             jnt = mc.joint(par, n=jnt, rad = 0.4)
+            self.eyelidFloodJnt.append(jnt)
             trsLib.setTRS(jnt, self.blueprintPoses[alias], space='world')
             self.joints[alias] = jnt
 

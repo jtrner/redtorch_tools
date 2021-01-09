@@ -3,14 +3,14 @@ from collections import OrderedDict
 
 import maya.cmds as mc
 
-from ....lib import trsLib
-from ....lib import attrLib
-from ....lib import container
-from ....lib import strLib
-from ....lib import deformLib
-from ....lib import keyLib
-from ....lib import jntLib
-from ....lib import connect
+from ...lib import trsLib
+from ...lib import attrLib
+from ...lib import container
+from ...lib import strLib
+from ...lib import deformLib
+from ...lib import keyLib
+from ...lib import jntLib
+from ...lib import connect
 from . import buildEyebrow
 from . import funcs
 
@@ -141,16 +141,45 @@ class Eyebrows(buildEyebrow.BuildEyebrow):
         connect.remapVal(self.mainCtls[1] + '.translateY', browShapes + '.brow_' + self.side + '_InDown',
                          inputMin=0, inputMax=-3, outputMin=0, outputMax=2, name=self.side + '_browInDownY')
 
+        if self.side == 'R':
+            mc.move(0, -1 * (self.movement), 0, self.browCtlGrp, r = True, ws = True)
+
     def connect(self):
         super(Eyebrows, self).connect()
 
-        ctlPar = self.getOut('ctlParent')
-        if ctlPar:
-            mc.parent(self.browCtlGrp, ctlPar)
+        if self.side == 'R':
+            ctlPar = self.getOut('ctlParent')
+            if ctlPar:
+                mc.parent(self.browCtlGrp, ctlPar)
 
-        localPar = self.getOut('localParent')
-        if localPar:
-            mc.parent(self.localBrowsGrp , localPar)
+            localPar = self.getOut('localParent')
+            if localPar:
+                mc.parent(self.localBrowsGrp , localPar)
+
+
+        eyebrowLocalBrowGeo = self.getOut('eyebrowlocalBrow')
+        eyebrowsGeo = self.getOut('eyebrowsGeo')
+        if eyebrowsGeo:
+            if self.side == 'L':
+
+                deformLib.bind_geo(geos=eyebrowsGeo, joints=self.browJnts)
+                if eyebrowLocalBrowGeo:
+                    deformLib.bind_geo(geos=eyebrowLocalBrowGeo, joints=self.browJnts)
+
+            else:
+                skin = mc.listHistory(eyebrowsGeo)
+                if skin:
+                    for i in skin:
+                        if mc.objectType(i) == 'skinCluster':
+                            for j in self.browJnts:
+                                mc.skinCluster(i, edit = True, ai = j)
+                if eyebrowLocalBrowGeo:
+                    skin = mc.listHistory(eyebrowLocalBrowGeo)
+                    if skin:
+                        for i in skin:
+                            if mc.objectType(i) == 'skinCluster':
+                                for j in self.browJnts:
+                                    mc.skinCluster(i, edit=True, ai=j)
 
 
     def createSettings(self):
@@ -163,6 +192,7 @@ class Eyebrows(buildEyebrow.BuildEyebrow):
         attrLib.addString(self.blueprintGrp, 'blu_ctlParent', v='C_head.topSquashSecond')
         attrLib.addString(self.blueprintGrp, 'blu_localParent', v='C_head.localRigs')
         attrLib.addString(self.blueprintGrp, 'blu_eyebrowsGeo', v='C_head.eyebrowsGeo')
+        attrLib.addString(self.blueprintGrp, 'blu_eyebrowlocalBrow', v='C_head.eyebrowlocalBrow')
 
 
 

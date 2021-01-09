@@ -3,14 +3,14 @@ from collections import OrderedDict
 
 import maya.cmds as mc
 
-from ....lib import trsLib
-from ....lib import attrLib
-from ....lib import container
-from ....lib import strLib
-from ....lib import deformLib
-from ....lib import keyLib
-from ....lib import jntLib
-from ....lib import connect
+from ...lib import trsLib
+from ...lib import attrLib
+from ...lib import container
+from ...lib import strLib
+from ...lib import deformLib
+from ...lib import keyLib
+from ...lib import jntLib
+from ...lib import connect
 from . import buildMisc
 from . import funcs
 
@@ -83,30 +83,43 @@ class Misc(buildMisc.BulidMisc):
         ctlPar = self.getOut('ctlParent')
         if ctlPar:
             mc.parent(self.nasalCtlOriGrp , ctlPar)
+            mc.move(0, -1 * (self.movement), 0, self.nasalCtlOriGrp, r=True, ws=True)
             mc.parent(self.earCtlOriGrp , ctlPar)
+            mc.move(0, -1 * (self.movement), 0, self.earCtlOriGrp, r=True, ws=True)
             mc.parent(self.orbitalLowerCtlOriGrp , ctlPar)
+            mc.move(0, -1 * (self.movement), 0, self.orbitalLowerCtlOriGrp, r=True, ws=True)
+
 
         ctlParB = self.getOut('ctlParentB')
         if ctlParB:
             mc.parent(self.browFleshCtlOriGrp , ctlParB)
+            mc.move(0, -1 * (self.movement), 0, self.browFleshCtlOriGrp, r=True, ws=True)
             mc.parent(self.orbitalUpperCtlOriGrp , ctlParB)
+            mc.move(0, -1 * (self.movement), 0, self.orbitalUpperCtlOriGrp, r=True, ws=True)
+
 
         ctlParC = self.getOut('ctlParentC')
         if ctlParC:
             mc.parent(self.nasalLabialCtlOriGrp , ctlParC)
+            mc.move(0, -1 * (self.movement), 0, self.nasalLabialCtlOriGrp, r=True, ws=True)
             mc.parent(self.cheekCtlOriGrp , ctlParC)
+            mc.move(0, -1 * (self.movement), 0, self.cheekCtlOriGrp, r=True, ws=True)
 
         ctlParD = self.getOut('ctlParentD')
         if ctlParD:
             mc.parent(self.cheekLowerCtlOriGrp , ctlParD)
+            mc.move(0, -1 * (self.movement), 0, self.cheekLowerCtlOriGrp, r=True, ws=True)
 
         applePar = self.getOut('appleParent')
         if applePar:
             mc.parent(self.appleCtlOriGrp , applePar)
+            mc.move(0, -1 * (self.movement), 0, self.appleCtlOriGrp, r=True, ws=True)
 
-        localPar = self.getOut('localParent')
-        if localPar:
-            mc.parent(self.localMiscJntGrp, localPar)
+        if self.side == 'R':
+
+            localPar = self.getOut('localParent')
+            if localPar:
+                mc.parent(self.localMiscJntGrp, localPar)
 
         cheekMod = self.getOut('cheekJntMod')
         cheekRaise = self.getOut('cheekRaiseJntZ')
@@ -135,7 +148,36 @@ class Misc(buildMisc.BulidMisc):
         cheekRiseEntJnt = self.getOut('cheekRiseEndJnt')
         if cheekRiseEntJnt:
             trsLib.match(self.cheekRaiseOriCtlGrp, t =cheekRiseEntJnt )
-            mc.move(0, -20, 0.5, self.cheekRaiseOriCtlGrp, r=True, ws=True)
+            mc.move(0, -1 * (self.movement/4), 0.5, self.cheekRaiseOriCtlGrp, r=True, ws=True)
+
+        miscGeo = self.getOut('miscGeo')
+        eyebrowlocalMisc = self.getOut('eyebrowlocalMisc')
+        if miscGeo:
+            if self.side == 'L':
+                deformLib.bind_geo(geos=miscGeo, joints=self.miscJnts)
+            else:
+                skin = mc.listHistory(miscGeo)
+                if skin:
+                    for i in skin:
+                        if mc.objectType(i) == 'skinCluster':
+                            for j in self.miscJnts:
+                                mc.skinCluster(i, edit = True, ai = j)
+
+        jntsToBindBrow = []
+        for i in (0,2,3,4,6,7,8):
+            jnt = self.miscJnts[i]
+            jntsToBindBrow.append(jnt)
+        if eyebrowlocalMisc:
+            if self.side == 'L':
+                deformLib.bind_geo(geos=eyebrowlocalMisc, joints=jntsToBindBrow)
+            else:
+                jntsToBindBrow.pop(0)
+                skin = mc.listHistory(eyebrowlocalMisc)
+                if skin:
+                    for i in skin:
+                        if mc.objectType(i) == 'skinCluster':
+                            for j in jntsToBindBrow:
+                                mc.skinCluster(i, edit = True, ai = j)
 
     def createSettings(self):
         """
@@ -151,6 +193,7 @@ class Misc(buildMisc.BulidMisc):
         attrLib.addString(self.blueprintGrp, 'blu_appleParent', v='C_head.facialCtlGrp')
         attrLib.addString(self.blueprintGrp, 'blu_localParent', v='C_head.localRigs')
         attrLib.addString(self.blueprintGrp, 'blu_miscGeo', v='C_head.miscGeo')
+        attrLib.addString(self.blueprintGrp, 'blu_eyebrowlocalMisc', v='C_head.eyebrowlocalMisc')
         attrLib.addString(self.blueprintGrp, 'blu_cheekJntMod', v=self.side + '_eyelid.cheekJntMod')
         attrLib.addString(self.blueprintGrp, 'blu_cheekRaiseJntZ', v=self.side + '_eyelid.cheekRaiseJntZ')
         attrLib.addString(self.blueprintGrp, 'blu_cheekRiseEndJnt', v=self.side + '_eyelid.cheekRiseEndJnt')

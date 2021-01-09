@@ -2,14 +2,14 @@ import os
 
 import maya.cmds as mc
 
-from ....lib import crvLib
-from ....lib import jntLib
-from ....lib import connect
-from ....lib import attrLib
-from ....lib import trsLib
-from ....lib import strLib
-from ....lib import deformLib
-from ....lib import control
+from ...lib import crvLib
+from ...lib import jntLib
+from ...lib import connect
+from ...lib import attrLib
+from ...lib import trsLib
+from ...lib import strLib
+from ...lib import deformLib
+from ...lib import control
 from . import funcs
 from . import headTemplate
 
@@ -43,8 +43,9 @@ class BuildHead(headTemplate.HeadTemplate):
                         'headTopSquashDrvrJnt':'headTopSquashDrvrJnt',
                         'headBotSquashDrvrJnt':'headBotSquashDrvrJnt',
                         'l_headMidSquashDrvrJnt': 'l_headMidSquashDrvrJnt',
-                        'r_headMidSquashDrvrJnt': 'r_headMidSquashDrvrJnt'
-                        }
+                        'r_headMidSquashDrvrJnt': 'r_headMidSquashDrvrJnt',
+                        'l_eyeSocket':'l_eyeSocket',
+                        'r_eyeSocket': 'r_eyeSocket'}
 
     def createBlueprint(self):
         super(BuildHead, self).createBlueprint()
@@ -52,6 +53,7 @@ class BuildHead(headTemplate.HeadTemplate):
         if not mc.objExists(self.blueprints['headTopSquashDrvrJnt']):
             mc.joint(self.blueprintGrp, name=self.blueprints['headTopSquashDrvrJnt'])
             mc.xform(self.blueprints['headTopSquashDrvrJnt'], ws=True, t=(0, 183.472, -2.934))
+
 
         self.blueprints['headBotSquashDrvrJnt'] = '{}_headBotSquashDrvrJnt_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['headBotSquashDrvrJnt']):
@@ -118,6 +120,16 @@ class BuildHead(headTemplate.HeadTemplate):
             mc.joint(self.blueprints['headTop_squashGuide_03'] , name=self.blueprints['headTop_squashGuide_04'])
             mc.xform(self.blueprints['headTop_squashGuide_04'], ws=True, t=(0, 183.472, -2.934))
 
+        self.blueprints['l_eyeSocket'] = '{}_l_eyeSocket_BLU'.format(self.name)
+        if not mc.objExists(self.blueprints['l_eyeSocket']):
+            mc.joint(self.blueprintGrp , name=self.blueprints['l_eyeSocket'])
+            mc.xform(self.blueprints['l_eyeSocket'], ws=True, t=(2.759, 177.462,1.342))
+
+        self.blueprints['r_eyeSocket'] = '{}_r_eyeSocket_BLU'.format(self.name)
+        if not mc.objExists(self.blueprints['r_eyeSocket']):
+            mc.joint(self.blueprintGrp , name=self.blueprints['r_eyeSocket'])
+            mc.xform(self.blueprints['r_eyeSocket'], ws=True, t=(-2.759, 177.462,1.342))
+
     def createJoints(self):
         par = self.moduleGrp
         self.headSquashDrvrJnts = []
@@ -174,23 +186,55 @@ class BuildHead(headTemplate.HeadTemplate):
         self.setOut('topSquashFirst', self.topJntSquash[0])
         self.setOut('topSquashSecond', self.topJntSquash[1])
 
+        par = self.moduleGrp
+        self.eyeSocketJnts = []
+        for alias, blu in self.blueprints.items():
+            if not alias in ('l_eyeSocket', 'r_eyeSocket'):
+                continue
+            jnt = '{}_{}_JNT'.format(self.name, self.aliases[alias])
+            jnt = mc.joint(par, n=jnt, rad=0.4)
+            trsLib.setTRS(jnt, self.blueprintPoses[alias], space='world')
+            self.joints[alias] = jnt
+            self.eyeSocketJnts.append(jnt)
+            par = jnt
+
+
 
     def build(self):
         super(BuildHead, self).build()
-        funcs.detachHead(geoName = self.geo,edge = self.headEdge,name = 'localEyeLid_GEO', movement = self.headMovement)
+        self.facialRigBustGeo, self.geo = funcs.detachHead(geoName = self.geo,edge = self.headEdge,name = 'facialRigBust_GEO',
+                                                 movement = self.headMovement)
+
+        self.localEyeLidsGeo = mc.duplicate('facialRigBust_GEO', name = 'localEyeLid_GEO')[0]
+        mc.move(0,self.headMovement, 0,self.localEyeLidsGeo ,r = True, ws = True )
         self.setOut('eyelidsGeo', 'localEyeLid_GEO')
 
-        self.localLipsGeo = mc.duplicate('localEyeLid_GEO', name = 'localLips_GEO')
+        self.eyeLocalEyelid = mc.duplicate(self.eye, name = 'eyeLocalEyelid')[0]
+        mc.move(0,self.headMovement, 0,self.eyeLocalEyelid ,r = True, ws = True )
+
+        self.facialRigBrow = mc.duplicate(self.eyebrow, name = 'facialRigBrow')[0]
+
+        self.eyebrowlocalBrow = mc.duplicate(self.eyebrow, name = 'eyebrowlocalBrow')[0]
+        mc.move(0,3 * float(self.headMovement), 0,self.eyebrowlocalBrow ,r = True, ws = True )
+        self.setOut('eyebrowlocalBrow', self.eyebrowlocalBrow)
+
+
+        self.eyebrowlocalMisc = mc.duplicate(self.eyebrow, name = 'eyebrowlocalMisc')[0]
+        mc.move(0,4 * float(self.headMovement), 0,self.eyebrowlocalMisc ,r = True, ws = True )
+        self.setOut('eyebrowlocalMisc', self.eyebrowlocalMisc)
+
+
+        self.localLipsGeo = mc.duplicate('localEyeLid_GEO', name = 'localLips_GEO')[0]
         mc.move(0,self.headMovement, 0,self.localLipsGeo ,r = True, ws = True )
-        self.setOut('lipsGeo', self.localLipsGeo[0] )
+        self.setOut('lipsGeo', self.localLipsGeo )
 
-        self.localBrowsGeo = mc.duplicate('localLips_GEO', name = 'localBrow_GEO')
+        self.localBrowsGeo = mc.duplicate('localLips_GEO', name = 'localBrow_GEO')[0]
         mc.move(0,self.headMovement, 0,self.localBrowsGeo ,r = True, ws = True )
-        self.setOut('eyebrowsGeo', self.localBrowsGeo[0] )
+        self.setOut('eyebrowsGeo', self.localBrowsGeo)
 
-        self.localMiscGeo = mc.duplicate('localBrow_GEO', name = 'localMisc_GEO')
+        self.localMiscGeo = mc.duplicate('localBrow_GEO', name = 'localMisc_GEO')[0]
         mc.move(0,self.headMovement, 0,self.localMiscGeo ,r = True, ws = True )
-        self.setOut('miscGeo', self.localMiscGeo[0] )
+        self.setOut('miscGeo', self.localMiscGeo )
 
 
         # create head buttom ctl
@@ -215,30 +259,39 @@ class BuildHead(headTemplate.HeadTemplate):
         mc.parent(self.topJntSquash[0] ,self.headTopSquashCtlModGrp )
 
         # duplicate buttom squash joints
-        self.headBotGlobalJnts = trsLib.duplicate(self.buttomJntSquash[0], search = 'head', replace = 'global', hierarchy = True)
+        n = self.buttomJntSquash[0].replace('head', 'global')
+        self.headBotGlobalJnts = mc.duplicate(self.buttomJntSquash[0], renameChildren=1, n=n)
         mc.parent(self.headBotGlobalJnts[0],self.globalBotJntModGrp )
 
         # duplicate top squash joints
-        self.headTopGlobalJnts = trsLib.duplicate(self.topJntSquash[0], search = 'head', replace = 'global', hierarchy = True)
-        mc.parent(self.headTopGlobalJnts[0],self.globalTopJntModGrp )
+        n = self.topJntSquash[0].replace('head', 'global')
+        self.headTopGlobalJnts = mc.duplicate(self.topJntSquash[0], renameChildren=1, n=n)
 
-        self.botSquashCurve = crvLib.fromJnts(self.buttomJntSquash, degree=3, name='headBotSquashIk_CRV')
+        self.l_eyeSocketJntOriGrp = mc.createNode('transform', name = 'l_eyeSocketJntOriGrp', p = self.headTopGlobalJnts[0])
+        trsLib.match(self.l_eyeSocketJntOriGrp,self.eyeSocketJnts[0])
+        self.l_eyeSocketJntModGrp = mc.createNode('transform', name = 'l_eyeSocketJntModGrp', p = self.l_eyeSocketJntOriGrp)
+        mc.parent(self.eyeSocketJnts[0], self.l_eyeSocketJntModGrp)
+
+        self.r_eyeSocketJntOriGrp = mc.createNode('transform', name = 'r_eyeSocketJntOriGrp', p = self.headTopGlobalJnts[0])
+        trsLib.match(self.r_eyeSocketJntOriGrp,self.eyeSocketJnts[1])
+        self.r_eyeSocketJntModGrp = mc.createNode('transform', name = 'r_eyeSocketJntModGrp', p = self.r_eyeSocketJntOriGrp)
+        mc.parent(self.eyeSocketJnts[1], self.r_eyeSocketJntModGrp)
+
+        self.botSquashCurve = crvLib.fromJnts(self.headBotGlobalJnts, degree=3, name='headBotSquashIk_CRV')
         self.botSquashCurve = mc.listRelatives(self.botSquashCurve, parent = True)[0]
         mc.parent(self.botSquashCurve ,self.globalBotJntModGrp)
 
-
-        self.topSquashCurve = crvLib.fromJnts(self.topJntSquash, degree=3, name='headTopSquashIk_CRV')
+        self.topSquashCurve = crvLib.fromJnts(self.headTopGlobalJnts, degree=3, name='headTopSquashIk_CRV')
         self.topSquashCurve = mc.listRelatives(self.topSquashCurve, parent = True)[0]
-
-
-        self.headTopIkHandle = mc.ikHandle(n='headTopSquash_IKH', sj=self.topJntSquash[0], ee=self.topJntSquash[-1],
-                                           sol='ikSplineSolver',c=self.topSquashCurve, ccv=False)[0]
         mc.parent(self.topSquashCurve ,self.globalTopJntModGrp)
+
+
+        self.headTopIkHandle = mc.ikHandle(n='headTopSquash_IKH', sj=self.headTopGlobalJnts[0], ee=self.headTopGlobalJnts[-1],
+                                           sol='ikSplineSolver',c=self.topSquashCurve, ccv=False)[0]
         mc.parent(self.headTopIkHandle ,self.headSquashMechanicGrp)
 
-        self.headBotIkHandle = mc.ikHandle(n='headButtomSquash_IKH', sj=self.buttomJntSquash[0], ee=self.buttomJntSquash[-1],
+        self.headBotIkHandle = mc.ikHandle(n='headButtomSquash_IKH', sj=self.headBotGlobalJnts[0], ee=self.headBotGlobalJnts[-1],
                                            sol='ikSplineSolver', c=self.botSquashCurve, ccv=False)[0]
-        mc.parent(self.botSquashCurve ,self.globalBotJntModGrp)
         mc.parent(self.headBotIkHandle ,self.headSquashMechanicGrp)
 
         # create hierarchy for squash drvr joints
@@ -258,8 +311,7 @@ class BuildHead(headTemplate.HeadTemplate):
         mc.parent(self.headSquashDrvrJnts[1], self.headBotSquashDrvrModGrp)
 
         # create curve on top and buttom squash joints
-        self.buttomJntSquash.reverse()
-        self.allJntsSquash =  self.buttomJntSquash + self.topJntSquash
+        self.allJntsSquash =  self.buttomJntSquash[-1::-1] + self.topJntSquash
 
         self.masterHeadCurve = crvLib.fromJnts(self.allJntsSquash, degree = 3 ,name = 'headSquetchMaster_CRV')
         self.masterHeadCurve = mc.listRelatives(self.masterHeadCurve, parent = True)[0]

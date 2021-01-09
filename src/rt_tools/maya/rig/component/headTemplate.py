@@ -3,11 +3,11 @@ from collections import OrderedDict
 
 import maya.cmds as mc
 
-from ....lib import trsLib
-from ....lib import attrLib
-from ....lib import container
-from ....lib import strLib
-from ...component import template
+from ...lib import trsLib
+from ...lib import attrLib
+from ...lib import container
+from ...lib import strLib
+from ..component import template
 
 reload(template)
 reload(trsLib)

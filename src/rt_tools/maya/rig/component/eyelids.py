@@ -1,34 +1,17 @@
-"""
-import sys
-path = r'D:\all_works\redtorch_tools\src'
-if not path in sys.path:
-    sys.path.insert(0,path)
-
-
-from rt_tools.maya.rig.component.eyelid import eyelids as eyelids
-reload(eyelids)
-eyelid = eyelids.Eyelids(upLidHdCrv = 'localL_upLidHD_CRV',lowLidHdCrv = 'localL_lowLidHD_CRV',
-                 upLidLdCrv = 'localL_upLidLD_CRV',lowLidLdCrv = 'localL_lowLidLD_CRV',lidBlinkCrv = 'localL_lidBlink_CRV',
-                 upLidBlink = 'localL_upLidBlink_CRV',lowLidBlink = 'localL_lowLidBlink_CRV',
-                 upCreaseHd = 'localupCreaseHD_CRV',lowCreaseHd = 'localL_lowCreaseHD_CRV',
-                 upCreaseLd = 'localL_upCreaseLD_CRV',lowCreaseLd = 'localL_lowCreaseLD_CRV')
-eyelid.build()
-
-"""
 
 import logging
 from collections import OrderedDict
 
 import maya.cmds as mc
 
-from ....lib import trsLib
-from ....lib import attrLib
-from ....lib import container
-from ....lib import strLib
-from ....lib import deformLib
-from ....lib import keyLib
-from ....lib import jntLib
-from ....lib import connect
+from ...lib import trsLib
+from ...lib import attrLib
+from ...lib import container
+from ...lib import strLib
+from ...lib import deformLib
+from ...lib import keyLib
+from ...lib import jntLib
+from ...lib import connect
 from . import buildEyelid
 from . import funcs
 
@@ -70,6 +53,7 @@ class Eyelids(buildEyelid.BuildEyelid):
         self.upCreaseLdEdge = upCreaseLdEdge
         self.lowCreaseHdEdge = lowCreaseHdEdge
         self.lowCreaseLdEdge = lowCreaseLdEdge
+
 
 
         super(Eyelids, self).__init__(**kwargs)
@@ -229,6 +213,8 @@ class Eyelids(buildEyelid.BuildEyelid):
         mc.parentConstraint(self.lowCreaseCtls[1],self.upCreaseCtls[-1],self.lowCreaseLdCtlGrps[2],skipRotate='x',weight = 0.5 ,mo = True)
 
 
+
+
         #clean outliner
         for i in [self.upLidHdEdge, self.upLidLdEdge, self.uplidBlinkEdge,
                   self.lowLidHdEdge, self.lowLidLdEdge, self.lowlidBlinkEdge, self.lidBlinkEdge, self.tempCurve, self.upCreaseHdEdge,
@@ -246,13 +232,14 @@ class Eyelids(buildEyelid.BuildEyelid):
     def connect(self):
         super(Eyelids, self).connect()
 
-        ctlPar = self.getOut('ctlParent')
-        if ctlPar:
-            mc.parent(self.eyelidCtlGrp, ctlPar)
+        if self.side == 'R':
+            ctlPar = self.getOut('ctlParent')
+            if ctlPar:
+                mc.parent(self.eyelidCtlGrp, ctlPar)
 
-        localPar = self.getOut('localParent')
-        if localPar:
-            mc.parent(self.localEyelidRig, localPar)
+            localPar = self.getOut('localParent')
+            if localPar:
+                mc.parent(self.localEyelidRig, localPar)
 
         eyeAimCtl = self.getOut('eyeAimCtl')
         eyeMakroLoc = self.getOut('eyeMakroloc')
@@ -319,6 +306,22 @@ class Eyelids(buildEyelid.BuildEyelid):
 
 
 
+        eyelidGeo = self.getOut('eyelidsGeo')
+        if eyelidGeo:
+            if self.side == 'L':
+                jntsToBindEyeLidGeo = self.upEyelidBndJnts + self.uplidCreaseBndJnts + self.lowEyelidBndJnts + self.lowlidCreaseBndJnts + self.eyelidFloodJnt
+                jntsToBindEyeLidGeo.append(self.cheeckJoints[0])
+                deformLib.bind_geo(geos=eyelidGeo, joints=jntsToBindEyeLidGeo)
+
+            else:
+                jntsToBindEyeLidGeo = self.upEyelidBndJnts + self.uplidCreaseBndJnts + self.lowEyelidBndJnts + self.lowlidCreaseBndJnts
+                jntsToBindEyeLidGeo.append(self.cheeckJoints[0])
+                skin = mc.listHistory(eyelidGeo)
+                if skin:
+                    for i in skin:
+                        if mc.objectType(i) == 'skinCluster':
+                            for j in jntsToBindEyeLidGeo:
+                                mc.skinCluster(i, edit = True, ai = j)
 
     def createSettings(self):
         """

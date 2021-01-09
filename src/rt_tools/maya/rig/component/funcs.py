@@ -1,14 +1,14 @@
 import maya.cmds as mc
 
-from ....lib import crvLib
-from ....lib import jntLib
-from ....lib import connect
-from ....lib import attrLib
-from ....lib import trsLib
-from ....lib import strLib
-from ....lib import deformLib
-from ....lib import control
-from ....lib import keyLib
+from ...lib import crvLib
+from ...lib import jntLib
+from ...lib import connect
+from ...lib import attrLib
+from ...lib import trsLib
+from ...lib import strLib
+from ...lib import deformLib
+from ...lib import control
+from ...lib import keyLib
 
 
 reload(keyLib)
@@ -30,19 +30,20 @@ def detachHead(geoName = '',edge = '',name = '', movement = 50):
         mc.ls(sl = True)
     mc.DetachComponent()
     mc.select(geoName)
-    mc.polySeparate(n = name , ch = False)
+    parts = mc.polySeparate(n = name , ch = False)
+    localGrp = mc.listRelatives(parts, parent=True)[0]
+    mc.rename(localGrp, 'localGeoGrp')
     head = mc.duplicate(name)[0]
-    print(head)
     mc.select(name, r = True)
     mc.select(name + '1', add = True)
-    mc.polyUnite(ch = False ,name = 'newHead', muv = 1)
-    mc.select('newHead' +'.vtx[:]')
+    body = mc.polyUnite(ch = False ,name = 'C_body_GEO', muv = 1)[0]
+    mc.select(body +'.vtx[:]')
     mc.polyMergeVertex(d = 0.01, am = True, ch = False)
     mc.select(cl = True)
     head = head.split('|')[-1]
-    mc.move(0,movement, 0, head, r = True, ws = True)
     newName = mc.rename(head, name)
-    return newName
+
+    return name,body
 
 def createCtl(parent = '',side = 'L',scale = [1, 1, 1],shape = 'square', orient = (0,1,0)):
     mult = [-1, 1][side == 'L']
@@ -493,7 +494,7 @@ def createNoseCtls(name = '', parent = '',mainSnap = '', cummelaSnap = '', leftS
     noseCtl = noseCtl.split('|')[-1]
     noseCtlBase = noseCtlBase.split('|')[-1]
     cumellaCtl = cumellaCtl.split('|')[-1]
-    return noseCtl, noseCtlBase, cumellaCtl
+    return noseCtl, noseCtlBase, cumellaCtl, r_nostrilCtl, l_nostrilCtl
 
 
 def drivenCornerLip(leftUpCtl = '', leftLowCtl = '', rightUpCtl = '', rightLowCtl = '',

@@ -2,14 +2,14 @@ import os
 
 import maya.cmds as mc
 
-from ....lib import crvLib
-from ....lib import jntLib
-from ....lib import connect
-from ....lib import attrLib
-from ....lib import trsLib
-from ....lib import strLib
-from ....lib import deformLib
-from ....lib import control
+from ...lib import crvLib
+from ...lib import jntLib
+from ...lib import connect
+from ...lib import attrLib
+from ...lib import trsLib
+from ...lib import strLib
+from ...lib import deformLib
+from ...lib import control
 from . import funcs
 from . import miscTemplate
 

@@ -3,15 +3,15 @@ from collections import OrderedDict
 
 import maya.cmds as mc
 
-from ....lib import trsLib
-from ....lib import attrLib
-from ....lib import container
-from ....lib import strLib
-from ....lib import deformLib
-from ....lib import keyLib
-from ....lib import jntLib
-from ....lib import connect
-from ....lib import crvLib
+from ...lib import trsLib
+from ...lib import attrLib
+from ...lib import container
+from ...lib import strLib
+from ...lib import deformLib
+from ...lib import keyLib
+from ...lib import jntLib
+from ...lib import connect
+from ...lib import crvLib
 from . import buildLip
 from . import funcs
 
@@ -339,6 +339,59 @@ class LipsB(buildLip.BuildLip):
 
         # connect columella ctl to the group above columella joint
         [mc.connectAttr(self.columellaCtl + '.{}{}'.format(t,a), self.columJntMod + '.{}{}'.format(t,a))for t in 'trs' for a in'xyz']
+
+        #connect left  and  right nose ctls to the mod joints grp
+        [mc.connectAttr(self.l_nostrilCtl + '.{}{}'.format(t,a), self.l_nostrilJntMod + '.{}{}'.format(t,a))for t in 'trs' for a in'xyz']
+        [mc.connectAttr(self.r_nostrilCtl + '.{}{}'.format(t,a), self.r_nostrilJntMod + '.{}{}'.format(t,a))for t in 'trs' for a in'xyz']
+        for i in [self.l_nostrilCtl,self.r_nostrilCtl]:
+            attrLib.addFloat(i , ln = 'flare', dv = 0)
+        units = []
+        fac = 0.1
+        for i in range(2):
+            unit = mc.shadingNode('unitConversion', asUtility=True)
+            mc.setAttr(unit + '.conversionFactor', fac)
+            units.append(unit)
+            fac = 0.06
+        mc.connectAttr(self.l_nostrilCtl + '.flare', units[0] + '.input')
+        mc.connectAttr(units[0]  + '.output', self.l_nostrilFlareMod + '.tx')
+        mc.connectAttr(self.l_nostrilCtl + '.flare', units[1] + '.input')
+        mc.connectAttr(units[1]  + '.output', self.l_nostrilFlareMod + '.ty')
+
+        units = []
+        fac = 0.1
+        for i in range(2):
+            unit = mc.shadingNode('unitConversion', asUtility=True)
+            mc.setAttr(unit + '.conversionFactor', fac)
+            units.append(unit)
+            fac = 0.06
+        mc.connectAttr(self.r_nostrilCtl + '.flare', units[0] + '.input')
+        mc.connectAttr(units[0]  + '.output', self.r_nostrilFlareMod + '.tx')
+        mc.connectAttr(self.r_nostrilCtl + '.flare', units[1] + '.input')
+        mc.connectAttr(units[1]  + '.output', self.r_nostrilFlareMod + '.ty')
+
+        # connect nose makro locs to the nostril joints
+        self.leftnostrils[0],self.l_nostMakroLoc
+        mc.pointConstraint(self.leftnostrils[0], self.l_nostMakroLoc, mo = True)
+        mc.pointConstraint(self.rightnostrils[0], self.r_nostMakroLoc, mo = True)
+
+        nostrilScaleMult = mc.createNode('multiplyDivide', name = 'nostrilScale_MDN')
+        mc.connectAttr(self.l_nostMakroLoc + '.ty', nostrilScaleMult + '.input1X')
+        mc.connectAttr(self.r_nostMakroLoc + '.ty', nostrilScaleMult + '.input1Y')
+        for i in ['input2X', 'input2Y', 'input2Z']:
+            mc.setAttr(nostrilScaleMult + '.' + i, -0.130)
+
+        nostrilScalePma = mc.createNode('plusMinusAverage', name = 'nostrilScale_PMA')
+        mc.connectAttr(nostrilScaleMult + '.outputX', nostrilScalePma + '.input3D[0].input3Dx')
+        mc.connectAttr(nostrilScaleMult + '.outputY', nostrilScalePma + '.input3D[0].input3Dy')
+        mc.setAttr(nostrilScalePma + '.input3D[1].input3Dx', 1)
+        mc.setAttr(nostrilScalePma + '.input3D[1].input3Dy', 1)
+        mc.connectAttr(nostrilScalePma + '.output3Dx',self.leftnostrils[0] + '.sy')
+        mc.connectAttr(nostrilScalePma + '.output3Dy',self.rightnostrils[0] + '.sy')
+
+        # connect local up lip conrner control to the lipcorner makro driver loc
+        mc.pointConstraint(self.leftUpCornerCtl,self.l_cornerMakroLoc ,mo = True)
+        mc.pointConstraint(self.rightUpCornerCtl,self.r_cornerMakroLoc ,mo = True)
+
 
         #connect mouth squash driver loc to the mouthsquash ctlGrp
         connect.remapVal(self.mouthSquashDrvrLoc + '.ty', self.upsquashCtlMakro + '.ty', inputMin= 0,
@@ -817,7 +870,7 @@ class LipsB(buildLip.BuildLip):
         [mc.connectAttr(self.cln(self.lowlipctl) + '.{}{}'.format(t, a), self.cln(self.lowMidRollLoc) + '.{}{}'.format(t, a)) for t in 'r' for a in 'xyz']
 
         # connect upCorner controls to the lower corner controls
-        for i in ['tx', 'ty', 'visibility','rotateOrder', 'zip', 'Z', 'puff']:
+        for i in ['tx', 'ty', 'rotateOrder', 'zip', 'Z', 'puff']:
             mc.connectAttr(self.cln(self.leftUpCornerCtl) + '.' + i, self.cln(self.leftLowCornerCtl) + '.' + i)
             mc.connectAttr(self.cln(self.rightUpCornerCtl) + '.' + i, self.cln(self.rightLowCornerCtl) + '.' + i)
 
@@ -839,6 +892,13 @@ class LipsB(buildLip.BuildLip):
                        [self.ctlupLipJawFollowLoc,self.ctlLipCornerJawFollowLoc,self.ctllowLipJawFollowLoc]):
 
             [mc.connectAttr(i + '.{}{}'.format(t, a), j + '.{}{}'.format(t, a)) for t in'trs' for a in 'xyz']
+
+        # hide left low corner ctls
+        for i in [self.leftLowCornerCtl, self.rightLowCornerCtl,
+                  self.cln(self.leftLowCornerCtl),self.cln(self.rightLowCornerCtl)]:
+            mc.setAttr(i + '.v' , 0)
+
+
 
         # clean out the outliner
         self.upperTeethCrvGrp = mc.createNode('transform', name = 'upperTeethCurve')
@@ -964,6 +1024,27 @@ class LipsB(buildLip.BuildLip):
         teethStufPar = self.getOut('teethStufParent')
         if teethStufPar:
             mc.parent(self.teethStuffGrp,teethStufPar)
+
+        # bind joints to the local lip geo
+        self.mouthAndJawMain.pop(2)
+        lipsGeo = self.getOut('lipsGeo')
+        if lipsGeo:
+            jntsToBindLipGeo = self.mouthAndJawMain+self.jawSecBndJnt+self.leftnostrils+self.rightnostrils+self.upMicroJnts+self.lowMicroJnts
+            jntsToBindLipGeo.append(self.upLipLowRezBindJnts[0])
+            jntsToBindLipGeo.append(self.upLipLowRezBindJnts[2])
+            jntsToBindLipGeo.append(self.l_upLipcornerminor)
+            jntsToBindLipGeo.append(self.r_upLipcornerminor)
+            deformLib.bind_geo(geos=lipsGeo, joints=jntsToBindLipGeo)
+
+        # bind jnts to the teeth geo
+        upperteeth = self.getOut('upperteeth')
+        if upperteeth:
+            deformLib.bind_geo(geos=upperteeth, joints=self.teethJnts[0])
+
+        lowerteeth = self.getOut('lowerteeth')
+        if lowerteeth:
+            deformLib.bind_geo(geos=lowerteeth, joints=self.teethJnts[1])
+
 
 
     def createSettings(self):
