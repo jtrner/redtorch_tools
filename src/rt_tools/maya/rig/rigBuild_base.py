@@ -195,7 +195,6 @@ class RigBuild_base(object):
             self.INSTANCES[bluGrp]['data'] = info['data']
             self.INSTANCES[bluGrp]['type'] = info['type']
 
-        print(self.INSTANCES)
         print('initBlueprints success')
 
     def build(self):

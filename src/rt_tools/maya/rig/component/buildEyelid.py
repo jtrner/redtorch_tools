@@ -562,7 +562,9 @@ class BuildEyelid(eyelidsTemplate.EyelidsTemplate):
             else:
                 mc.parent(grp, self.lowCreaseOriGrp)
 
-
+    def connect(self):
+        super(BuildEyelid, self).connect()
+        pass
 
 
 

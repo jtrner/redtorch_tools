@@ -40,6 +40,8 @@ class EyelidsTemplate(template.Template):
         self.eyelidSocketGrp = mc.createNode('transform', name = self.side + '_eyeLidCtrlSocket_GRP',p = self.eyelidCtlGrp)
         self.eyelidsideCtlGrp = mc.createNode('transform', name = self.side + '_eyeLidCtrl_GRP',p = self.eyelidSocketGrp)
 
+        self.setOut('eyelidSocketGrp', self.eyelidSocketGrp)
+
         if self.side == 'L':
             self.eyeCreaseGrp = mc.createNode('transform', name = 'eyeCrease_Rig', p = self.localEyelidRig)
         else:

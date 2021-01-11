@@ -67,8 +67,15 @@ class Eyelids(buildEyelid.BuildEyelid):
             mc.wire(gw=False, en=1.000000, ce=0.000000, li=0.000000, w= self.lidBlinkEdge)
 
         # blend shape up and low ld curves to lid blink
-        mc.blendShape(self.upLidLdEdge, self.lowLidLdEdge, self.lidBlinkEdge, tc=False, automatic=True, name=self.side + '_lidBlink_BLS')
+        self.lidBlink = mc.blendShape(self.upLidLdEdge, self.lowLidLdEdge, self.lidBlinkEdge, tc=False,
+                                      automatic=True, name=self.side + '_lidBlink_BLS')[0]
         mc.blendShape(self.side + '_lidBlink_BLS' , edit=True, w=[(0, 0.15), (1, 0.85)])
+
+        self.lowlidBlinkBshp = mc.blendShape(self.lowlidBlinkEdge, self.lowLidHdEdge ,tc=False,
+                                      automatic=True, name=self.side + '_lowlidBlink_BLS')[0]
+
+        self.uplidBlinkBshp = mc.blendShape(self.uplidBlinkEdge, self.upLidHdEdge ,tc=False,
+                                      automatic=True, name=self.side + '_uplidBlink_BLS')[0]
 
 
         # connect controls to the transform above upLd eyelid joints
@@ -229,6 +236,7 @@ class Eyelids(buildEyelid.BuildEyelid):
         if self.side == 'R':
             mc.setAttr(self.eyelidCtlGrp + '.ty', -1 * (self.movement))
 
+        print(self.upLidLdEdge)
     def connect(self):
         super(Eyelids, self).connect()
 
@@ -299,12 +307,6 @@ class Eyelids(buildEyelid.BuildEyelid):
         mc.pointConstraint(self.browOutLoc,self.browInLoc,self.browMidMakroDrvrOriGrp, mo = True)
         mc.pointConstraint(self.browMidMakroDrvrLoc, self.browMidMakroLoc, mo = True)
 
-        eyeSquashCtl = self.getOut('eyeSquashCtl')
-        if eyeSquashCtl:
-            # connect squash ctl to the socket group
-            [mc.connectAttr(eyeSquashCtl + '.{}{}'.format(a, v), self.eyelidSocketGrp + '.{}{}'.format(a, v)) for a in 'trs' for v in 'xyz']
-
-
 
         eyelidGeo = self.getOut('eyelidsGeo')
         if eyelidGeo:
@@ -322,6 +324,24 @@ class Eyelids(buildEyelid.BuildEyelid):
                         if mc.objectType(i) == 'skinCluster':
                             for j in jntsToBindEyeLidGeo:
                                 mc.skinCluster(i, edit = True, ai = j)
+
+        # connect stuf to the link blendshapes
+        eyeSquashCtl = self.getOut('eyeSquashCtl')
+        if eyeSquashCtl:
+            blinkRemap = connect.remapVal(eyeSquashCtl + '.blinkHeight',self.lidBlink + '.' + self.side + '_upLidLd_CRV',
+                             inputMin= 0,inputMax = 10,outputMin = 0,outputMax = 1,name = self.side + '_blinkHeight')
+            reverseBlink = mc.createNode('reverse', name = self.side  + '_lidBlinkHeight_RVN')
+            mc.connectAttr(blinkRemap + '.outValue', reverseBlink + '.inputX')
+            mc.connectAttr(reverseBlink + '.outputX',self.lidBlink + '.' + self.side  +  '_lowLidLd_CRV' )
+
+            self.lowlidBlinkBshp
+            upblinkRemap = connect.remapVal(eyeSquashCtl + '.blink',self.uplidBlinkBshp + '.' + self.side  +'_upLidBlink_CRV',
+                             inputMin= 0,inputMax = 10,outputMin = 0,outputMax = 1,name = self.side + '_upLidblink')
+
+            lowblinkRemap = connect.remapVal(eyeSquashCtl + '.blink',self.lowlidBlinkBshp + '.' + self.side +  '_lowLidBlink_CRV',
+                             inputMin= 0,inputMax = 10,outputMin = 0,outputMax = 1,name = self.side + '_lowLidLd')
+
+
 
     def createSettings(self):
         """

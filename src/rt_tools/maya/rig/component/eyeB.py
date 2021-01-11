@@ -84,6 +84,26 @@ class EyeB(buildEye.BuildEye):
             if aimPar:
                 mc.parent(self.eyeAimCtlOriGrp, aimPar)
 
+        if self.side == 'L':
+            l_eyeSocketJntModGrp = self.getOut('l_eyeSocketJntModGrp')
+            if l_eyeSocketJntModGrp:
+                [mc.connectAttr(self.squashCtl + '.{}{}'.format(a, v), l_eyeSocketJntModGrp + '.{}{}'.format(a, v)) for a in 'trs' for v in 'xyz']
+
+        else:
+            r_eyeSocketJntModGrp = self.getOut('r_eyeSocketJntModGrp')
+            if r_eyeSocketJntModGrp:
+                [mc.connectAttr(self.squashCtl + '.{}{}'.format(a, v), r_eyeSocketJntModGrp + '.{}{}'.format(a, v)) for a in 'trs' for v in 'xyz']
+
+        eyelidSocketGrp = self.getOut('eyelidSocketGrp')
+        if eyelidSocketGrp:
+            [mc.connectAttr(self.squashCtl + '.{}{}'.format(a, v), eyelidSocketGrp + '.{}{}'.format(a, v)) for a in 'trs' for v in 'xyz']
+
+        # add attr on squash ctl
+        attrLib.addFloat(self.squashCtl, ln = 'blink', min = 0, max = 10, dv = 0)
+        attrLib.addFloat(self.squashCtl, ln = 'blinkHeight', min = 0, max = 10, dv = 1.5)
+
+
+
 
 
     def createSettings(self):
@@ -95,6 +115,9 @@ class EyeB(buildEye.BuildEye):
 
         attrLib.addString(self.blueprintGrp, 'blu_rigParent', v='C_head.topSquashFirst')
         attrLib.addString(self.blueprintGrp, 'blu_aimParent', v='C_head.facialCtlGrp')
+        attrLib.addString(self.blueprintGrp, 'blu_l_eyeSocketJntModGrp', v='C_head.l_eyeSocketJntModGrp')
+        attrLib.addString(self.blueprintGrp, 'blu_r_eyeSocketJntModGrp', v='C_head.r_eyeSocketJntModGrp')
+        attrLib.addString(self.blueprintGrp, 'blu_eyelidSocketGrp', v=self.side + '_eyelid.eyelidSocketGrp')
 
 
 

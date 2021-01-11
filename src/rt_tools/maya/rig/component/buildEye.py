@@ -104,7 +104,7 @@ class BuildEye(eyeTemplate.EyeTemplate):
 
         ctl, grp = funcs.createCtl(parent = self.eyePupilJntOriGrp ,side = self.side,
                                    scale = [0.5, 0.5, 0.5],shape = 'circle', orient = (0,0,1))
-        newName = self.eyeSquashCtlOriGrp.replace('OriGRP', '_CTL')
+        newName = self.eyePupilJntOriGrp.replace('OriGRP', '_CTL')
         self.pupilCtl = mc.rename(ctl, newName)
         mc.parent(self.eyeJoints[2], self.pupilCtl)
         newName = self.eyePupilJntOriGrp.replace('OriGRP', '_ZRO')
@@ -148,7 +148,6 @@ class BuildEye(eyeTemplate.EyeTemplate):
 
         mc.makeIdentity(self.sideAimCtl,apply = True, r = True, t = True, s = True)
         attrLib.lockHideAttrs(self.sideAimCtl, ['tz','rx','ry','rz','sx','sy','sz'],lock = True, hide = True)
-
 
 
 

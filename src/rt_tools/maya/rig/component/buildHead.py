@@ -272,10 +272,15 @@ class BuildHead(headTemplate.HeadTemplate):
         self.l_eyeSocketJntModGrp = mc.createNode('transform', name = 'l_eyeSocketJntModGrp', p = self.l_eyeSocketJntOriGrp)
         mc.parent(self.eyeSocketJnts[0], self.l_eyeSocketJntModGrp)
 
+        self.setOut('l_eyeSocketJntModGrp', self.l_eyeSocketJntModGrp)
+
         self.r_eyeSocketJntOriGrp = mc.createNode('transform', name = 'r_eyeSocketJntOriGrp', p = self.headTopGlobalJnts[0])
         trsLib.match(self.r_eyeSocketJntOriGrp,self.eyeSocketJnts[1])
         self.r_eyeSocketJntModGrp = mc.createNode('transform', name = 'r_eyeSocketJntModGrp', p = self.r_eyeSocketJntOriGrp)
         mc.parent(self.eyeSocketJnts[1], self.r_eyeSocketJntModGrp)
+
+        self.setOut('r_eyeSocketJntModGrp', self.r_eyeSocketJntModGrp)
+
 
         self.botSquashCurve = crvLib.fromJnts(self.headBotGlobalJnts, degree=3, name='headBotSquashIk_CRV')
         self.botSquashCurve = mc.listRelatives(self.botSquashCurve, parent = True)[0]

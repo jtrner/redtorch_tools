@@ -942,6 +942,59 @@ class LipsB(buildLip.BuildLip):
             deformLib.blendShapeTarget(self.cln(self.uplipMedRezEdge), i, upMedRezblsGlob)
             deformLib.blendShapeTarget(self.cln(self.lowLipMedRezEdge), i, lowMedRezblsGlob)
 
+        # connect stuf to the sneer blendshapes
+        # up lip
+        for c,b in zip([self.rightUpCornerCtl, self.cln(self.rightUpCornerCtl)], [upLowRezbls, upLowRezblsGlob]):
+            connect.remapVal(c + '.tx', b + '.R_CornerIn6',
+                             inputMin= 0, inputMax= -6, outputMin= 0, outputMax= 1, name = c.split('_')[0] + '_CornerInBshp')
+
+            connect.remapVal(c + '.tx', b + '.R_CornerOut10',
+                             inputMin= 0, inputMax= 20, outputMin= 0, outputMax= 2, name = c.split('_')[0] + '_CornerOutBshp')
+        for c,b in zip([self.leftUpCornerCtl, self.cln(self.leftUpCornerCtl)], [upLowRezbls, upLowRezblsGlob]):
+            connect.remapVal(c + '.tx', b + '.L_CornerIn6',
+                             inputMin= 0, inputMax= -6, outputMin= 0, outputMax= 1, name = c.split('_')[0] + '_CornerInBshp')
+
+            connect.remapVal(c + '.tx', b + '.L_CornerOut10',
+                             inputMin= 0, inputMax= 20, outputMin= 0, outputMax= 2, name = c.split('_')[0] + '_CornerOutBshp')
+
+        for c,b in zip([upLowRezbls, upLowRezblsGlob], [upMedRezbls, upMedRezblsGlob]):
+
+            localHalfMdBshpMult = mc.createNode('multiplyDivide', name = c.split('_')[0] + '_HalfMdBshp_MDN')
+            for i in ['input2X', 'input2Y', 'input2Z']:
+                mc.setAttr(localHalfMdBshpMult + '.' + i, 0.5)
+            mc.connectAttr(c + '.L_CornerOut10', localHalfMdBshpMult + '.input1X')
+            mc.connectAttr(c + '.R_CornerOut10', localHalfMdBshpMult + '.input1Y')
+            mc.connectAttr(localHalfMdBshpMult + '.outputX', b +'.L_MedCornerOut20')
+            mc.connectAttr(localHalfMdBshpMult + '.outputY', b +'.R_MedCornerOut20')
+            mc.connectAttr(c + '.L_CornerIn6', b + '.L_MedCornerIn6')
+            mc.connectAttr(c + '.R_CornerIn6', b + '.R_MedCornerIn6')
+        # low lip
+        for c,b in zip([self.rightLowCornerCtl, self.cln(self.rightLowCornerCtl)], [lowLowRezbls, lowLowRezblsGlob]):
+            connect.remapVal(c + '.tx', b + '.R_CornerIn6',
+                             inputMin= 0, inputMax= -6, outputMin= 0, outputMax= 1, name = c.split('_')[0] + '_CornerInBshp')
+
+            connect.remapVal(c + '.tx', b + '.R_CornerOut10',
+                             inputMin= 0, inputMax= 20, outputMin= 0, outputMax= 2, name = c.split('_')[0] + '_CornerOutBshp')
+        for c,b in zip([self.leftLowCornerCtl, self.cln(self.leftLowCornerCtl)], [lowLowRezbls, lowLowRezblsGlob]):
+            connect.remapVal(c + '.tx', b + '.L_CornerIn6',
+                             inputMin= 0, inputMax= -6, outputMin= 0, outputMax= 1, name = c.split('_')[0] + '_CornerInBshp')
+
+            connect.remapVal(c + '.tx', b + '.L_CornerOut10',
+                             inputMin= 0, inputMax= 20, outputMin= 0, outputMax= 2, name = c.split('_')[0] + '_CornerOutBshp')
+
+        for c,b in zip([lowLowRezbls, lowLowRezblsGlob], [lowMedRezbls, lowMedRezblsGlob]):
+
+            localHalfMdBshpMult = mc.createNode('multiplyDivide', name = c.split('_')[0] + '_HalfMdBshp_MDN')
+            for i in ['input2X', 'input2Y', 'input2Z']:
+                mc.setAttr(localHalfMdBshpMult + '.' + i, 0.5)
+            mc.connectAttr(c + '.L_CornerOut10', localHalfMdBshpMult + '.input1X')
+            mc.connectAttr(c + '.R_CornerOut10', localHalfMdBshpMult + '.input1Y')
+            mc.connectAttr(localHalfMdBshpMult + '.outputX', b +'.L_MedCornerOut20')
+            mc.connectAttr(localHalfMdBshpMult + '.outputY', b +'.R_MedCornerOut20')
+            mc.connectAttr(c + '.L_CornerIn6', b + '.L_MedCornerIn6')
+            mc.connectAttr(c + '.R_CornerIn6', b + '.R_MedCornerIn6')
+
+
         # clean outliner
         self.noTuchyUp = self.noTuchyUp.split('|')[-1]
         self.noTuchyLow = self.noTuchyLow.split('|')[-1]
