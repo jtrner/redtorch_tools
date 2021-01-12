@@ -45,7 +45,7 @@ def detachHead(geoName = '',edge = '',name = '', movement = 50):
 
     return name,body
 
-def createCtl(parent = '',side = 'L',scale = [1, 1, 1],shape = 'square', orient = (0,1,0)):
+def createCtl(parent = '',side = 'L',scale = [1, 1, 1],shape = 'square', orient = (0,1,0),moveShape=[0,0,0.7]):
     mult = [-1, 1][side == 'L']
     ctl = control.Control(descriptor='',
                           side=side,
@@ -53,7 +53,7 @@ def createCtl(parent = '',side = 'L',scale = [1, 1, 1],shape = 'square', orient 
                           shape=shape,
                           color=control.SECCOLORS[side],
                           scale=scale,
-                          moveShape=[0,0,0.7],
+                          moveShape=moveShape,
                           matchTranslate=parent,
                           matchRotate= parent)
 
