@@ -4,6 +4,7 @@ from collections import OrderedDict
 
 import maya.cmds as mc
 
+from ...lib import crvLib
 from ...lib import trsLib
 from ...lib import attrLib
 from ...lib import container
@@ -16,6 +17,7 @@ from . import neckTemplate
 from . import funcs
 
 reload(jntLib)
+reload(crvLib)
 reload(connect)
 reload(funcs)
 reload(keyLib)
@@ -89,7 +91,7 @@ class NeckB(neckTemplate.NeckTemplate):
         for alias, blu in self.blueprints.items():
             if not alias in ('neck_01', 'neck_02','neck_03','neck_04','neck_05'):
                 continue
-            jnt = '{}_{}_JNT'.format(self.name, self.aliases[alias])
+            jnt = '{}_{}_JNT'.format(self.side, self.aliases[alias])
             jnt = mc.joint(par, n=jnt, rad = 1)
             self.neckJnts.append(jnt)
             trsLib.setTRS(jnt, self.blueprintPoses[alias], space='world')
@@ -101,7 +103,7 @@ class NeckB(neckTemplate.NeckTemplate):
         for alias, blu in self.blueprints.items():
             if not alias in ('headStart', 'headEnd'):
                 continue
-            jnt = '{}_{}_JNT'.format(self.name, self.aliases[alias])
+            jnt = '{}_{}_JNT'.format(self.side, self.aliases[alias])
             jnt = mc.joint(par, n=jnt, rad = 1)
             self.headJnts.append(jnt)
             trsLib.setTRS(jnt, self.blueprintPoses[alias], space='world')
@@ -118,6 +120,8 @@ class NeckB(neckTemplate.NeckTemplate):
 
     def build(self):
         super(NeckB, self).build()
+        mc.parent(self.neckJnts[0], self.neckJntGrp)
+
         # create headCtl
         ctl, grp = funcs.createCtl(parent = self.headOriGrp,side = 'C',scale = [15, 1, 15],shape = 'cube',
                                    orient = (0,1,0),moveShape=[0,12,0])
@@ -140,6 +144,11 @@ class NeckB(neckTemplate.NeckTemplate):
         name = self.neckBaseOriGrp.replace('Ori_GRP', '_CTL')
         self.neckStartCtl = mc.rename(ctl, name)
         mc.parent(self.neckStartCtlGrp, self.neckBaseOriGrp)
+
+        attrLib.addEnum(self.neckStartCtl, 'spaceSwitch', en = ['chest', 'body', 'global'], dv = 0)
+        for i in ['L_sternoCleidomastoid', 'R_sternoCleidomastoid']:
+            attrLib.addFloat(self.neckStartCtl, ln = i, min = 0, max = 10, dv = 0)
+
 
         self.neckIkButtomDrvrJnt = mc.joint(self.neckStartCtl, name = 'neckIkButtomDriver_JNT')
         trsLib.match(self.neckIkButtomDrvrJnt, self.neckJnts[0])
@@ -183,6 +192,88 @@ class NeckB(neckTemplate.NeckTemplate):
         self.neckTwisterTopDrvrLocShape = mc.createNode('locator', name = 'neckTwister_topDrvrShape_LOC', p = self.neckTwisterTopDrvrLoc)
         trsLib.match(self.neckTwisterTopDrvrLoc , self.neckJnts[-1])
         mc.move(0,0,-16,self.neckTwisterTopDrvrLoc, r = True, ws = True)
+
+        # connect stuf togather
+        self.neckTwisterIkh = mc.ikHandle(solver="ikSCsolver",startJoint=self.neckIkTwisterJnt,
+                                          endEffector=self.neckIkTwisterEndJnt,
+                                          name=self.name + "_ikTwister_IKH")[0]
+
+        mc.parent(self.neckTwisterIkh, self.headJnts[0])
+
+        # create ik for neck jnts
+        self.neckIkCurve, self.neckIkCurveShape = crvLib.fromJnts(jnts= self.neckJnts, degree=3, name='neckIk_CRV')
+
+        self.neckIkh = mc.ikHandle(sj = self.neckJnts[0] ,ee = self.neckJnts[-1] ,
+                             name = self.name + '_IKH',solver = 'ikSplineSolver',
+                             c = 'neckIk_CRV', ccv = False)[0]
+
+        # parent,orient and scale constraint stuf to the headOriGrp
+        attrLib.addEnum(self.headCtl, 'spaceSwitch', en = ['chest', 'body', 'global'], dv = 2)
+
+        mc.pointConstraint(self.neckHeadDrvrLoc, self.headOriGrp, mo = True)
+        #todo scale constraint the global ctl to the headOriGrp
+        #todo orient constraint chest loc,global loc and body loc to the headOriGrp
+
+        #todo scale constraint global ctl to the neckBaseOriGrp
+
+        # aim constraint locators to the neckSpaceMaster loc
+        neckSpaceAimCons = mc.aimConstraint([self.neckSpaceAimChestLoc,self.neckSpaceAimGlobalLoc,self.neckSpaceAimBodyLoc ],
+                                   self.neckSpaceMasterLoc,
+                                   aimVector=[1, 0, 0],
+                                   upVector=[0, 1, 0],
+                                   worldUpType="object",
+                                   worldUpObject=self.neckSpaceAimUpLoc)[0]
+
+        # connect stuf to the weight of aimConstraint targets
+
+        keyLib.setDriven(self.neckStartCtl + '.spaceSwitch', neckSpaceAimCons + '.' + self.neckSpaceAimChestLoc + 'W0',
+                         [0,1,2], [1,0,0], itt='auto',
+                         ott='auto')
+
+        keyLib.setDriven(self.neckStartCtl + '.spaceSwitch', neckSpaceAimCons + '.' + self.neckSpaceAimGlobalLoc + 'W1',
+                         [0,1,2], [0,0,1], itt='auto',
+                         ott='auto')
+
+        keyLib.setDriven(self.neckStartCtl + '.spaceSwitch', neckSpaceAimCons + '.' + self.neckSpaceAimBodyLoc + 'W2',
+                         [0,1,2], [0,1,0], itt='auto',
+                         ott='auto')
+
+        #todo parentConstraint spineBlendEnt jnt to the neckSpace aim loc  and neckSpaceAim chest later]
+
+        #todo orientConstraint bodySpaceLoc to the neckSpaceAimBody loc
+
+        #todo orient constraint global space loc to the neckSpaceAimGlobal point
+
+        # parentConstraint neckSpaceMasterLoc to the neckBasMod grp
+        mc.parentConstraint(self.neckSpaceMasterLoc, self.neckStartCtlGrp, mo = True)
+
+        # add stretch on neck joints
+        infoNode = mc.createNode('curveInfo', name = 'neckCurveDistance')
+
+        mc.connectAttr(self.neckIkCurveShape + '.worldSpace[0]', infoNode + '.inputCurve')
+
+        neckDistMult = mc.createNode('multiplyDivide', name = 'neckDist_MDN')
+        mc.connectAttr(infoNode + '.arcLength', neckDistMult + '.input1X')
+
+        inputVal = mc.getAttr(neckDistMult + '.input1X')
+        mc.setAttr(neckDistMult + '.input2X', inputVal)
+
+        mc.setAttr(neckDistMult + '.operation', 2)
+        for i in self.neckJnts:
+            for j in ['sx','sy','sz']:
+                mc.connectAttr(neckDistMult + '.outputX', i + '.' + j)
+
+        # scaleConstarint neckBaseCtl to the neckTwister transform
+        mc.scaleConstraint(self.neckStartCtl,self.neckTwisterGrp, mo = True)
+
+        #todo parentConstraint spineIk_chestDrvr and spineBlend to the neckIkTwister later
+
+        mc.pointConstraint(self.headJnts[0], self.neckIkTopDrvrJnt, mo = True)
+
+
+
+
+
 
 
 

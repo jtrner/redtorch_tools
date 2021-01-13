@@ -46,7 +46,7 @@ from rt_tools import package
 
 
 from .component import arm, chain, eye, eyes, finger, leg,head, lipsB, eyelids,eyebrows,eyeB,misc,\
-    legQuad, lid, neck, piston, root, spine, spineB, tail,jaw, lid2, lips,birdArm,wingFeather,wingTail,template
+    legQuad, lid, neck, piston, root, spine, spineZ, tail,jaw, lid2, lips,birdArm,wingFeather,wingTail,template
 
 reload(head)
 reload(lipsB)
@@ -81,7 +81,7 @@ reload(neck)
 reload(piston)
 reload(root)
 reload(spine)
-reload(spineB)
+reload(spineZ)
 reload(tail)
 reload(template)
 
