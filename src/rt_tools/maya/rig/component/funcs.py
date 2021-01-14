@@ -915,6 +915,44 @@ def createSquashStretch(curve = '', joints = []):
     for i in joints:
         mc.connectAttr(curveValumeMult + '.outputX', i + '.sx')
         mc.connectAttr(curveValumeMult + '.outputX', i + '.sz')
+def spineStretch(name = '', jnts = '', curve = ''):
+
+    # add stretch on spine joints
+    infoNode = mc.createNode('curveInfo', name = 'spineCurveDistance')
+    mc.connectAttr(curve + '.worldSpace[0]', infoNode + '.inputCurve')
+    squashNormalizeMult = mc.createNode('multiplyDivide', name = name + '_squashNormalize_MDN')
+    mc.setAttr(squashNormalizeMult + '.operation', 2)
+    # todo connect ctlglobal scaleY to the input2x squashNormalizeMult later
+    mc.connectAttr(infoNode + '.arcLength', squashNormalizeMult + '.input1X')
+
+    stretchIkMult = mc.createNode('multiplyDivide', name = name  + '_ikStretch_MDN')
+    mc.setAttr(stretchIkMult + '.operation', 2)
+    mc.setAttr(stretchIkMult + '.input1Z', 1)
+    for i in ['input1X', 'input1Y']:
+        mc.connectAttr(squashNormalizeMult + '.outputX',stretchIkMult + '.' + i )
+        val = mc.getAttr(stretchIkMult + '.' + i)
+        for j in ['input2X', 'input2Y']:
+            mc.setAttr(stretchIkMult + '.' + j, val)
+    autovalumeBCN = mc.createNode('blendColors', name = name + '_autoValume_BLN')
+    mc.connectAttr(stretchIkMult + '.outputY', autovalumeBCN + '.color1R')
+    mc.connectAttr(stretchIkMult + '.outputZ', autovalumeBCN + '.color2R')
+    # todo connect body ctl to autovalumeBCN later
+    multSpineIkSquash = mc.createNode('multiplyDivide', name =  name + '_ikSquash1_MDN')
+    mc.setAttr(multSpineIkSquash + '.operation', 3)
+    mc.setAttr(multSpineIkSquash + '.input2X', 0.5)
+    mc.connectAttr(autovalumeBCN + '.outputR', multSpineIkSquash + '.input1X')
+
+    multSpineIkSquash2 = mc.createNode('multiplyDivide', name =  name + '_ikSquash2_MDN')
+    mc.setAttr(multSpineIkSquash2 + '.operation', 2)
+    mc.setAttr(multSpineIkSquash2 + '.input1X', 1)
+    mc.connectAttr(multSpineIkSquash + '.outputX',multSpineIkSquash2 + '.input2X')
+    for i in ['sx', 'sz']:
+        for j in jnts:
+            mc.connectAttr(multSpineIkSquash2 + '.outputX', j + '.' + i)
+    for i in jnts:
+        mc.connectAttr(stretchIkMult + '.outputX', i + '.sy')
+
+    # todo connect body ctl ik fk to the weight of constraint later
 
 
 
