@@ -64,12 +64,12 @@ class HeadTemplate(template.Template):
         trsLib.match(self.globalTopJntOriGrp, self.topJntSquash[0])
 
         trsLib.match(self.botSquashOriGrp, self.headSquashDrvrJnts[1])
-        mc.move(0,-1,10, self.botSquashOriGrp, r = True, ws = True)
+        mc.move(0,-1,17.385, self.botSquashOriGrp, r = True, ws = True)
         trsLib.match(self.topSquashOriGrp, self.headSquashDrvrJnts[0])
-        mc.move(0,1,10, self.topSquashOriGrp, r = True, ws = True)
+        mc.move(0,1,14.09, self.topSquashOriGrp, r = True, ws = True)
 
         mc.delete(mc.parentConstraint(self.headSquashDrvrJnts[-1],self.headSquashDrvrJnts[-2], self.midSquashOriGrp))
-        mc.move(0,0,10, self.midSquashOriGrp, r = True, ws = True)
+        mc.move(0,0,17.337, self.midSquashOriGrp, r = True, ws = True)
 
 
 

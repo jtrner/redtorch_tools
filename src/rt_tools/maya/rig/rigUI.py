@@ -1645,15 +1645,20 @@ class UI(QtWidgets.QDialog):
                                 'task', 'rig', 'users', self.user, self.version,
                                 'data', 'blueprint.ma')
 
-        if blue:
-            answer = qtLib.confirmDialog(self, msg='Export selected as "{}"?'.format(blueprintFile))
 
+        if blue:
+            bluDir = blueprintFile.split('blueprint.ma')[0]
+            if not os.path.lexists(bluDir):
+                os.makedirs(bluDir)
+            answer = qtLib.confirmDialog(self, msg='Export selected as "{}"?'.format(blueprintFile))
             if answer:
                 mc.file(blueprintFile, force=True, es=True, type="mayaAscii")
 
         else:
+            skelDir = skelFile.split('skeleton.ma')[0]
+            if not os.path.lexists(skelDir):
+                os.makedirs(skelDir)
             answer = qtLib.confirmDialog(self, msg='Export selected as "{}"?'.format(skelFile))
-
             if answer:
                 mc.file(skelFile, force=True, es=True, type="mayaAscii")
 

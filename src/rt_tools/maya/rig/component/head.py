@@ -85,13 +85,17 @@ class Head(buildHead.BuildHead):
                                            topologyCheck = False,n='localRigBrow_bShp')[0]
         mc.setAttr(self.localBrowBshp + '.' + self.facialRigBrow, 1)
 
-
         # skin joints to the head
         self.facialBustBindJnts = self.headBotGlobalJnts + self.headTopGlobalJnts
         for i in [self.headFloodJnt[0],self.eyeSocketJnts[1],self.eyeSocketJnts[0]]:
             self.facialBustBindJnts.append(i)
 
         deformLib.bind_geo(geos=self.facialRigBustGeo, joints=self.facialBustBindJnts)
+
+        # skin headBndJnt to the eyebrows
+        deformLib.bind_geo(geos=self.facialRigBrow, joints=self.facialBustBindJnts)
+
+
 
 
     def connect(self):

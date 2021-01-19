@@ -136,6 +136,8 @@ class LipsTemplate(template.Template):
         self.upLipJntLocLowGrp = mc.createNode('transform', name='localUpLipjntLocLow_GRP', p=self.noTuchyUp)
         self.jntLocMedUp = mc.createNode('transform', name='localUpLipjntLocMed_GRP', p=self.noTuchyUp)
         self.jntLocHiUp = mc.createNode('transform', name='localUpLipjntLocHi_GRP', p=self.noTuchyUp)
+
+
         self.r_localUpLipOutOrient_GRP = mc.createNode('transform', name='R_localUpLipOutOrient_GRP',
                                                        p=self.upLipMakroJntCtl)
         self.l_localUpLipOutOrient_GRP = mc.createNode('transform', name='L_localUpLipOutOrient_GRP',
@@ -161,6 +163,7 @@ class LipsTemplate(template.Template):
         self.lowLipJntLocLowGrp = mc.createNode('transform', name='localLowLipjntLocLow_GRP', p=self.noTuchyLow)
         self.jntLocMedLow = mc.createNode('transform', name='localLowLipjntLocMed_GRP', p=self.noTuchyLow)
         self.jntLocHiLow = mc.createNode('transform', name='localLowLipjntLocHi_GRP', p=self.noTuchyLow)
+
         self.r_localLowLipOutOrient_GRP = mc.createNode('transform', name='R_localLowLipOutOrient_GRP',
                                                         p=self.lowLipMakroJntCtl)
         self.l_localLowLipOutOrient_GRP = mc.createNode('transform', name='L_localLowLipOutOrient_GRP',

@@ -46,7 +46,6 @@ class Misc(buildMisc.BulidMisc):
         # connect stuf to the transform above misc joints
         for i in [self.miscCtls[-1],self.miscCtls[1], self.miscCtls[-2]]:
             attrLib.addFloat(i, ln = 'Z', dv = 0)
-        self.miscCtls[-1],self.miscCtls[1],self.cheeckModGrp
         self.cheekSubPma = mc.createNode('plusMinusAverage', name = self.side + '_cheeksub_PMA')
         mc.connectAttr(self.miscCtls[-1] + '.tx', self.cheekSubPma + '.input3D[0].input3Dx')
         mc.connectAttr(self.miscCtls[-1] + '.ty', self.cheekSubPma + '.input3D[0].input3Dy')
@@ -160,11 +159,12 @@ class Misc(buildMisc.BulidMisc):
                 if skin:
                     for i in skin:
                         if mc.objectType(i) == 'skinCluster':
+                            self.miscJnts.pop(1)
                             for j in self.miscJnts:
                                 mc.skinCluster(i, edit = True, ai = j)
 
         jntsToBindBrow = []
-        for i in (0,2,3,4,6,7,8):
+        for i in (0,1,2,3,5,6,7):
             jnt = self.miscJnts[i]
             jntsToBindBrow.append(jnt)
         if eyebrowlocalMisc:

@@ -149,72 +149,72 @@ class BuildLip(lipsTemplate.LipsTemplate):
         self.blueprints['tongueBase'] = '{}_tongueBase_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['tongueBase']):
             mc.joint(self.blueprintGrp, name = self.blueprints['tongueBase'])
-            mc.xform(self.blueprints['tongueBase'], ws = True, t = (0, self.movement + 170.5, -2.437))
+            mc.xform(self.blueprints['tongueBase'], ws = True, t = (0, self.movement + 90.5, -2.437))
 
         self.blueprints['tongue_01'] = '{}_tongue_01_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['tongue_01']):
             mc.joint(self.blueprints['tongueBase'], name = self.blueprints['tongue_01'])
-            mc.xform(self.blueprints['tongue_01'], ws = True, t = (0, self.movement + 170.5, -1.041))
+            mc.xform(self.blueprints['tongue_01'], ws = True, t = (0, self.movement + 90.5, -1.041))
 
         self.blueprints['tongue_02'] = '{}_tongue_02_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['tongue_02']):
             mc.joint(self.blueprints['tongue_01'], name = self.blueprints['tongue_02'])
-            mc.xform(self.blueprints['tongue_02'], ws = True, t = (0, self.movement + 170.5, 0.255))
+            mc.xform(self.blueprints['tongue_02'], ws = True, t = (0, self.movement + 90.5, 0.255))
 
         self.blueprints['tongue_03'] = '{}_tongue_03_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['tongue_03']):
             mc.joint(self.blueprints['tongue_02'], name = self.blueprints['tongue_03'])
-            mc.xform(self.blueprints['tongue_03'], ws = True, t = (0, self.movement + 170.5, 1.554))
+            mc.xform(self.blueprints['tongue_03'], ws = True, t = (0, self.movement + 90.5, 1.554))
 
         self.blueprints['tongue_04'] = '{}_tongue_04_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['tongue_04']):
             mc.joint(self.blueprints['tongue_03'], name = self.blueprints['tongue_04'])
-            mc.xform(self.blueprints['tongue_04'], ws = True, t = (0, self.movement + 170.5, 2.69))
+            mc.xform(self.blueprints['tongue_04'], ws = True, t = (0, self.movement + 90.5, 2.69))
 
         self.blueprints['tongue_05'] = '{}_tongue_05_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['tongue_05']):
             mc.joint(self.blueprints['tongue_04'], name = self.blueprints['tongue_05'])
-            mc.xform(self.blueprints['tongue_05'], ws = True, t = (0, self.movement + 170.5, 3.648))
+            mc.xform(self.blueprints['tongue_05'], ws = True, t = (0, self.movement + 90.5, 3.648))
 
         self.blueprints['topTeeth'] = '{}_topTeeth_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['topTeeth']):
             mc.joint(self.blueprintGrp, name = self.blueprints['topTeeth'])
-            mc.xform(self.blueprints['topTeeth'], ws = True, t = (0, self.movement + 171.5, 3.466))
+            mc.xform(self.blueprints['topTeeth'], ws = True, t = (0, self.movement + 91.5, 3.466))
 
         self.blueprints['lowTeeth'] = '{}_lowTeeth_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['lowTeeth']):
             mc.joint(self.blueprintGrp, name = self.blueprints['lowTeeth'])
-            mc.xform(self.blueprints['lowTeeth'], ws = True, t = (0, self.movement + 170, 3.466))
+            mc.xform(self.blueprints['lowTeeth'], ws = True, t = (0, self.movement + 90, 3.466))
 
         self.blueprints['upTeethWireMid'] = '{}_upTeethWireMid_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['upTeethWireMid']):
             mc.joint(self.blueprintGrp, name = self.blueprints['upTeethWireMid'])
-            mc.xform(self.blueprints['upTeethWireMid'], ws = True, t = (0, self.movement + 171.5, 3.444))
+            mc.xform(self.blueprints['upTeethWireMid'], ws = True, t = (0, self.movement + 91.5, 3.444))
 
         self.blueprints['upTeethWireLeft'] = '{}_upTeethWireLeft_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['upTeethWireLeft']):
             mc.joint(self.blueprintGrp, name = self.blueprints['upTeethWireLeft'])
-            mc.xform(self.blueprints['upTeethWireLeft'], ws = True, t = (3.755, self.movement + 171.5,-1.083))
+            mc.xform(self.blueprints['upTeethWireLeft'], ws = True, t = (3.755, self.movement + 91.5,-1.083))
 
         self.blueprints['upTeethWireRight'] = '{}_upTeethWireRight_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['upTeethWireRight']):
             mc.joint(self.blueprintGrp, name = self.blueprints['upTeethWireRight'])
-            mc.xform(self.blueprints['upTeethWireRight'], ws = True, t = (-3.755, self.movement + 171.5, -1.083))
+            mc.xform(self.blueprints['upTeethWireRight'], ws = True, t = (-3.755, self.movement + 91.5, -1.083))
 
         self.blueprints['lowTeethWireMid'] = '{}_lowTeethWireMid_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['lowTeethWireMid']):
             mc.joint(self.blueprintGrp, name = self.blueprints['lowTeethWireMid'])
-            mc.xform(self.blueprints['lowTeethWireMid'], ws = True, t = (0, self.movement + 170, 3.444))
+            mc.xform(self.blueprints['lowTeethWireMid'], ws = True, t = (0, self.movement + 90, 3.444))
 
         self.blueprints['lowTeethWireLeft'] = '{}_lowTeethWireLeft_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['lowTeethWireLeft']):
             mc.joint(self.blueprintGrp, name = self.blueprints['lowTeethWireLeft'])
-            mc.xform(self.blueprints['lowTeethWireLeft'], ws = True, t = (3.755, self.movement + 170,-1.083))
+            mc.xform(self.blueprints['lowTeethWireLeft'], ws = True, t = (3.755, self.movement + 90,-1.083))
 
         self.blueprints['lowTeethWireRight'] = '{}_lowTeethWireRight_BLU'.format(self.name)
         if not mc.objExists(self.blueprints['lowTeethWireRight']):
             mc.joint(self.blueprintGrp, name = self.blueprints['lowTeethWireRight'])
-            mc.xform(self.blueprints['lowTeethWireRight'], ws = True, t = (-3.755, self.movement + 170, -1.083))
+            mc.xform(self.blueprints['lowTeethWireRight'], ws = True, t = (-3.755, self.movement + 90, -1.083))
 
 
     def createJoints(self):
@@ -573,7 +573,7 @@ class BuildLip(lipsTemplate.LipsTemplate):
         zipUpSecJnts = jntLib.create_on_curve(self.uplipZipperEdge, numOfJoints = 9, parent = False, description='C_base', radius = 0.1)
 
         # create zipper joints
-        self.upMicroJnts,self.upTerLocs,self.upTerOrientGrp,self.upZipOutBndGrp,self.upLocMod,self.microUpCtls,self.upZipJnts =  funcs.createZipperJnts(name='localUpLip',
+        self.upMicroJnts,self.upTerLocs,self.upTerOrientGrp,self.upZipOutBndGrp,self.upLocMod,self.microUpCtls,self.upZipJnts,self.upZipperTargetLoc =  funcs.createZipperJnts(name='localUpLip',
                                                                                                                                                         crv=self.uplipZipperEdge,
                                                                                                                                                         upCurve=self.tempCurve, posJnts=zipUpSecJnts,
                                                                                                                                                         parent = self.noTuchyUp, jntParent = self.upMicroJntCtlGrp,
@@ -747,7 +747,7 @@ class BuildLip(lipsTemplate.LipsTemplate):
         # create zipper joints
         zipLowSecJnts = jntLib.create_on_curve(self.uplipZipperEdge, numOfJoints = 9, parent = False, description='C_base', radius = 0.1)
 
-        self.lowMicroJnts, self.lowTerLocs,self.lowTerOrientGrp,self.lowZipOutBndGrp,self.lowLocMod ,self.microLowCtls,self.lowZipJnts = funcs.createZipperJnts(name='localLowLip',
+        self.lowMicroJnts, self.lowTerLocs,self.lowTerOrientGrp,self.lowZipOutBndGrp,self.lowLocMod ,self.microLowCtls,self.lowZipJnts ,self.lowZipperTargetLoc= funcs.createZipperJnts(name='localLowLip',
                                                                                                               crv=self.lowLipZipperEdge, upCurve=self.tempCurve,
                          posJnts=zipLowSecJnts, parent = self.noTuchyLow, jntParent = self.lowMicroJntCtlGrp, up = False)
         # create locators under jntDriver
@@ -791,14 +791,14 @@ class BuildLip(lipsTemplate.LipsTemplate):
         self.mentalisModCtlGrp = mc.rename(grp, 'mentalisCtlMod_GRP')
         self.mentalisCtl = mc.rename(ctl, 'mentalis_CTL')
         mc.parent(self.mentalisModCtlGrp, self.jawSecCtl)
-        mc.move(0,-1 * float(self.movement), 0, self.mentalisCtl, r = True, ws = True )
+        mc.move(0,-1 * float(self.movement), 0, self.mentalisModCtlGrp, r = True, ws = True )
 
 
         ctl,grp = funcs.createCtl(parent = self.jawSecBndJnt[1], side = self.side)
         self.chinModCtlGrp = mc.rename(grp, 'chinCtlMod_GRP')
         self.chinCtl = mc.rename(ctl, 'chin_CTL')
         mc.parent(self.chinModCtlGrp, self.jawSecCtl)
-        mc.move(0,-1 * float(self.movement), 0, self.chinCtl, r = True, ws = True )
+        mc.move(0,-1 * float(self.movement), 0, self.chinModCtlGrp, r = True, ws = True )
 
 
         self.jaw2ndFollowLoc = mc.createNode('transform', name = 'jaw2ndFollow_LOC',p = self.jawSecCtl )
@@ -809,14 +809,9 @@ class BuildLip(lipsTemplate.LipsTemplate):
         #create teeth hierarchy
         self.upTeethOriGrp = mc.createNode('transform', name = 'topTeethOri_GRP' )
         trsLib.match(self.upTeethOriGrp, t = self.teethJnts[0],r = self.teethJnts[0])
-        mc.move(0,-1 * float(self.movement), 0, self.upTeethOriGrp, r = True, ws = True )
 
         self.lowTeethOriGrp = mc.createNode('transform', name = 'lowTeethOri_GRP', p = self.lowMouthGrp)
         trsLib.match(self.lowTeethOriGrp, t = self.teethJnts[1],r = self.teethJnts[1])
-        mc.move(0,-1 * float(self.movement), 0, self.lowTeethOriGrp, r = True, ws = True )
-
-        for i in self.teethJnts:
-            mc.move(0,-1 * float(self.movement),0, i, r= True, ws = True)
 
 
 
@@ -850,9 +845,6 @@ class BuildLip(lipsTemplate.LipsTemplate):
         mc.connectAttr(teethMult+ '.outputY', self.upTeethMakroGrp + '.ty')
         mc.connectAttr(teethMult + '.outputX', self.lowTeethMakroGrp + '.tx')
         mc.connectAttr(teethMult+ '.outputY', self.lowTeethMakroGrp + '.ty')
-
-
-        mc.move(0,-1 * float(self.movement),0, self.tongueJnts[0] ,r= True, ws = True)
 
 
         self.tongueCtls = []

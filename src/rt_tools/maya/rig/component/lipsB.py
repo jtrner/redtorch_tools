@@ -898,6 +898,9 @@ class LipsB(buildLip.BuildLip):
                   self.cln(self.leftLowCornerCtl),self.cln(self.rightLowCornerCtl)]:
             mc.setAttr(i + '.v' , 0)
 
+        # connect mentalis and chin control to the joints
+        [mc.connectAttr(self.mentalisCtl + '.{}{}'.format(t, a), self.jawSecBndJnt[2] + '.{}{}'.format(t, a)) for t in 'trs' for a in 'xyz']
+        [mc.connectAttr(self.chinCtl + '.{}{}'.format(t, a), self.jawSecBndJnt[1] + '.{}{}'.format(t, a)) for t in 'trs' for a in 'xyz']
 
 
         # clean out the outliner
@@ -1031,6 +1034,15 @@ class LipsB(buildLip.BuildLip):
             mc.parent(i,j)
 
         mc.parent(self.tempCurve,'localzipper_CRVBaseWire' , 'localzipper_CRVBaseWire1',self.noTuchyUp)
+
+
+        for i in [self.cln(self.lowLipJntLocLowGrp),self.cln(self.jntLocMedLow),self.cln(self.jntLocHiLow),
+                  self.cln(self.upLipJntLocLowGrp),self.cln(self.jntLocMedUp),self.cln(self.jntLocHiUp),
+                  self.cln(self.lowZipperTargetLoc),self.cln(self.upZipperTargetLoc),
+                  self.upLipCurves,self.lowLipCurves]:
+            mc.setAttr(i + '.inheritsTransform', 0)
+            mc.move(0, -1 * float(self.movement), 0, i, r = True, ws = True)
+
 
         # bind joints to the up Zipper Curves
         deformLib.bind_geo(geos=self.cln(self.uplipZipperEdge), joints=upZipperBindJnts)

@@ -270,7 +270,7 @@ def createZipperJnts(name = '', crv = '',upCurve = '' ,posJnts = '', parent = ''
         mc.parent(posJnts[i], outBnd)
 
 
-    return BNDJNTS, tempList, outTerList, outBndList,locMods,outTerCtls,posJnts
+    return BNDJNTS, tempList, outTerList, outBndList,locMods,outTerCtls,posJnts,ZipperTargetLoc
 
 
 def createTerCtl(name = '', parent = '', side = 'C', up = True):
@@ -834,9 +834,6 @@ def createTeethHierarchy(jnt = '', parent ='', side = '', scale = [1,1,1], prefi
 
     trsLib.match(l_teethOri, t = leftPos, r = leftPos)
     trsLib.match(r_teethOri, t = rightPos, r = rightPos)
-    mc.move(0,-1 * float(movement),0, l_teethOri, r = True, ws = True)
-    mc.move(0,-1 * float(movement),0, r_teethOri, r = True, ws = True)
-
     controls.append(teethCtl)
     groups.append(teethGrp)
 
