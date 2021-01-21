@@ -89,7 +89,7 @@ class BuildEye(eyeTemplate.EyeTemplate):
         # create stuf under socketOri grp
         self.socketModGrp = mc.createNode('transform', name = self.side + '_eyeMasterAimDrvrSocketMod_GRP', p = self.eyeMasterAimDrvrSocketOriGrp)
         self.eyeMasterAimDrvrLoc = mc.createNode('transform', name = self.side + '_eyeMasterAimDrvr_LOC', p = self.socketModGrp)
-        self.eyeMasterAimDrvrShape = mc.createNode('transform', name = self.side + '_eyeMasterAimDrvrShape_LOC', p = self.eyeMasterAimDrvrLoc)
+        self.eyeMasterAimDrvrShape = mc.createNode('locator', name = self.side + '_eyeMasterAimDrvrShape_LOC', p = self.eyeMasterAimDrvrLoc)
         self.eyeMasterJntOriGrp = mc.createNode('transform', name = self.side + '_eyeMasterJntOriGRP', p = self.eyeMasterAimDrvrLoc)
         self.eyeMasterJntModGrp = mc.createNode('transform', name = self.side + '_eyeMasterJntModGRP', p = self.eyeMasterJntOriGrp)
 

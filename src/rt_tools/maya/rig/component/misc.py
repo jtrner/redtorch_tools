@@ -52,7 +52,7 @@ class Misc(buildMisc.BulidMisc):
         mc.connectAttr(self.miscCtls[1] + '.tx', self.cheekSubPma + '.input3D[1].input3Dx')
         mc.connectAttr(self.miscCtls[1] + '.ty', self.cheekSubPma + '.input3D[1].input3Dy')
         mc.connectAttr(self.miscCtls[1] + '.Z', self.cheekSubPma + '.input3D[1].input3Dz')
-        for i, j in zip(['output3Dz', 'output3Dy', 'output3Dz'],['translateX', 'translateY', 'translateZ']):
+        for i, j in zip(['output3Dx', 'output3Dy', 'output3Dz'],['translateX', 'translateY', 'translateZ']):
             mc.connectAttr(self.cheekSubPma + '.' + i, self.cheeckModGrp + '.' + j)
 
         [mc.connectAttr(self.miscCtls[8] + '.{}{}'.format(a,v),self.cheekLowerModGrp + '.{}{}'.format(a,v))for a in 'trs' for v in 'xyz']

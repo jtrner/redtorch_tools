@@ -71,6 +71,14 @@ class EyeB(buildEye.BuildEye):
         mc.orientConstraint(self.eyeJoints[0],self.eyeMasterMakroLoc, mo = True)
 
 
+        # aim constraint eye iris ctl to the eyeMasterJntOriGrp
+        mc.aimConstraint(self.irisCtl,self.eyeMasterJntOriGrp,  aimVector=[0,0,1],
+                         upVector=[0, 1, 0], worldUpType="object",
+                         worldUpObject=self.eyeMasterAimUpVecLoc, mo = True)[0]
+        # connect Z attr of eyeris ctl to the eye pupil joint
+        mc.connectAttr(self.irisCtl + '.z', self.eyeJoints[2] + '.translateZ')
+
+
     def connect(self):
         super(EyeB, self).connect()
 

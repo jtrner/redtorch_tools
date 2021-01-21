@@ -209,9 +209,28 @@ class Eyelids(buildEyelid.BuildEyelid):
 
         # connect controls to the neighbor transform above controls
         mc.parentConstraint(self.upmidCtl,self.upLdCtls[0],self.upLdCtlGrps[1],weight = 0.5 ,mo = True)
-        mc.parentConstraint(self.upmidCtl,self.upLdCtls[-1],self.upLdCtlGrps[2],weight = 0.5 ,mo = True)
+        mc.parentConstraint(self.upmidCtl,self.upLdCtls[-1],self.upLdCtlGrps[2],weight = 0.5,mo = True)
         mc.parentConstraint(self.lowmidCtl,self.upLdCtls[0],self.lowLdCtlGrps[0],weight = 0.5 ,mo = True)
         mc.parentConstraint(self.lowmidCtl,self.upLdCtls[-1],self.lowLdCtlGrps[1],weight = 0.5 ,mo = True)
+
+        # parent constraint mid joints on eye lids to the transform above joints next to that
+        con = mc.parentConstraint(self.jntsOnUpLd[2],self.jntsOnUpLd[0],self.oriUpOnJoints[1],weight = 0.5 ,mo = True)
+        con = mc.parentConstraint(self.jntsOnUpLd[2],self.jntsOnUpLd[4],self.oriUpOnJoints[3],weight = 0.5 ,mo = True)[0]
+        mc.setAttr(con + '.' + self.jntsOnUpLd[2] + 'W0', 0.8)
+        mc.setAttr(con + '.' + self.jntsOnUpLd[4] + 'W1', 0.2)
+        con = mc.parentConstraint(self.jntsOnLowLd[1],self.jntsOnUpLd[0],self.oriLowOnJoints[0],weight = 0.5 ,mo = True)[0]
+        mc.setAttr(con + '.' + self.jntsOnLowLd[1] + 'W0', 0.4)
+        mc.setAttr(con + '.' + self.jntsOnUpLd[0] + 'W1', 0.6)
+        con = mc.parentConstraint(self.jntsOnLowLd[1],self.jntsOnUpLd[4],self.oriLowOnJoints[2],weight = 0.5 ,mo = True)[0]
+        mc.setAttr(con + '.' + self.jntsOnLowLd[1] + 'W0', 0.6)
+        mc.setAttr(con + '.' + self.jntsOnUpLd[4] + 'W1', 0.4)
+
+        # parent constraint mid joints on eye creases to the transform above joints next to that
+        mc.parentConstraint(self.jntsOnUpLdCrease[2],self.jntsOnUpLdCrease[0],self.oriUpCreaseOnJoints[1],weight = 1 ,mo = True)
+        mc.parentConstraint(self.jntsOnUpLdCrease[2],self.jntsOnUpLdCrease[4],self.oriUpCreaseOnJoints[3],weight = 1 ,mo = True)
+
+        mc.parentConstraint(self.jntsOnLowLdCrease[1],self.jntsOnUpLdCrease[0],self.oriLowCreaseOnJoints[0],weight = 1 ,mo = True)
+        mc.parentConstraint(self.jntsOnLowLdCrease[1],self.jntsOnUpLdCrease[4],self.oriLowCreaseOnJoints[2],weight = 1 ,mo = True)
 
         # connect controls to the neighbor transform above crease controls
         mc.parentConstraint(self.upCreaseCtls[0],self.upCreaseCtls[2],self.upCreaseLdCtlGrps[1],skipRotate='x',weight = 0.5 ,mo = True)

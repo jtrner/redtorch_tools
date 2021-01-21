@@ -267,16 +267,19 @@ class BuildEyelid(eyelidsTemplate.EyelidsTemplate):
             self.jntsOnUpLd.append(niceName)
 
         self.modUpOnJoints = []
+        self.oriUpOnJoints = []
         for i,j in enumerate(self.jntsOnUpLd):
             middle = True if i == 2 else False
             if middle:
-                self.modUpJntGrp,self.makroUpJntGrp = funcs.sharpJntsHierarchy(name= j + 'up', parent= self.eyelidSharperJntGrp,
+                self.modUpJntGrp,self.makroUpJntGrp,self.makroUpJntOriGrp = funcs.sharpJntsHierarchy(name= j + 'up', parent= self.eyelidSharperJntGrp,
                                                                                joint= j , middle = middle)
             else:
-                self.modUpJntGrp = funcs.sharpJntsHierarchy(name= j + 'up', parent= self.eyelidSharperJntGrp,
+                self.modUpJntGrp,self.makroUpJntOriGrp  = funcs.sharpJntsHierarchy(name= j + 'up', parent= self.eyelidSharperJntGrp,
                                                             joint= j , middle = middle)
 
             self.modUpOnJoints.append(self.modUpJntGrp)
+            self.oriUpOnJoints.append(self.makroUpJntOriGrp)
+        print(self.modUpOnJoints)
 
         # skin the joints on ld curve to it
         deformLib.bind_geo(geos = self.upLidLdEdge, joints = self.jntsOnUpLd)
@@ -318,15 +321,17 @@ class BuildEyelid(eyelidsTemplate.EyelidsTemplate):
             self.jntsOnUpLdCrease.append(niceName)
 
         self.modUpCreaseOnJoints = []
+        self.oriUpCreaseOnJoints = []
         for i,j in enumerate(self.jntsOnUpLdCrease):
             middle = True if i == 2 else False
             if middle:
-                self.modCreaseUpJntGrp,self.makroCreaseUpJntGrp = funcs.sharpJntsHierarchy(name= j + 'upCrease', parent= self.creaseSharperJnt,
+                self.modCreaseUpJntGrp,self.makroCreaseUpJntGrp ,self.makroCreaseOriGrp= funcs.sharpJntsHierarchy(name= j + 'upCrease', parent= self.creaseSharperJnt,
                                                                    joint= j , middle = middle)
             else:
-                self.modCreaseUpJntGrp= funcs.sharpJntsHierarchy(name= j + 'upCrease', parent= self.creaseSharperJnt,
+                self.modCreaseUpJntGrp,self.makroCreaseOriGrp= funcs.sharpJntsHierarchy(name= j + 'upCrease', parent= self.creaseSharperJnt,
                                                                    joint= j , middle = middle)
             self.modUpCreaseOnJoints.append(self.modCreaseUpJntGrp)
+            self.oriUpCreaseOnJoints.append(self.makroCreaseOriGrp)
 
         # skin the joints on ld curve to it
         deformLib.bind_geo(geos = self.upCreaseLdEdge, joints = self.jntsOnUpLdCrease)
@@ -406,16 +411,18 @@ class BuildEyelid(eyelidsTemplate.EyelidsTemplate):
             self.jntsOnLowLd.append(niceName)
 
         self.modLowOnJoints = []
+        self.oriLowOnJoints = []
         for i,j in enumerate(self.jntsOnLowLd):
             middle = True if i == 1 else False
             if middle:
-                self.modLowJntGrp,self.makroLowJntGrp = funcs.sharpJntsHierarchy(name= j + 'low', parent= self.eyelidSharperJntGrp,
+                self.modLowJntGrp,self.makroLowJntGrp ,self.makroLowJntOriGrp= funcs.sharpJntsHierarchy(name= j + 'low', parent= self.eyelidSharperJntGrp,
                                                                                  joint= j , middle = middle)
             else:
-                self.modLowJntGrp = funcs.sharpJntsHierarchy(name= j + 'low', parent= self.eyelidSharperJntGrp,
+                self.modLowJntGrp,self.makroLowJntOriGrp = funcs.sharpJntsHierarchy(name= j + 'low', parent= self.eyelidSharperJntGrp,
                                                              joint= j , middle = middle)
 
             self.modLowOnJoints.append(self.modLowJntGrp)
+            self.oriLowOnJoints.append(self.makroLowJntOriGrp)
 
         self.lowerLdjntsToBind = []
         for i in self.jntsOnLowLd:
@@ -466,16 +473,19 @@ class BuildEyelid(eyelidsTemplate.EyelidsTemplate):
             self.jntsOnLowLdCrease.append(niceName)
 
         self.modLowCreaseOnJoints = []
+        self.oriLowCreaseOnJoints = []
+
         for i,j in enumerate(self.jntsOnLowLdCrease):
             middle = True if i == 1 else False
             if middle:
-                self.modCreaseLowJntGrp,self.makroCreaseLowJntGrp = funcs.sharpJntsHierarchy(name= j + 'lowCrease', parent= self.eyelidSharperJntGrp,
+                self.modCreaseLowJntGrp,self.makroCreaseLowJntGrp,self.makroCreaseLowJntOriGrp = funcs.sharpJntsHierarchy(name= j + 'lowCrease', parent= self.eyelidSharperJntGrp,
                                                                     joint= j , middle = middle)
             else:
-                self.modCreaseLowJntGrp = funcs.sharpJntsHierarchy(name=j + 'lowCrease',
+                self.modCreaseLowJntGrp ,self.makroCreaseLowJntOriGrp= funcs.sharpJntsHierarchy(name=j + 'lowCrease',
                                                                    parent=self.eyelidSharperJntGrp,
                                                                    joint=j, middle=middle)
             self.modLowCreaseOnJoints.append(self.modCreaseLowJntGrp )
+            self.oriLowCreaseOnJoints.append(self.makroCreaseLowJntOriGrp )
 
         self.lowerLdjntsToBindCrease = []
         for i in self.jntsOnLowLdCrease:

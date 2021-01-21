@@ -358,7 +358,7 @@ class LipsB(buildLip.BuildLip):
         mc.connectAttr(units[1]  + '.output', self.l_nostrilFlareMod + '.ty')
 
         units = []
-        fac = 0.1
+        fac = -0.1
         for i in range(2):
             unit = mc.shadingNode('unitConversion', asUtility=True)
             mc.setAttr(unit + '.conversionFactor', fac)
@@ -485,13 +485,13 @@ class LipsB(buildLip.BuildLip):
         [mc.connectAttr(self.lowJntCtlLoc+ '.{}{}'.format(t, a), self.lowLipJntMidLoc+ '.{}{}'.format(t, a)) for t in 'r' for a in 'xyz']
 
         # connect locator under lip corner makro group to the lip corner joint
-        leftRemapCornerMakro = connect.remapVal(self.l_cornerMakroLoc + '.ty',self.upLipLowRezBindJnts[2] + '.tz', name = 'L_lipCornerTZ_MAKRO',
+        leftRemapCornerMakro = connect.remapVal(self.l_cornerMakroLoc + '.ty',self.upLipLowRezBindJnts[2] + '.ty', name = 'L_lipCornerTZ_MAKRO',
                          inputMin = 0, inputMax=-6, outputMin=0, outputMax=-3)
-        rightRemapCornerMakro = connect.remapVal(self.r_cornerMakroLoc + '.ty',self.upLipLowRezBindJnts[0] + '.tz', name = 'R_lipCornerTZ_MAKRO',
+        rightRemapCornerMakro = connect.remapVal(self.r_cornerMakroLoc + '.ty',self.upLipLowRezBindJnts[0] + '.ty', name = 'R_lipCornerTZ_MAKRO',
                          inputMin = 0, inputMax=-6, outputMin=0, outputMax=-3)
 
-        mc.connectAttr(leftRemapCornerMakro + '.outValue',self.lowLipLowRezBindJnts[2] + '.tz')
-        mc.connectAttr(rightRemapCornerMakro + '.outValue',self.lowLipLowRezBindJnts[0] + '.tz')
+        mc.connectAttr(leftRemapCornerMakro + '.outValue',self.lowLipLowRezBindJnts[2] + '.ty')
+        mc.connectAttr(rightRemapCornerMakro + '.outValue',self.lowLipLowRezBindJnts[0] + '.ty')
 
         rightUpSquash = connect.remapVal(self.mouthSquashDrvrLoc + '.ty',self.upSquashMak + '.ty', name = 'upLip_mouthSquashCtlCorr',
                          inputMin = 0, inputMax=3.527, outputMin=0, outputMax=2)
@@ -781,15 +781,15 @@ class LipsB(buildLip.BuildLip):
         self.l_cornerMakroLoc = self.l_cornerMakroLoc.split('|')[-1]
         self.r_cornerMakroLoc = self.r_cornerMakroLoc.split('|')[-1]
 
-        leftRemapCornerMakroGlob = connect.remapVal(self.cln(self.l_cornerMakroLoc) + '.ty',self.cln(self.upLipLowRezBindJnts[2]) + '.tz',
+        leftRemapCornerMakroGlob = connect.remapVal(self.cln(self.l_cornerMakroLoc) + '.ty',self.cln(self.upLipLowRezBindJnts[2]) + '.ty',
                                                     name = 'L_lipCornerTZ_MAKROGlob',
                          inputMin = 0, inputMax=-6, outputMin=0, outputMax=-3)
-        rightRemapCornerMakroGlob = connect.remapVal(self.cln(self.r_cornerMakroLoc) + '.ty',self.cln(self.upLipLowRezBindJnts[0]) + '.tz',
+        rightRemapCornerMakroGlob = connect.remapVal(self.cln(self.r_cornerMakroLoc) + '.ty',self.cln(self.upLipLowRezBindJnts[0]) + '.ty',
                                                      name = 'R_lipCornerTZ_MAKROGlob',
                          inputMin = 0, inputMax=-6, outputMin=0, outputMax=-3)
 
-        mc.connectAttr(leftRemapCornerMakroGlob + '.outValue',self.cln(self.lowLipLowRezBindJnts[2]) + '.tz')
-        mc.connectAttr(rightRemapCornerMakroGlob + '.outValue',self.cln(self.lowLipLowRezBindJnts[0]) + '.tz')
+        mc.connectAttr(leftRemapCornerMakroGlob + '.outValue',self.cln(self.lowLipLowRezBindJnts[2]) + '.ty')
+        mc.connectAttr(rightRemapCornerMakroGlob + '.outValue',self.cln(self.lowLipLowRezBindJnts[0]) + '.ty')
 
         self.mouthSquashDrvrLoc = self.mouthSquashDrvrLoc.split('|')[-1]
 

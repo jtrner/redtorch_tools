@@ -89,14 +89,14 @@ def sharpJntsHierarchy(name = '', parent = '',joint = '',middle = False):
         makroGrp = mc.createNode('transform', name = name + '_makro_GRP', p = modGrp)
         mc.parent(joint, makroGrp)
         makroGrp = makroGrp.split('|')[-1]
-        return modGrp,makroGrp
+        return modGrp,makroGrp,oriGrp
     else:
         oriGrp = mc.createNode('transform', name = name + '_ori_GRP',p = parent)
         trsLib.match(oriGrp, t = joint, r = joint)
         modGrp = mc.createNode('transform', name = name + '_mod_GRP', p = oriGrp)
         mc.parent(joint, modGrp)
         modGrp = modGrp.split('|')[-1]
-        return modGrp
+        return modGrp,oriGrp
 
 def createMiddleCtls(parent = '',side = 'L'):
     mult = [-1, 1][side == 'L']
