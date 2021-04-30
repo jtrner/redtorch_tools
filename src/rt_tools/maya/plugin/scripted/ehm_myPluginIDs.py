@@ -24,7 +24,7 @@ for id in IDs:
 0x0011E18C ehm_gaussianNode
 0x0011E18D ehm_scatter
 0x0011E18E auto_rotate
-0x0011E18F
+0x0011E18F squish
 0x0011E190
 0x0011E191
 0x0011E192
