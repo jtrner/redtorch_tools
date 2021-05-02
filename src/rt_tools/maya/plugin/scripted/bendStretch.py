@@ -1,14 +1,14 @@
 """
 import sys
-path = 'D:/plugin/scripted'
+path = 'D:/Pipeline/ehsanm/dev/git_repo/iRig/src/iRig/iRig_maya/plugin/scripted'
 if path not in sys.path:
     sys.path.insert(0, path)
 
-import squish
-reload(squish)
+import bendStretch
+reload(bendStretch)
 
 
-squish.main()
+bendStretch.main()
 """
 
 import maya.cmds as mc
@@ -16,7 +16,7 @@ import maya.OpenMaya as om
 import maya.OpenMayaMPx as mpx
 import math
 
-nodeName = 'squish'
+nodeName = 'bendStretch'
 nodeId = om.MTypeId(0x0011E18F)
 
 # Some global variables were moved from MPxDeformerNode to MPxGeometryFilter.
@@ -34,7 +34,7 @@ else:
     kEnvelope = mpx.cvar.MPxGeometryFilter_envelope
 
 
-class squish(mpx.MPxDeformerNode):
+class bendStretch(mpx.MPxDeformerNode):
 
     def __init__(self):
         mpx.MPxDeformerNode.__init__(self)
@@ -65,6 +65,10 @@ class squish(mpx.MPxDeformerNode):
         # bendXValue
         bendXHandle = dataBlock.inputValue(self.bendX)
         bendXValue = bendXHandle.asFloat()
+
+        # bendZValue
+        bendZHandle = dataBlock.inputValue(self.bendZ)
+        bendZValue = bendZHandle.asFloat()
 
         # using this we have complete control over geometry # use MFnMesh for faster results
         inmeshVertexItr = om.MItMeshVertex(inMesh)
@@ -117,6 +121,7 @@ class squish(mpx.MPxDeformerNode):
                 bend_deltas = self.calculate_bend(
                     point_world,
                     bendXValue,
+                    bendZValue,
                     deformer_scale_y,
                     envelopeValue,
                     weight,
@@ -173,7 +178,7 @@ class squish(mpx.MPxDeformerNode):
         return stretch_deltas * envelopeValue * weight
 
     @staticmethod
-    def calculate_bend(point_world, bendXValue, deformer_scale_y, envelopeValue, weight):
+    def calculate_bend(point_world, bendXValue, bendZValue, deformer_scale_y, envelopeValue, weight):
         """
         To calculate bend x:
          - project point to Y vector (get rid of x)
@@ -188,6 +193,8 @@ class squish(mpx.MPxDeformerNode):
         bend_delta_z = 0.0
 
         if bendXValue != 0.0:
+            ratio = point_world.y / deformer_scale_y
+
             # find bend circle (center and radius)
             circumference = deformer_scale_y * 360.0 / bendXValue
             radius_for_middle_points = circumference / (2 * math.pi)
@@ -195,28 +202,47 @@ class squish(mpx.MPxDeformerNode):
             radius = radius_for_middle_points - point_world.x
 
             # find out much current point should rotate around the circle
-            angle_of_pnt_on_circle = point_world.y * bendXValue
+            angle_of_pnt_on_circle = ratio * bendXValue
 
             # find x and y of the point on circle
-            x_in_radian = math.radians(angle_of_pnt_on_circle)
-            cos_x = math.cos(x_in_radian)
-            sin_x = math.sin(x_in_radian)
+            angle_of_point_on_circle_in_radian = math.radians(angle_of_pnt_on_circle)
+            cos_x = math.cos(angle_of_point_on_circle_in_radian)
+            sin_x = math.sin(angle_of_point_on_circle_in_radian)
 
             # scale the found x and y to match the radius of given circle for each point
-            bend_delta_x = center_of_circle_x - (radius * cos_x)
-            bend_delta_y = radius * sin_x
+            bend_delta_x += (center_of_circle_x - (radius * cos_x)) - point_world.x
+            bend_delta_y += (radius * sin_x) - point_world.y
+
+        # if bendZValue != 0.0:
+        #     # find bend circle (center and radius)
+        #     circumference = deformer_scale_y * 360.0 / bendZValue
+        #     radius_for_middle_points = circumference / (2 * math.pi)
+        #     center_of_circle_z = radius_for_middle_points
+        #     radius = radius_for_middle_points - point_world.z
+        #
+        #     # find out much current point should rotate around the circle
+        #     angle_of_pnt_on_circle = point_world.y * bendZValue
+        #
+        #     # find x and y of the point on circle
+        #     angle_of_point_on_circle_in_radian = math.radians(angle_of_pnt_on_circle)
+        #     cos_x = math.cos(angle_of_point_on_circle_in_radian)
+        #     sin_x = math.sin(angle_of_point_on_circle_in_radian)
+        #
+        #     # scale the found z and y to match the radius of given circle for each point
+        #     bend_delta_z += (center_of_circle_z - (radius * cos_x)) - point_world.z
+        #     bend_delta_y += (radius * sin_x) - point_world.y
 
         #
         bend_deltas = om.MVector(
-            bend_delta_x - point_world.x,
-            bend_delta_y - point_world.y,
+            bend_delta_x,
+            bend_delta_y,
             bend_delta_z,
         )
         return bend_deltas * envelopeValue * weight
 
 
 def nodeCreator():
-    return mpx.asMPxPtr(squish())
+    return mpx.asMPxPtr(bendStretch())
 
 
 def nodeInitializer():
@@ -225,13 +251,13 @@ def nodeInitializer():
     matAttr = om.MFnMatrixAttribute()
 
     # handle matrix
-    squish.matrix = matAttr.create('matrix', 'matrix', 1)
+    bendStretch.matrix = matAttr.create('matrix', 'matrix', 1)
     matAttr.default = om.MMatrix()
     matAttr.setStorable(True)
     matAttr.setWritable(True)
 
     # stretch
-    squish.stretch = nAttr.create('stretch', 'stretch', om.MFnNumericData.kFloat, 0.0)
+    bendStretch.stretch = nAttr.create('stretch', 'stretch', om.MFnNumericData.kFloat, 0.0)
     nAttr.setReadable(1)
     nAttr.setWritable(1)
     nAttr.setStorable(1)
@@ -239,7 +265,7 @@ def nodeInitializer():
     nAttr.setMin(-0.99)
 
     # volume multiplier
-    squish.volume = nAttr.create('volume', 'volume', om.MFnNumericData.kFloat, 1.0)
+    bendStretch.volume = nAttr.create('volume', 'volume', om.MFnNumericData.kFloat, 1.0)
     nAttr.setReadable(1)
     nAttr.setWritable(1)
     nAttr.setStorable(1)
@@ -247,26 +273,35 @@ def nodeInitializer():
     nAttr.setMin(0.0)
 
     # bendX
-    squish.bendX = nAttr.create('bendX', 'bendX', om.MFnNumericData.kFloat, 0.0)
+    bendStretch.bendX = nAttr.create('bendX', 'bendX', om.MFnNumericData.kFloat, 0.0)
+    nAttr.setReadable(1)
+    nAttr.setWritable(1)
+    nAttr.setStorable(1)
+    nAttr.setKeyable(1)
+
+    # bendZ
+    bendStretch.bendZ = nAttr.create('bendZ', 'bendZ', om.MFnNumericData.kFloat, 0.0)
     nAttr.setReadable(1)
     nAttr.setWritable(1)
     nAttr.setStorable(1)
     nAttr.setKeyable(1)
 
     # add attrs
-    squish.addAttribute(squish.matrix)
-    squish.addAttribute(squish.stretch)
-    squish.addAttribute(squish.volume)
-    squish.addAttribute(squish.bendX)
+    bendStretch.addAttribute(bendStretch.matrix)
+    bendStretch.addAttribute(bendStretch.stretch)
+    bendStretch.addAttribute(bendStretch.volume)
+    bendStretch.addAttribute(bendStretch.bendX)
+    bendStretch.addAttribute(bendStretch.bendZ)
 
     # design circuitary
-    squish.attributeAffects(squish.matrix, kOutputGeom)
-    squish.attributeAffects(squish.stretch, kOutputGeom)
-    squish.attributeAffects(squish.volume, kOutputGeom)
-    squish.attributeAffects(squish.bendX, kOutputGeom)
+    bendStretch.attributeAffects(bendStretch.matrix, kOutputGeom)
+    bendStretch.attributeAffects(bendStretch.stretch, kOutputGeom)
+    bendStretch.attributeAffects(bendStretch.volume, kOutputGeom)
+    bendStretch.attributeAffects(bendStretch.bendX, kOutputGeom)
+    bendStretch.attributeAffects(bendStretch.bendZ, kOutputGeom)
 
     # make deformer paintable
-    om.MGlobal.executeCommand("makePaintable -attrType multiFloat -sm deformer squish weights;")
+    om.MGlobal.executeCommand("makePaintable -attrType multiFloat -sm deformer bendStretch weights;")
 
 
 def initializePlugin(mObj):
@@ -287,6 +322,7 @@ def main():
 
     mc.loadPlugin(pluginPath)
 
+    # geo = mc.polySphere()[0]
     geo = mc.polyCube(height=2, subdivisionsHeight=10)[0]
 
     dfmN = mc.deformer(geo, type=nodeName)[0]
