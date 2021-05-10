@@ -5,15 +5,15 @@ test code:
 import os
 import maya.cmds as mc
 
-path = 'D:/Pipeline/ehsanm/dev/git_repo/iRig/src/iRig/iRig_maya/plugin/compiled/build/win_2019'
+path = 'D:/plugin_dev/rig_squish/x64/build'
 nodeName = 'rig_squish'
 pluginPath = os.path.join(path, nodeName)
 if mc.pluginInfo(nodeName, q=True, loaded=True):
-    mc.file(new=True, f=True)
-mc.unloadPlugin(nodeName)
+	mc.file(new=True, f=True)
+	mc.unloadPlugin(nodeName)
 mc.loadPlugin(pluginPath)
 
-geo = mc.polyCube(height=2, subdivisionsHeight=10)[0]
+geo = mc.polyCube(height=2, sw=20, sd=20, sh=20)[0]
 geo2 = mc.polySphere()[0]
 dfmN = mc.deformer(geo, geo2, type=nodeName)[0]
 
@@ -40,11 +40,14 @@ mc.scale(1, 1, 1, loc)
 #include <maya/MFnNumericData.h>
 #include <maya/MFnMatrixAttribute.h>
 #include <maya/MFnMatrixData.h>
-#include <maya/MGlobal.h>
-#include <stdlib.h>
 #include <maya/MArrayDataHandle.h>
 #include <maya/MItGeometry.h>
 #include <math.h>
+#include <maya/MPointArray.h>
+#include <maya/MGlobal.h>
+#include <maya/MStreamUtils.h>
+//#include <stdlib.h>
+//#include <maya/MIOStream.h>
 
 
 // header
@@ -83,7 +86,6 @@ MObject rig_squish::stretchAlongBend;
 MObject rig_squish::handleMatrix;
 MTypeId rig_squish::id(0x000003E9);
 
-
 // constructor and distructor
 rig_squish::rig_squish() {}
 rig_squish::~rig_squish() {}
@@ -91,17 +93,20 @@ rig_squish::~rig_squish() {}
 
 // deform
 MStatus rig_squish::deform(MDataBlock& dataBlock, MItGeometry& geoItr, const MMatrix& worldMatrix, unsigned int geoIndex)
-{	
+{
 	MStatus status;
 
 	// envelope
 	MDataHandle env_h = dataBlock.inputValue(envelope, &status);
 	float envelopeValue = env_h.asFloat();
 
+	if (envelopeValue < 0.001f) {
+		return MS::kSuccess;
+	}
+
 	// matrix
 	MDataHandle mat_h = dataBlock.inputValue(handleMatrix, &status);
-	MMatrix matrixValue = mat_h.asMatrix();
-	MMatrix matrixInverseValue = matrixValue.inverse();
+	MMatrix handleMatrixValue = mat_h.asMatrix();
 
 	// squishX
 	MDataHandle squishX_h = dataBlock.inputValue(squishX, &status);
@@ -124,56 +129,70 @@ MStatus rig_squish::deform(MDataBlock& dataBlock, MItGeometry& geoItr, const MMa
 	bool stretchAlongBendValue = stretchAlongBendHandle.asBool();
 
 	// find how much the deformer_handle_transform_node is scaled in Y
-	float deformerScaleY = MVector(matrixValue[1]).length() / MVector(worldMatrix[1]).length();
+	float deformerScaleY = MVector(handleMatrixValue[1]).length() / MVector(worldMatrix[1]).length();
 
 	// stretch along Y instead of stretching along bend
 	if (!stretchAlongBendValue)
 	{
-		deformerScaleY *= (1.0 + squishYValue);
+		deformerScaleY *= (1.0f + squishYValue);
 	}
 
+	// this is used to put the points back to object local space after calculating defomration
+	MMatrix toLocalMatrix = handleMatrixValue * worldMatrix.inverse();
+
+	// this is used to put the points in handle's local space for easier deformation calculations
+	MMatrix handleLocalMatrix = worldMatrix * handleMatrixValue.inverse();
+
+	// input and output points
+	MPointArray inputPoints;
+	geoItr.allPositions(inputPoints);
+
+	//// output points
+	//unsigned int vert_count = geoItr.count();
+	//MPointArray outputPoints;
+	//outputPoints.setLength(vert_count);
+	
 	// deform points
-	for (; !geoItr.isDone(); geoItr.next()) {
-		MPoint pointPosition = geoItr.position();
-
+	#pragma omp parallel for
+	for (int i = 0; i < geoItr.count(); i++) {
 		// weight
-		float weight = weightValue(dataBlock, geoIndex, geoItr.index());
-
+		float weight = weightValue(dataBlock, geoIndex, i);
+		
+		//if (weight > 0.001f) {
+	
 		// take the point to space of given deformer_handle_transform_node
-		MPoint pointWorld = pointPosition * worldMatrix * matrixInverseValue;
-
+		MPoint pointWorld = inputPoints[i] * handleLocalMatrix;
+	
 		// only deform points that are above the given deformer_handle_transform_node
-		if (pointWorld.y > 0.0)
+		if (pointWorld.y > 0.001f)
 		{
 			// strech and volume
-			MVector stretch_deltas = calculateStretch(
+			pointWorld += calculateStretch(
 				pointWorld,
 				squishYValue,
 				volumeValue,
 				envelopeValue,
 				weight
-				);
-			pointWorld += stretch_deltas;
-
+			);
+	
 			// bend
-			MVector bend_deltas = calculateBend(
+			pointWorld += calculateBend(
 				pointWorld,
 				squishXValue,
 				squishZValue,
 				deformerScaleY,
 				envelopeValue,
 				weight
-				);
-			pointWorld += bend_deltas;
-
+			);
+	
 		}
-
-		// put the point back to world position(todo: move this out of the loop)
-		pointWorld = pointWorld * matrixValue * worldMatrix.inverse();
-
-		//
-		geoItr.setPosition(pointWorld);
+	
+		// put the point back to world position
+		inputPoints[i] = pointWorld * toLocalMatrix;
+		//}
 	}
+
+	geoItr.setAllPositions(inputPoints);
 
 
 	return MS::kSuccess;
@@ -183,12 +202,12 @@ MStatus rig_squish::deform(MDataBlock& dataBlock, MItGeometry& geoItr, const MMa
 MVector rig_squish::calculateStretch(MPoint pointWorld, float stretchValue, float volumeValue, float envelopeValue, float weight)
 {
 	// add 1.0 to stretch value so 0.0 is neutral pose instead of 1.0 being neutral
-	stretchValue += 1.0;
+	stretchValue += 1.0f;
 
 	// stretch value can't be zero or negative
-	if (stretchValue <= 0.0)
+	if (stretchValue <= 0.0001f)
 	{
-		stretchValue = 0.0001;
+		stretchValue = 0.0001f;
 	}
 
 	// stretch the point along y
@@ -198,7 +217,7 @@ MVector rig_squish::calculateStretch(MPoint pointWorld, float stretchValue, floa
 	float stretch_y_delta = (stretch_vector.y - pointWorld.y);
 
 	// maintain volume by scaling the x and z in the opposite direction
-	float squish_mult = pow(stretchValue, 0.5) / stretchValue;
+	float squish_mult = pow(stretchValue, 0.5f) / stretchValue;
 	float stretch_x_delta = volumeValue * ((pointWorld.x * squish_mult) - pointWorld.x);
 	float stretch_z_delta = volumeValue * ((pointWorld.z * squish_mult) - pointWorld.z);
 
@@ -207,11 +226,11 @@ MVector rig_squish::calculateStretch(MPoint pointWorld, float stretchValue, floa
 		stretch_x_delta,
 		stretch_y_delta,
 		stretch_z_delta
-		);
+	);
 
 	return stretch_deltas * envelopeValue * weight;
 
-	}
+}
 
 
 MVector rig_squish::calculateBend(MPoint pointWorld, float squishX, float squishZ, float deformerScaleY, float envelopeValue, float weight)
@@ -222,14 +241,14 @@ MVector rig_squish::calculateBend(MPoint pointWorld, float squishX, float squish
 	float xz_len = xz_vec.length();
 
 	// get angle based on length of vector that x and z make together
-	float bend_angle = xz_len * 90.0;
+	float bend_angle = xz_len * 90.0f;
 
 	// find rotation of bend around Y
 	MVector xz_vec_normal = xz_vec.normal();
 	float rotate_y = atan2(
 		xz_vec_normal.z,
 		xz_vec_normal.x
-		);
+	);
 
 	// rotate bend space around y, so it points to direction of x and z(similar to rotating bend handle in Y)
 	pointWorld = MVector(pointWorld).rotateBy(
@@ -237,17 +256,17 @@ MVector rig_squish::calculateBend(MPoint pointWorld, float squishX, float squish
 	);
 
 	// calculate xyz amounts that bend moves each point
-	float bend_delta_x = 0.0;
-	float bend_delta_y = 0.0;
-	float bend_delta_z = 0.0;
+	float bend_delta_x = 0.0f;
+	float bend_delta_y = 0.0f;
+	float bend_delta_z = 0.0f;
 
-	if (bend_angle != 0.0)
+	if (bend_angle > 0.001f)
 	{
 		float ratio = pointWorld.y / deformerScaleY;
 
 		// find bend circle(center and radius)
-		float circumference = deformerScaleY * 360.0 / bend_angle;
-		float radius_for_middle_points = (circumference / (2 * PI));
+		float circumference = deformerScaleY * 360.0f / bend_angle;
+		float radius_for_middle_points = (circumference / (2.0f * PI));
 		float center_of_circle_x = radius_for_middle_points;
 		float radius = (radius_for_middle_points - pointWorld.x);
 
@@ -269,7 +288,7 @@ MVector rig_squish::calculateBend(MPoint pointWorld, float squishX, float squish
 		bend_delta_x,
 		bend_delta_y,
 		bend_delta_z
-		);
+	);
 
 	// now that the point bends are caculated properly, we can rotate the points back to their orig rotation
 	bend_deltas = bend_deltas.rotateBy(
@@ -329,7 +348,7 @@ MStatus rig_squish::initialize()
 	nAttr.setWritable(true);
 	nAttr.setStorable(true);
 	nAttr.setKeyable(true);
-	
+
 	// add attrs
 	addAttribute(squishX);
 	addAttribute(squishY);
@@ -345,7 +364,7 @@ MStatus rig_squish::initialize()
 	attributeAffects(volume, outputGeom);
 	attributeAffects(stretchAlongBend, outputGeom);
 	attributeAffects(handleMatrix, outputGeom);
-	
+
 	// make paintable
 	MGlobal::executeCommand("makePaintable -attrType multiFloat -sm deformer rig_squish weights;");
 
@@ -379,7 +398,7 @@ MStatus uninitializePlugin(MObject obj)
 {
 	MStatus   status;
 	MFnPlugin plugin(obj);
-	
+
 	status = plugin.deregisterNode(rig_squish::id);
 	if (!status) {
 		status.perror("deregisterNode");
