@@ -1,0 +1,2 @@
+b = Behnam()
+print(b)

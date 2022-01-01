@@ -32,7 +32,7 @@ def detachHead(geoName = '',edge = '',name = '', movement = 50):
     mc.select(geoName)
     parts = mc.polySeparate(n = name , ch = False)
     localGrp = mc.listRelatives(parts, parent=True)[0]
-    mc.rename(localGrp, 'localGeoGrp')
+    mc.rename(localGrp, 'localGeoGrp')ro
     head = mc.duplicate(name)[0]
     mc.select(name, r = True)
     mc.select(name + '1', add = True)

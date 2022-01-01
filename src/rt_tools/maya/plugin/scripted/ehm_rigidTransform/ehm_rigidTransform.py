@@ -172,7 +172,7 @@ def rigid_transform_3D( A, B ):
        R = Vt.T * U.T
 
     """
-    if determinant(R) &lt; 0
+    if determinant(R) &lt; 0path
         multiply 3rd column of V by -1
         recompute R
     end if
