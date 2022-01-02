@@ -1,0 +1,20 @@
+def interpolate(self, target_matrix, i=0.5):
+    result = Matrix()
+    X1 = self.x_vector()
+    Y1 = self.y_vector()
+    Z1 = self.z_vector()
+    T1 = self.get_translation()
+    X2 = target_matrix.x_vector()
+    Y2 = target_matrix.y_vector()
+    Z2 = target_matrix.z_vector()
+    T2 = target_matrix.get_translation()
+    result.data = [[], [], [], []]
+    result.data[0].extend(list((X1 * i) + (X2 * (1.0 - i))))
+    result.data[0].append(0)
+    result.data[1].extend(list((Y1 * i) + (Y2 * (1.0 - i))))
+    result.data[1].append(0)
+    result.data[2].extend(list((Z1 * i) + (Z2 * (1.0 - i))))
+    result.data[2].append(0)
+    result.data[3].extend(list((T1 * i) + (T2 * (1.0 - i))))
+    result.data[3].append(1)
+    return result
