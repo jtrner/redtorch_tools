@@ -30,7 +30,6 @@ def run(**kwargs):
     """
 
     # inputs
-    volume = kwargs.setdefault('volume', True)
     ik_curve = kwargs.setdefault('ik_curve')
     name = kwargs.setdefault('name', 'newStretchyIk')
 
