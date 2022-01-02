@@ -24,14 +24,11 @@ for id in IDs:
 0x0011E18C ehm_gaussianNode
 0x0011E18D ehm_scatter
 0x0011E18E auto_rotate
-0x0011E18F parentCons
-0x0011E190 aimCons
-0x0011E191 RBF_Solver
 0x0011E18F bendStretch
 0x0011E190 squish
-0x0011E191
-0x0011E192
-0x0011E193
+0x0011E191 RBF_Solver
+0x0011E192 parent_cons
+0x0011E193 aim_cons
 0x0011E194
 0x0011E195
 0x0011E196

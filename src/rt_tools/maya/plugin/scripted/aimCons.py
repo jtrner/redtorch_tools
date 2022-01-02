@@ -6,7 +6,7 @@ import sys
 import math
 
 nodeName = 'aimCons'
-nodeID = om2.MTypeId(0x0011E190)
+nodeID = om2.MTypeId(0x0011E193)
 
 
 # node definition

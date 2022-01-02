@@ -6,7 +6,7 @@ import sys
 import math
 
 nodeName = 'parentCons'
-nodeID = om2.MTypeId(0x0011E18F)
+nodeID = om2.MTypeId(0x0011E192)
 
 
 # node definition
