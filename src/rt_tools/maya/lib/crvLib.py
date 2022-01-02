@@ -23,6 +23,13 @@ from . import display
 reload(trsLib)
 reload(attrLib)
 
+def edgeToCurve(geo,edges,name):
+    # create curve
+    mc.select(None)
+    for edge in edges:
+        mc.select('{}.e[{}]'.format(geo, edge),add = True)
+    crv = mc.polyToCurve(form = 2, degree = 3,conformToSmoothMeshPreview =  0, name = '{}_CRV'.format(name), ch = False)[0]
+    return crv
 
 def fromPoses(poses, degree=1, fit=False, name='newCurve'):
     """
@@ -740,7 +747,7 @@ def getUParam(pnt=None, curve=None):
     return param
 
 
-def attachToCurve(node=None, crv=None, uParam=None, upObj=None):
+def attachToCurve(node=None, crv=None, uParam=None, upObj=None, translate = False, side = 'L'):
     """
     attaches node to curve using pointOnCurveInfo node
 
@@ -761,12 +768,18 @@ def attachToCurve(node=None, crv=None, uParam=None, upObj=None):
     mc.setAttr(mop + ".follow", True)
     mc.setAttr(mop + ".follow", True)
     mc.setAttr(mop + ".worldUpType", 2)
+    mc.setAttr(mop + '.frontAxis', 0)
+    mc.setAttr(mop + '.upAxis', 1)
+    if side =='R':
+        mc.setAttr(mop + '.inverseFront', 1)
+
     mc.connectAttr(upObj + '.worldMatrix', mop + ".worldUpMatrix")
     [mc.connectAttr("{}.{}Coordinate".format(mop, x), "{}.t{}".format(node, x)) for x in 'xyz']
-    [mc.connectAttr("{}.rotate{}".format(mop, x.title()), "{}.r{}".format(node, x)) for x in 'xyz']
+    if not translate:
+        [mc.connectAttr("{}.rotate{}".format(mop, x.title()), "{}.r{}".format(node, x)) for x in 'xyz']
 
 
-def attach(node=None, curve=None, upCurve=None, upAxis='y', aimUparam=None):
+def attach(node=None, curve=None, upCurve=None, upAxis='y',param = 1, translate = False,aimUparam=None):
     """
     attaches given object to curve using pointOnCurveInfo node
 
@@ -788,6 +801,7 @@ def attach(node=None, curve=None, upCurve=None, upAxis='y', aimUparam=None):
     # get closest u param
     pos = mc.xform(node, q=1, ws=1, t=1)
     u = getUParam(pos, crvS)
+    u = u * param
 
     # closest point on crvS
     pci_1 = mc.createNode('pointOnCurveInfo', n=node + crvS + '_PCI')
@@ -878,8 +892,11 @@ def attach(node=None, curve=None, upCurve=None, upAxis='y', aimUparam=None):
     mc.connectAttr(fmx + '.output', dmx + '.inputMatrix')
 
     # connect result
-    mc.connectAttr(dmx + '.outputTranslate', node + '.translate')
-    mc.connectAttr(dmx + '.outputRotate', node + '.rotate')
+    if translate:
+        mc.connectAttr(dmx + '.outputTranslate', node + '.translate')
+    else:
+        mc.connectAttr(dmx + '.outputTranslate', node + '.translate')
+        mc.connectAttr(dmx + '.outputRotate', node + '.rotate')
 
     return pci_1, pci_2
 

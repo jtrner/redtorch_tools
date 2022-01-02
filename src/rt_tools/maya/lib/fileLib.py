@@ -53,8 +53,19 @@ def saveJson(path, data):
     """
     if not os.path.lexists(os.path.dirname(path)):
         os.makedirs(os.path.dirname(path))
-    with open(path, 'w') as f:
+    with open(path, "w") as f:
         json.dump(data, f, sort_keys=False, indent=4)
+
+
+
+
+def checkJsonExists(path, key):
+    a_file = open(path, "r")
+    data = json.load(a_file)
+    if not key in data.values()[:]:
+        print('ueeeeeee')
+        return True
+
 
 
 def copy(src, dest, ignore=None):
@@ -81,7 +92,6 @@ def appendToJson(path, data, ordered=True):
             data[k] = v
 
     saveJson(path, data)
-
 
 def dictToStr(data):
     data_as_str = ''

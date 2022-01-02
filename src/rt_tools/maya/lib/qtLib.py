@@ -19,12 +19,10 @@ import maya.OpenMayaUI as omui
 from shiboken2 import wrapInstance
 from PySide2 import QtCore, QtGui, QtWidgets
 
-# rt_tools modules
+# iRig modules
 from . import fileLib
 from . import decoratorLib
 
-reload(fileLib)
-reload(decoratorLib)
 
 # CONSTANTS
 GREY = (93, 93, 93)
@@ -45,8 +43,8 @@ GREEN_PALE = (130, 160, 130)
 PURPLE_PALE = (180, 150, 180)
 ORANGE_PALE = (200, 130, 80)
 
-dirname = __file__.split('rt_tools')[0]
-ICON_DIR = os.path.abspath(os.path.join(dirname, 'rt_tools', 'icon'))
+dirname = __file__.split('iRig_maya')[0]
+ICON_DIR = os.path.abspath(os.path.join(dirname, 'icon'))
 SETTINGS_PATH = os.path.join(os.getenv("HOME"), 'testUI.uiconfig')
 
 
@@ -279,6 +277,8 @@ def createTreeWidget(parent=None, selectionMode='single', selectFocused=True):
         tw.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
     elif selectionMode == 'multi':
         tw.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
+    elif selectionMode == 'continues':
+        tw.setSelectionMode(QtWidgets.QAbstractItemView.ContiguousSelection)
     else:
         tw.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
     tw.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectItems)
@@ -361,6 +361,17 @@ def filterTW(tw, le):
         # show item if given text is found in it
         else:
             item.setHidden(False)
+
+
+def getSelectedItemsAsText(tw):
+    """
+    return the text of currently selected items in given QTreeWidget
+    :param tw: QTreeWidget we want to get the selected item for
+    :return: list of text of currently selected items
+    :rtype: list
+    """
+    items = tw.selectedItems() or []
+    return [x.text(0) for x in items]
 
 
 def getSelectedItemAsText(tw):
@@ -644,7 +655,6 @@ class Button(QtWidgets.QPushButton):
         self.btnSize = kwargs.get('btnSize', 32)
         self.transparent = kwargs.get('transparent', True)
         self.rightClickData = kwargs.get('rightClickData', {})
-        self.isMenuButton = kwargs.get('isMenuButton', False)
 
         # annotation
         if annotation:
@@ -664,11 +674,16 @@ class Button(QtWidgets.QPushButton):
             self.setContextMenuPolicy(QtCore.Qt.PreventContextMenu)
 
         # command
-        self.clicked.connect(lambda: run_command(command))
+        if isinstance(command, basestring):
+            # if command is given as string
+            self.clicked.connect(lambda: run_command(command))
+        else:
+            # if command is object (partial, lambda, etc)
+            self.clicked.connect(command)
 
     def paintEvent(self, event):
         QtWidgets.QPushButton.paintEvent(self, event)
-        if self.rightClickData and not self.isMenuButton:
+        if self.rightClickData:
             self.drawCornerTriangle()
 
     def leaveEvent(self, event):
@@ -680,19 +695,19 @@ class Button(QtWidgets.QPushButton):
 
     def addMenuAction(self):
         # action menu policy
-        if self.isMenuButton:
-            menu = QtWidgets.QMenu(self)
-            self.setMenu(menu)
-        else:
-            menu = self
-            self.setContextMenuPolicy(QtCore.Qt.ActionsContextMenu)
+        self.setContextMenuPolicy(QtCore.Qt.ActionsContextMenu)
 
         # add right-click options
         for button_title, command in self.rightClickData.items():
             action = QtWidgets.QAction(self)
             action.setText(button_title)
-            action.triggered.connect(functools.partial(run_command, command))
-            menu.addAction(action)
+            # if command is given as string
+            if isinstance(command, basestring):
+                action.triggered.connect(functools.partial(run_command, command))
+            # if command is object (partial, lambda, etc)
+            else:
+                action.triggered.connect(command)
+            self.addAction(action)
 
     def addIcon(self):
         if self.iconPath and os.path.lexists(self.iconPath) and os.path.isfile(self.iconPath):
@@ -900,6 +915,11 @@ def fillWidgetsWithBtns(widget, btnNames, btnSize=None):
 
 def btnsFromJson(layout, config, btnSize=None):
     categoriesAndBtns_data = fileLib.loadJson(config)
+
+    if not categoriesAndBtns_data:
+        label = QtWidgets.QLabel('Right Click and choose Edit Buttons')
+        layout.addWidget(label)
+        return
 
     # add an extra widget and layout so we can minimize empty spaces
     ww = QtWidgets.QWidget()
@@ -1149,4 +1169,7 @@ class DockingUI(QtWidgets.QWidget):
 @decoratorLib.repeatable_cmd
 @decoratorLib.undoChunk
 def run_command(commandString):
+    print('-' * 80)
+    print(commandString)
+    print('-' * 80)
     exec (commandString, globals(), globals())

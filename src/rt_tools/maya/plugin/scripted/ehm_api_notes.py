@@ -265,7 +265,8 @@ matFn.matrix()
 mc.getAttr('ehm_pushDeformer1.weightList[0].weights')
 mc.getAttr('blendShape1.inputTarget[0].paintTargetWeights')
 
-mc.connectAttr('ehm_pushDeformer1.weightList[0].weights', 'blendShape1.inputTarget[0].paintTargetWeights', f=True)
+mc.connectAttr('ehm_pushDeformer1.weightList[0].weights',
+               'blendShape1.inputTarget[0].paintTargetWeights', f=True)
 
 # ======================================================================================
 # deformer weightList to doubleArray

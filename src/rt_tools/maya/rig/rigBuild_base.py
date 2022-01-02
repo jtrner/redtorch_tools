@@ -5,7 +5,7 @@ import os
 
 # maya modules
 import maya.cmds as mc
-
+from collections import OrderedDict
 # redtorch modules
 from rt_tools.maya.general import workspace
 from rt_tools.maya.lib import attrLib
@@ -30,6 +30,12 @@ from .component import jaw
 from .component import birdArm
 from .component import wingFeather
 from .component import wingTail
+from .component import eyeB
+from .component import lipsB
+from .component import eyebrows
+from .component import eyelids
+from .component import head
+from .component import misc
 
 
 reload(workspace)
@@ -38,6 +44,12 @@ reload(connect)
 reload(deformLib)
 
 
+reload(eyeB)
+reload(lipsB)
+reload(eyebrows)
+reload(eyelids)
+reload(head)
+reload(misc)
 reload(wingTail)
 reload(jaw)
 reload(wingFeather)
@@ -160,9 +172,9 @@ class RigBuild_base(object):
 
     def initBlueprints(self):
         bluGrps = mc.ls('*_blueprint_GRP')
-        modules = {}
+        modules = OrderedDict()
         for bluGrp in bluGrps:
-            modules[bluGrp] = {}
+            modules[bluGrp] = OrderedDict()
             bluAttrs = mc.listAttr(bluGrp, st='blu_*')
             data = {}
             for at in bluAttrs:
@@ -174,8 +186,9 @@ class RigBuild_base(object):
             modules[bluGrp]['data'] = data
             modules[bluGrp]['type'] = typ
 
+        self.INSTANCES = OrderedDict()
         for bluGrp, info in modules.items():
-            self.INSTANCES[bluGrp] = {}
+            self.INSTANCES[bluGrp] = OrderedDict()
             package = sys.modules['rt_tools.maya.rig.component.' + info['name']]
             classObj = getattr(package, info['type'])
             self.INSTANCES[bluGrp]['class'] = classObj(**info['data'])

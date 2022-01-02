@@ -15,7 +15,7 @@ import numpy as np
 #from math import sqrt
 import maya.cmds as mc
 
-
+mc
 def rigid_transform_3D( A, B ):
     assert len(A) == len(B)
 

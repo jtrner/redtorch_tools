@@ -6,12 +6,15 @@ Author: Ehsan Hassani Moghaddam
 """
 
 # python modules
+import collections
+import json
 import os
 from itertools import groupby
 import sys
 import logging
 import re
 from collections import OrderedDict
+import math
 
 # third party modules
 try:
@@ -22,13 +25,16 @@ except ImportError:
 # maya modules
 import maya.api.OpenMaya as om2
 import maya.api.OpenMayaAnim as oma2
+import maya.OpenMayaAnim as oma
+import maya.OpenMaya as om
 import maya.cmds as mc
+import maya.mel as mm
 
-# rt_tools modules
-from rt_tools.maya.lib import trsLib
-from rt_tools.maya.lib import fileLib
-from rt_tools.maya.lib import keyLib
-
+# iRig modules
+from . import trsLib
+from . import fileLib
+from . import keyLib
+from . import decoratorLib
 # constants
 logger = logging.getLogger(__name__)
 skin_suffix = 'Skn'
@@ -54,32 +60,54 @@ def bind_geo(components):
                        dropoffRate=0.5, obeyMaxInfluences=1, maximumInfluences=3, tsb=1)
     return True
 
-
-def importSkin(dataPath):
+@decoratorLib.timeIt
+def importSkin(dataPath, node=None, ignore=None):
     """
-    import deformLib weights from given path
+    import skincluster weights from given path
+    :param dataPath: path to the directory of skincluster weights (*.wgt files)
+    :type ignore: string
+    :param node: if given, only imports skin for given node
+    :type ignore: string
+    :param ignore: doesn't import skin for nodes in ignore list
+    :type ignore: list
     """
-
     # search given path for skin wgt files
     if not os.path.lexists(dataPath):
         return
 
-    wgtFiles = [os.path.join(dataPath, x) for x in os.listdir(dataPath)
+    json_Files = [os.path.join(dataPath, x) for x in os.listdir(dataPath)
+                if x.endswith('.json')]
+
+    wgt_Files = [os.path.join(dataPath, x) for x in os.listdir(dataPath)
                 if x.endswith('.wgt')]
+
+    wgtFiles = json_Files + wgt_Files
+
+    # only import on given node
+    if node:
+        wgtFiles = [x for x in wgtFiles if node == os.path.splitext(os.path.basename(x))[0]]
 
     # for each wgt file, find geo and check if skinCluster exists
     for wgtFile in wgtFiles:
-        # import wgt
         skinData = importSkinData(wgtFile)
-
-        # geo node
         node = skinData[0]
+        infs = skinData[2]
+
+        if ignore and (node in ignore):
+            continue
+
         if len(mc.ls(node)) > 1:
             logger.error('There are more than one "{}" in the scene, skipped!'.format(node))
             continue
+
+        # does geo exist?
         if not mc.objExists(node):
-            logger.error('Could not find "{0}", skipped!'.format(node))
-            continue
+            logger.warning('Could not find "{0}", trying without namespace!'.format(node))
+            # try without namespaces
+            node = node.split(':')[-1]
+            if not mc.objExists(node):
+                logger.error('Could not find "{0}", skipped!'.format(node))
+                continue
 
         # delete existing skinCluster
         sknNode = getSkinCluster(node)
@@ -87,12 +115,12 @@ def importSkin(dataPath):
             mc.delete(sknNode)
 
         # find missing joints
-        for j in skinData[2]:
+        for j in infs:
             if not mc.objExists(j):
                 logger.error('joint "{0}" does not exist!'.format(j))
 
         # error if no joint found
-        infs = mc.ls(skinData[2])
+        infs = mc.ls(infs)
         if not infs:
             logger.error('None of influences exist for "{}", skipped!'.format(node))
             continue
@@ -105,9 +133,11 @@ def importSkin(dataPath):
         setSkinData(skinData)
 
 
-def exportSkin(geos, dataPath):
+def exportSkin(geos, dataPath, removeUnused=False):
     """
     export skincluster weights for given rig component asset nodes
+    :param removeUnused: this flag decides whether to remove unused influences from every skincluster node.
+                        set it true if any error occurs in importing skin weights
     """
     geos = mc.ls(geos, type='transform')
 
@@ -117,20 +147,44 @@ def exportSkin(geos, dataPath):
         if not sknNode:
             notSkinnedGeos.append(node)
             continue
+
+        if removeUnused:
+            remove_unused_influences(sknNode)
+
         skinData = getSkinData(sknNode)
 
         node = node.rpartition(':')[2]
-        wgtFiles = os.path.join(dataPath, node + '.wgt')
+        wgtFiles = os.path.join(dataPath, node + '.json')
 
         exportSkinData(skinData, wgtFiles)
-        logger.info('Exported skinculster for "{0}"'.format(node))
+        logger.info('Exported skincluster for "{0}"'.format(node))
 
     if notSkinnedGeos:
-        print('No skincluster node found on nodes bellow, export skipped!')
-        print('.................................................................')
+        print 'No skincluster node found on nodes bellow, export skipped!'
+        print '.................................................................'
         for x in notSkinnedGeos:
-            print(x)
-        print('.................................................................')
+            print x
+        print '.................................................................'
+
+
+def remove_unused_influences(skinCls, targetInfluences=[]):
+    """
+
+    Snippet to removeUnusedInfluences in Autodesk Maya using Python.
+    The MEL version runs slowly, over every influence one at a time.
+    "targetInfluences" allows you to directly specify which influences to remove.
+    This will only remove targets which are not currently being used.
+    """
+    allInfluences = mc.skinCluster(skinCls, q=True, inf=True)
+    weightedInfluences = mc.skinCluster(skinCls, q=True, wi=True)
+    unusedInfluences = [inf for inf in allInfluences if inf not in weightedInfluences]
+    if targetInfluences:
+        unusedInfluences = [
+            inf for inf in allInfluences
+            if inf in targetInfluences
+            if inf not in weightedInfluences
+        ]
+    mc.skinCluster(skinCls, e=True, removeInfluence=unusedInfluences)
 
 
 def getInfs(skin):
@@ -162,6 +216,20 @@ def getComponent(dag):
     return component
 
 
+def getTransformFromDag(node):
+    dag = getDag(node)
+    is_transform = dag.hasFn(om2.MFn.kTransform)
+    if is_transform:
+        return dag.fullPathName().split('|')[-1]
+    else:
+        node_fn = om2.MFnDagNode(dag)
+        if not node_fn.parentCount():
+            raise Exception('Could not find transform for {}'.format(node))
+        par_o = node_fn.parent(0)
+        node_fn.setObject(par_o)
+        return node_fn.fullPathName().split('|')[-1]
+
+
 def getSkinData(skin, weightsAsList=False):
     """
     given a skinCluster node, get's skin data such as number of
@@ -185,9 +253,19 @@ def getSkinData(skin, weightsAsList=False):
     if mc.getAttr(skin + '.skinningMethod') == 2:
         blend_wgts = getSkinBlendWeights(skin)
 
-    # geo
-    dag = fnSkin.getPathAtIndex(0)
-    geo = dag.fullPathName().split('|')[-1]
+    # skin's output geo's shape node
+    objs = fnSkin.getOutputGeometry()
+    if not objs:
+        mc.warning('Could not find a geo for skinCluster {}'.format(skin))
+        return
+    node_fn = om2.MFnDependencyNode(objs[0])
+    shapeNode = node_fn.name()
+
+    # shape's dag
+    dag = getDag(shapeNode)
+
+    # shape's transform
+    geo = getTransformFromDag(shapeNode)
 
     # create components variable
     oComps = getComponent(dag)
@@ -205,8 +283,9 @@ def getSkinData(skin, weightsAsList=False):
     if weightsAsList:
         wgts = _lineToLists(wgts, numVerts, len(infs))
 
-    #
-    return geo, skin, infs, numVerts, wgts, blend_wgts
+    deformer_order = get_deformer_order(geo)
+
+    return geo, skin, infs, numVerts, wgts, blend_wgts, deformer_order
 
 
 def exportSkinData(skinData, filePath):
@@ -225,8 +304,11 @@ def exportSkinData(skinData, filePath):
     skin = skinData[1]
     infs = skinData[2]
     numVerts = skinData[3]
-    wgts = skinData[4]
+    wgts = [x for x in skinData[4]]
     blend_wgts = skinData[5]
+    if blend_wgts:
+        blend_wgts = [x for x in skinData[5]]
+    deformer_order = skinData[6]
 
     if not os.path.exists(os.path.dirname(filePath)):
         try:
@@ -234,64 +316,67 @@ def exportSkinData(skinData, filePath):
         except:
             raise
 
-    with open(filePath, 'w') as f:
-        f.write(geo + '\n\n')
-        f.write(skin + '\n\n')
-        for inf in infs:
-            f.write(inf + '\n')
-        f.write('\n')
+    weight_map = dict((i, dict()) for i in range(numVerts))
+    h = 0
+    for i in range(numVerts):
+        for j in sorted([x for x in range(0, len(infs))]):
+            if wgts[h] == 0.0:
+                h += 1
+                continue
+            weight_dict_new = {j: wgts[h]}
+            weight_map[i].update(weight_dict_new)
+            h += 1
+        i += 1
+        h = i * len(infs)
 
-        # write the whole weights for all verts on the same line
-        f.write(str(numVerts))
-        f.write('\n\n')
-        f.write(' '.join([str(x) for x in wgts]))
+    skinData = {'geometry': geo,
+                'skin_name': skin,
+                'joints': infs,
+                'numVerts': numVerts,
+                'weights': weight_map,
+                'blend_wgts': blend_wgts,
+                'deformer_order': deformer_order}
 
-        if blend_wgts:
-            f.write('\n\n')
-            f.write(' '.join([str(x) for x in blend_wgts]))
-
-
-def getSkinCluster(obj):
-    fnSkin = getFnSkinCluster(obj)
-    if fnSkin:
-        return fnSkin.name()
-
-
-def getFnSkinCluster(geo):
-    # if name of skinCluster is given
-    mSel = om2.MSelectionList()
-    mSel.add(geo)
-    depN = mSel.getDependNode(0)
-    if depN.hasFn(om2.MFn.kSkinClusterFilter):
-        return oma2.MFnSkinCluster(depN)
-
-    # if name of geo is given
-    dagShape = getDagShape(geo)
-    try:
-        itDG = om2.MItDependencyGraph(dagShape.node(),
-                                      om2.MFn.kSkinClusterFilter,
-                                      om2.MItDependencyGraph.kUpstream)
-        while not itDG.isDone():
-            oCurrentItem = itDG.currentNode()
-            return oma2.MFnSkinCluster(oCurrentItem)
-    except:
-        pass
-    return None
+    fileLib.saveJson(filePath, data=skinData)
 
 
-def getDagShape(geo):
-    mSel = om2.MSelectionList()
-    mSel.add(geo)
-    dagS = mSel.getDagPath(0)
+def getSkinCluster(geo):
+    return mm.eval("findRelatedSkinCluster " + geo)
+
+
+def getDagShape(node):
+    dagS = getDag(node)
     dagS.extendToShape()
     return dagS
 
 
 def getDag(node):
     sel = om2.MSelectionList()
-    sel.add(node)
-    dag = sel.getDagPath(0)
-    return dag
+    try:
+        sel.add(node)
+        dag = sel.getDagPath(0)
+        return dag
+    except Exception as e:
+        message = '{} "{}". There might be none or more than one ' \
+                  'object with given name.'.format(e, node)
+        raise Exception(message)
+
+
+def dagFromMObject(m_obj):
+    if m_obj.hasFn(om2.MFn.kDagNode):
+        return om2.MDagPath.getAPathTo(m_obj)
+
+
+def getDepend(node):
+    sel = om2.MSelectionList()
+    try:
+        sel.add(node)
+        dag = sel.getDependNode(0)
+        return dag
+    except Exception as e:
+        message = '{} "{}". There might be none or more than one ' \
+                  'object with given name.'.format(e, node)
+        raise Exception(message)
 
 
 def getFnSkin(skin):
@@ -318,10 +403,12 @@ def setSkinData(skinData=None, ignoreMissingJnts=True, **kwargs):
     """
     # gather data
     skin = kwargs.setdefault('skin', skinData[1])
+    geo = skinData[0]
     infs = skinData[2]
     # numVerts = skinData[3]
     wgt_values = skinData[4]
     blend_wgt_values = skinData[5]
+    deformer_order = skinData[6]
     # numInfs = len(infs)
 
     # skin fn
@@ -356,8 +443,13 @@ def setSkinData(skinData=None, ignoreMissingJnts=True, **kwargs):
                     pass
 
         infDag = getDag(inf)
+        if (mc.nodeType(infDag) != "joint"):
+            raise Exception("please remove unused influence named {} and reexport skin for {}".format(infDag, skin))
+
         infId = fnSkin.indexForInfluenceObject(infDag)
         infIds.append(infId)
+
+        list(set(infIds))
 
     # set all weights for all influences at once
     fnSkin.setWeights(dag, component, infIds, wgts)
@@ -366,6 +458,10 @@ def setSkinData(skinData=None, ignoreMissingJnts=True, **kwargs):
     if blend_wgt_values:
         mc.setAttr(skin + '.skinningMethod', 2)
         setSkinBlendWeights(skin, blend_wgt_values)
+
+    set_deformer_order(geo, deformer_order)
+
+    logger.info('Imported skincluster for "{0}"'.format(skin))
 
 
 def getInfIndex(skin, jnt):
@@ -398,36 +494,52 @@ def importSkinData(filePath):
              geo, skin, infs, numVerts, wgts, blend_wgts
     :return type: list
     """
-    with open(filePath, 'r') as f:
-        lines = [x for x in f]
-        skinData = [list(group) for k,
-                                    group in groupby(lines, lambda x: x == "\n")
-                    if not k]
 
-        # get geo
-        geo = _lineToStr(skinData[0])
+    if filePath.endswith('.json'):
+        skin_data = fileLib.loadJson(filePath, ordered=True)
+        geo = skin_data['geometry']
+        joints = skin_data['joints']
+        blend_wgts = skin_data['blend_wgts']
+        numVerts = skin_data['numVerts']
+        skin_name = skin_data['skin_name']
+        deformer_order = skin_data['deformer_order']
+        weight_num_dict = skin_data['weights']
+        weights = [0.0] * (numVerts * len(joints))
+        for vtx in range(numVerts):
+            for inf in range(len(joints)):
+                if str(inf) not in weight_num_dict[str(vtx)]:
+                    continue
+                weight_dict = weight_num_dict[str(vtx)]
+                weights[(vtx * len(joints)) + inf] = weight_dict[str(inf)]
 
-        # reference mesh with skinCluster have Deformed in the end, get rid of them
-        geo = geo.split('Deformed')[0]
+    elif filePath.endswith('.wgt'):
+        deformer_order = ''
+        with open(filePath, 'r') as f:
+            lines = [x for x in f]
+            skinData = [list(group) for k,
+                                        group in groupby(lines, lambda x: x == "\n")
+                        if not k]
+            # get geo
+            geo = _lineToStr(skinData[0])
 
-        # get skin
-        skin = _lineToStr(skinData[1])
+            # get skin
+            skin_name = _lineToStr(skinData[1])
 
-        # get influences
-        infs = [x.rstrip('\n') for x in skinData[2]]
+            # get influences
+            joints = [x.rstrip('\n') for x in skinData[2]]
 
-        # get num verts
-        numVerts = int(_lineToStr(skinData[3]))
+            # get num verts
+            numVerts = int(_lineToStr(skinData[3]))
 
-        # get weights as one list with all weights in it
-        wgts = [float(x) for x in skinData[4][0].split(' ')]
+            # get weights as one list with all weights in it
+            weights = [float(x) for x in skinData[4][0].split(' ')]
 
-        # get blend weights
-        blend_wgts = None
-        if len(skinData) > 5:
-            blend_wgts = [float(x) for x in skinData[5][0].split(' ')]
-
-        return [geo, skin, infs, numVerts, wgts, blend_wgts]
+            # get blend weights
+            blend_wgts = None
+            if len(skinData) > 5:
+                blend_wgts = [float(x) for x in skinData[5][0].split(' ')]
+                
+    return [geo, skin_name, joints, numVerts, weights, blend_wgts, deformer_order]
 
 
 def _firstToIntRestToFloat(aList):
@@ -453,9 +565,9 @@ def _lineToLists(wgts, numVerts, numInfs):
     :return: list of weight lists
     """
     wgtsList = []
-    for i in range(numVerts):
+    for i in xrange(numVerts):
         tempList = [i]
-        for j in range(numInfs):
+        for j in xrange(numInfs):
             tempList.append(float(wgts[(i * numInfs) + j]))
         wgtsList.append(tempList)
     return wgtsList
@@ -463,7 +575,7 @@ def _lineToLists(wgts, numVerts, numInfs):
 
 def copySkin(src=None, targets=None, useSelection=False):
     """
-    from rt_tools.maya.lib import deformLib
+    from iRig_maya.lib import deformLib
     deformLib.copySkin(useSelection=True)
     """
     if useSelection:
@@ -473,11 +585,12 @@ def copySkin(src=None, targets=None, useSelection=False):
         src = sels[0]
         targets = sels[1:]
 
-    if not isinstance(targets, (list, tuple)):
+    if isinstance(targets, basestring):
         targets = [targets]
 
     # get joints from src
-    infs = mc.skinCluster(src, q=True, inf=True)
+    src_skin = getSkinCluster(src)
+    infs = mc.skinCluster(src_skin, q=True, inf=True)
 
     skn_nodes = []
     for tgt in targets:
@@ -498,9 +611,118 @@ def copySkin(src=None, targets=None, useSelection=False):
                            surfaceAssociation='closestPoint',
                            influenceAssociation=['label', 'name', 'closestJoint'])
 
+    # keep user selection
+    if useSelection:
+        mc.select(sels)
+
     logger.info("[Finished Skin] :: {}".format(skn_nodes))
 
     return skn_nodes
+
+
+def skinOtherSide(sources=None, useSelection=False):
+    """
+    mirrors the skinning of geometries of selected objects to objects on the other side.
+    from iRig_maya.lib import deformLib
+    deformLib.skinOtherSide(useSelection=True)
+    """
+    if useSelection:
+        sources = mc.ls(sl=True)
+        if not sources:
+            logger.error('Need to provide source geos to mirror the skin to the other side!')
+            return
+
+    if isinstance(sources, basestring):
+        sources = [sources]
+
+    skn_nodes = []
+    for src in sources:
+        # find side and other side
+        geo_no_namespace = src.split(':')[-1]
+        side = geo_no_namespace[0]
+        other_side = get_other_side(side)
+
+        # find other side (target) geos
+        tgt = '{0}{1}'.format(other_side, src[1:])
+        if not mc.objExists(tgt):
+            logging.warning('Geo does not exist, skipped: {}'.format(tgt))
+            continue
+
+        # delete current skinCluster if exists
+        skn = getSkinCluster(tgt)
+        if skn:
+            mc.delete(skn)
+
+        # get skincluster from src
+        src_skin = getSkinCluster(src)
+        if not src_skin:
+            logger.warning('Could not find skincluster on source geo "{}"'.format(src))
+            continue
+
+        # get joints from src
+        infs = mc.skinCluster(src_skin, q=True, inf=True)
+
+        # find joints for other side geos
+        infs_other_side = []
+        for inf in infs:
+            if ':' in inf:
+                ns = inf.rsplit(':', 1)[0]
+                inf = inf.split(':')[-1]
+            else:
+                ns = ''
+            inf_side = inf[0]
+            other_inf_side = get_other_side(inf_side)
+            infs_other_side.append('{0}:{1}{2}'.format(ns, other_inf_side, inf[1:]))
+
+        # create skin for target
+        skn_node = tgt + '_' + skin_suffix
+        mc.skinCluster(infs_other_side, tgt, toSelectedBones=True, n=skn_node)
+        skn_nodes.append(skn_node)
+
+        # copy weights from src to target
+        mc.copySkinWeights(
+            ss=src_skin,
+            ds=skn_node,
+            mirrorMode='YZ',
+            surfaceAssociation='closestPoint',
+            influenceAssociation=['label', 'closestJoint']
+        )
+
+    # keep user selection
+    if useSelection:
+        mc.select(sources)
+
+    logger.info("[Finished Mirror Skin] :: {}".format(skn_nodes))
+
+    return skn_nodes
+
+
+def get_other_side(side):
+    sides_dict = {
+        'C': 'C',
+        'L': 'R',
+        'R': 'L',
+    }
+    return sides_dict.get(side, side)
+
+
+def copySkinFromReference():
+    """
+    copy skin from referenced to last selected
+    """
+    sels = mc.ls(sl=True)
+    source = sels[0]
+    target = sels[1]
+    infs = mc.skinCluster(source, q=True, inf=True)
+
+    infs = mc.ls([x.split(':')[-1] for x in infs])
+    mc.skinCluster(infs, target, tsb=True)
+
+    mc.copySkinWeights(source,
+                       target,
+                       noMirror=True,
+                       surfaceAssociation='closestPoint',
+                       influenceAssociation=['label', 'name', 'closestJoint'])
 
 
 def getSkinBlendWeights(skin):
@@ -508,7 +730,9 @@ def getSkinBlendWeights(skin):
     skin_fn = getFnSkin(skin)
 
     # get shape
-    shape_dag = skin_fn.getPathAtIndex(0)
+    # probably maya bug skin_fn.getPathAtIndex(0) sometimes doesn't return anything.
+    shape_mobj = skin_fn.getOutputGeometry()[0]
+    shape_dag = dagFromMObject(shape_mobj)
 
     # create a list of verts indices
     components = getComponent(shape_dag)
@@ -570,7 +794,7 @@ def exportLattice(ffd, path):
         # lattice before skinning returns: -0.5
         # lattice skinned returns: [(0.0, 0.0, 0.0)]
 
-    import rt_tools.maya.lib.deformLib as deformLib
+    import iRig.iRig_maya.lib.deformLib as deformLib
     reload(deformLib)
     for ffd in 'ffd1Lattice', 'ffd3Lattice':
         ffd_json = os.path.join(mc.internalVar(uad=True), '..', '..', 'Desktop', ffd+'.json')
@@ -615,7 +839,7 @@ def exportLattice(ffd, path):
 
 def importLattice(path):
     """
-    import rt_tools.maya.lib.deformLib as deformLib
+    import iRig.iRig_maya.lib.deformLib as deformLib
     reload(deformLib)
     for ffd in 'ffd1Lattice', 'ffd3Lattice':
         ffd_json = os.path.join(mc.internalVar(uad=True), '..', '..', 'Desktop', ffd+'.json')
@@ -656,7 +880,7 @@ def importLattice(path):
 
 def mirrorFFD(ffd, copy=True, findAndDeformGeos=True, search='L_', replace='R_'):
     """
-    import rt_tools.maya.lib.deformLib as deformLib
+    import iRig.iRig_maya.lib.deformLib as deformLib
     reload(deformLib)
     deformLib.mirrorFFD(ffd='ffd1Lattice')
     """
@@ -761,24 +985,56 @@ def getShapes(mesh="", fullPath=False):
     return shapes
 
 
-def findClosestPolygons(geoToFindPolygons, proxyGeo):
+def findClosestPolygons(searchGeo, targetGeo):
     """
-    import rt_tools.maya.lib.deformLib as deformLib
-    reload(deformLib)
-    deformLib.findClosestPolygons(geoToFindPolygons, proxyGeo)
+    for each face of targetGeo, finds closest face on searchGeo.
+    usage:
+        import iRig.iRig_maya.lib.deformLib as deformLib
+        reload(deformLib)
+        deformLib.findClosestPolygons(searchGeo, targetGeo)
+    :param searchGeo: geo to find face indices on
+                      eg: source geo with good deformer weights
+    :param targetGeo: for each face of this geo, search the other geo
+                      eg: geometry to copy weights to.
+    :return: (list)
+        indices of closets faces of searchGeo, eg: [3, 4, 2, 4]
     """
-    tgtPoints = getPolygonCenters(geoToFindPolygons)
-    proxyPoints = getPolygonCenters(proxyGeo)
-    return getClosestPointsIDs(tgtPoints=tgtPoints, proxyPoints=proxyPoints)
+    searchPoints = getPolygonCenters(searchGeo)
+    targetPoints = getPolygonCenters(targetGeo)
+    return getClosestPointsIDs(
+        searchPoints=searchPoints,
+        targetPoints=targetPoints
+    )
 
 
-def getClosestPointsIDs(tgtPoints, proxyPoints):
+def getClosestPointsIDs(searchPoints, targetPoints, count=1):
     """
-    finds indices of points on tgtPoints that are close to proxyPoints
+    finds indices of points on searchPoints that are close to targetPoints
     """
-    tree = ckdtree.cKDTree(tgtPoints)
-    _, ids = tree.query(proxyPoints)
-    return [x for x in ids]
+    tree = ckdtree.cKDTree(searchPoints)
+    _, ids = tree.query(targetPoints, k=count)
+    return [x.tolist() for x in ids]
+
+
+def get3ClosestVerts(searchGeo, targetGeo):
+    searchPoints = getPoints(searchGeo)
+    targetPoints = getPoints(targetGeo)
+    return getClosestPointsIDs(
+        searchPoints=searchPoints,
+        targetPoints=targetPoints,
+        count=3,
+    )
+
+
+def getClosestPoint(from_point, mesh_name):
+    target_point = om2.MPoint(*from_point)
+    sel = om2.MSelectionList()
+    sel.add(mesh_name)
+    geo_mobj = sel.getDependNode(0)
+    mesh_intersector = om2.MMeshIntersector()
+    mesh_intersector.create(geo_mobj)
+    point_on_mesh = mesh_intersector.getClosestPoint(target_point)
+    return point_on_mesh.point
 
 
 def findClosestUfromGeoToCrv(geo, crv):
@@ -799,7 +1055,7 @@ def findClosestUfromGeoToCrv(geo, crv):
 
 def getCurveCVs(crv, asMPoint=False):
     """
-    import rt_tools.maya.lib.deformLib as deformLib
+    import iRig.iRig_maya.lib.deformLib as deformLib
     reload(deformLib)
     deformLib.getCurveCVs('curve1')
     """
@@ -814,9 +1070,9 @@ def getCurveCVs(crv, asMPoint=False):
         return [[x.x, x.y, x.z] for x in poses]
 
 
-def getPoints(geo, asMPoint=False):
+def getPoints(geo, asMPoint=False, space=om2.MSpace.kWorld):
     """
-    import rt_tools.maya.lib.deformLib as deformLib
+    import iRig.iRig_maya.lib.deformLib as deformLib
     reload(deformLib)
     deformLib.getPoints('pCube1')
     """
@@ -824,21 +1080,21 @@ def getPoints(geo, asMPoint=False):
     sel.add(geo)
     dag = sel.getDagPath(0)
     geoIt = om2.MFnMesh(dag)
-    poses = geoIt.getPoints(om2.MSpace.kWorld)
+    poses = geoIt.getPoints(space=space)
     if asMPoint:
         return poses
     else:
         return [[x.x, x.y, x.z] for x in poses]
 
 
-def getPolygonCenters(geo):
+def getPolygonCenters(geo, space=om2.MSpace.kWorld):
     sel = om2.MSelectionList()
     sel.add(geo)
     dag = sel.getDagPath(0)
     mpIt = om2.MItMeshPolygon(dag)
     poses = []
     while not mpIt.isDone():
-        pos = mpIt.center()
+        pos = mpIt.center(space=space)
         poses.append([pos.x, pos.y, pos.z])
         mpIt.next(0)
     return poses
@@ -884,7 +1140,7 @@ def getTargetIdx(bls, target):
 
 def setBlsWgtsFromCrv(bls, geo, crv, target=None, geoIdx=0, curveType='mid'):
     """
-    import rt_tools.maya.lib.deformLib as deformLib
+    import iRig.iRig_maya.lib.deformLib as deformLib
     reload(deformLib)
     bls = 'blendShape1'
     geos = mc.listRelatives('C_mouth_GRP', f=True)
@@ -937,7 +1193,7 @@ def invertBlsWgts(bls):
     inputTargets = mc.ls('{}.inputTarget[*]'.format(bls))
     for inputTarget in inputTargets:
         geoIdx = int(re.findall(r'(\d+)', inputTarget)[-1])
-        numVerts = getNumVertsFromBls(bls, geoIdx)
+        numVerts = getNumVertsFromDeformer(bls, geoIdx)
         for i in range(numVerts):
             baseWgtAt = '{}.baseWeights[{}]'.format(inputTarget, i)
             wgts = mc.getAttr(baseWgtAt)
@@ -945,7 +1201,7 @@ def invertBlsWgts(bls):
             mc.setAttr(baseWgtAt, val)
 
 
-def getNumVertsFromBls(bls, geoIdx):
+def getNumVertsFromDeformer(bls, geoIdx):
     mesh = mc.createNode('mesh')
     mc.connectAttr('{}.outputGeometry[{}]'.format(bls, geoIdx), mesh + '.inMesh')
     numVerts = mc.polyEvaluate(mesh, v=True)
@@ -957,17 +1213,81 @@ def resetBlsWgts(bls):
     inputTargets = mc.ls('{}.inputTarget[*]'.format(bls))
     for inputTarget in inputTargets:
         geoIdx = int(re.findall(r'(\d+)', inputTarget)[-1])
-        numVerts = getNumVertsFromBls(bls, geoIdx)
+        numVerts = getNumVertsFromDeformer(bls, geoIdx)
         for i in range(numVerts):
             baseWgtAt = '{}.baseWeights[{}]'.format(inputTarget, i)
             mc.setAttr(baseWgtAt, 1)
+
+def get_bls_TargetWeights(blendShape, target, geometry=''):
+
+    geo_idx = getGeoIndexFromDeformer(geometry, blendShape)
+
+    numVerts = get_num_verts(geometry)
+    # find out vertices of the geo that are deforming
+    deformer_set = getDeformerSet(blendShape)
+    all_deformed_verts = mc.sets(deformer_set, query=True)
+    this_geos_deformed_verts = [x for x in all_deformed_verts if geometry in x or mc.listRelatives(geometry, p=True)[0] in x]
+    deformed_verts = mc.ls(this_geos_deformed_verts, fl=True)
+    deformed_vert_ids = [int(x.split('[')[1][:-1]) for x in deformed_verts]
+
+    target_index = getTargetIdx(blendShape, target)
+
+    # get a list of weights for all verts (the ones out of deformer set have 0.0 weight)
+    wgts = []
+    for i in range(numVerts):
+        if i in deformed_vert_ids:
+            attr = '{0}.inputTarget[{1}].inputTargetGroup[{2}].targetWeights[{3}]'.format(blendShape, geo_idx, target_index, i)
+            wgt = mc.getAttr(attr)
+            wgts.append(wgt)
+        else:
+            wgts.append(0.0)
+
+    return wgts
+
+def set_bls_TargetWeights(blendShape, target, wt, geometry=''):
+    geo_idx = getGeoIndexFromDeformer(geometry, blendShape)
+    target_index = getTargetIdx(blendShape, target)
+
+    numVerts = get_num_verts(geometry)
+    attr = '{0}.inputTarget[{1}].inputTargetGroup[{2}].targetWeights'.format(blendShape, geo_idx, target_index)
+
+    plug = get_plug(attr)
+    ids = om.MIntArray()
+    plug.getExistingArrayAttributeIndices(ids)
+
+    for i in range(numVerts):
+        plug.elementByLogicalIndex(ids[i]).setFloat(wt[i])
+
+def get_plug(pl):
+    plug = om.MPlug()
+    sel = om.MSelectionList()
+    sel.add(pl)
+    sel.getPlug(0, plug)
+
+    return plug
+
+def get_num_verts(node):
+    dag = getDag(node)
+    sel = om2.MSelectionList()
+    sel.add(dag)
+    mesh_fn = om2.MFnMesh(dag)
+    numVerts = mesh_fn.numVertices
+
+    return numVerts
+
+def get_bls_TargetList(bls):
+    # Get attribute alias
+    targetList = mc.listAttr(bls + '.w', m=True) or []
+
+    # Return result
+    return targetList
 
 
 def exportBlsWgts(bls, path):
     """
     exports baseWeights for all geos in the blendShape node
 
-    import rt_tools.maya.lib.deformLib as deformLib
+    import iRig.iRig_maya.lib.deformLib as deformLib
     reload(deformLib)
     bls = 'blendShape1'
     bls_json = os.path.join(mc.internalVar(uad=True), '..', '..', 'Desktop', bls+'.json')
@@ -976,15 +1296,23 @@ def exportBlsWgts(bls, path):
     inputTargets = mc.ls('{}.inputTarget[*]'.format(bls))
 
     data = OrderedDict()
+    data['target_weights'] = {}
+
+    targets = get_bls_TargetList(bls)
+    shape = mc.blendShape(bls, q=True, geometry=True)[0]
+    geo = mc.listRelatives(shape, p=True)[0]
+    for target in targets:
+        wgt = get_bls_TargetWeights(bls, target, geometry=geo)
+        data['target_weights'].update({target: wgt})
 
     for inputTarget in inputTargets:
         geoIdx = int(re.findall(r'(\d+)', inputTarget)[-1])
-        numVerts = getNumVertsFromBls(bls, geoIdx)
+        numVerts = getNumVertsFromDeformer(bls, geoIdx)
         wgts = []
         for i in range(numVerts):
             wgt = mc.getAttr('{}.baseWeights[{}]'.format(inputTarget, i))
             wgts.append(wgt)
-        data[inputTarget + '.baseWeights'] = wgts
+        data[geo] = wgts
 
     fileLib.saveJson(path=path, data=data)
 
@@ -999,11 +1327,27 @@ def importBlsWgts(path, newBls=None):
     if not data:
         mc.error('given blendShape weight json file is no valid: {}'.format(path))
 
-    for inputTarget, wgts in data.items():
-        if newBls:
-            inputTarget = newBls + '.' + inputTarget.split('.', 1)[-1]
-        for i in range(len(wgts)):
-            mc.setAttr('{}[{}]'.format(inputTarget, i), wgts[i])
+    bls_name = os.path.splitext(os.path.basename(path))[0]
+
+    inputTargets = mc.ls('{}.inputTarget[*]'.format(bls_name))
+    shape = mc.blendShape(bls_name, q=True, geometry=True)[0]
+    geo = mc.listRelatives(shape, p=True)[0]
+    targets = get_bls_TargetList(bls_name)
+    target_weight_dict = data['target_weights']
+
+    for key, values in data.items():
+        if not geo in key:
+            continue
+        wgts = data[geo]
+        for inputTarget in inputTargets:
+            inputTarget = inputTarget + '.baseWeights'
+            for i in range(len(wgts)):
+                mc.setAttr('{}[{}]'.format(inputTarget, i), wgts[i])
+
+            newBls = inputTarget.split('.', 1)[0]
+
+    for target in targets:
+        set_bls_TargetWeights(newBls, target, target_weight_dict[target], geometry=geo)
 
 
 def createShrinkWrap(driver, driven, **kwargs):
@@ -1015,7 +1359,7 @@ def createShrinkWrap(driver, driven, **kwargs):
     """
     n = kwargs.pop('name', 'shrinkWrap1')
     driverShape = trsLib.getShapes(driver)[0]
-    shrink = mc.deformLib(driven, type='shrinkWrap', name=n)[0]
+    shrink = mc.deformer(driven, type='shrinkWrap', name=n)[0]
 
     mc.connectAttr(driverShape + '.worldMesh[0]', shrink + '.targetGeom')
     mc.connectAttr(driverShape + '.continuity', shrink + '.continuity')
@@ -1032,11 +1376,19 @@ def createShrinkWrap(driver, driven, **kwargs):
     return shrink
 
 
+def createWrap(driver, driven):
+    mc.select(driven, driver)
+    wrap_node = mm.eval(
+        'doWrapArgList "7" {"1", "0", "1", "2", "1", "1", "0", "0"};'
+    )[0]
+    return wrap_node
+
+
 def exportDeformerWgts(node, path):
     """
-    exports baseWeights for all geos in the blendShape node
+    exports deformer weights
 
-    import rt_tools.maya.lib.deformLib as deformLib
+    import iRig.iRig_maya.lib.deformLib as deformLib
     reload(deformLib)
 
     # export shrink wrap weights
@@ -1052,36 +1404,648 @@ def exportDeformerWgts(node, path):
     deformLib.exportDeformerWgts(node=ffd_node, path=ffd_json)
 
     """
-    # shrinkWrap1.weightList[0].weights[5]
-    inputTargets = mc.ls('{}.weightList[*]'.format(node))
 
-    data = OrderedDict()
+    deformer_order_data = OrderedDict()
 
-    for inputTarget in inputTargets:
-        geoIdx = int(re.findall(r'(\d+)', inputTarget)[-1])
-        numVerts = getNumVertsFromBls(node, geoIdx)
-        wgts = []
-        for i in range(numVerts):
-            wgt = mc.getAttr('{}.weights[{}]'.format(inputTarget, i))
-            wgts.append(wgt)
-        data[inputTarget + '.weights'] = wgts
+    geos = mc.deformer(
+        node,
+        query=True,
+        geometry=True
+    )
+    for geo in geos:
+        deformer_order = get_deformer_order(geo)
+        deformer_order_data[geo] = deformer_order
 
-    fileLib.saveJson(path=path, data=data)
+    deformer_weights = getDeformerWeights(node)
+
+    deformer_data = {'weights': deformer_weights,
+                     'deformer_order': deformer_order_data}
+
+    fileLib.saveJson(path=path, data=deformer_data)
+
+    logger.info('Weights were exported for "{}" here: {}'.format(node, path))
 
 
-def importDeformerWgts(path, newNode=None):
+def importDeformerWgts(path, deformer_name=None):
     """
-    imports baseWeights for all geos in the blendShape node
-
-    deformLib.importDeformerWgts(path=wgts_json, newNode=None)
-
+    imports deformer weight from given path
+    deformLib.importDeformerWgts(path=wgts_json)
     """
-    data = fileLib.loadJson(path=path)
-    if not data:
+    deformer_data = fileLib.loadJson(path=path)
+    if not deformer_data:
         mc.error('given deformer weight json file is no valid: {}'.format(path))
 
-    for wgt_attr, wgts in data.items():
-        if newNode:
-            wgt_attr = newNode + '.' + wgt_attr.split('.', 1)[-1]
-        for i in range(len(wgts)):
-            mc.setAttr('{}[{}]'.format(wgt_attr, i), wgts[i])
+    deformer_weights = deformer_data['weights']
+    deformer_order = deformer_data['deformer_order']
+
+    if deformer_name:
+        deformer_node = deformer_name
+    else:
+        deformer_node = os.path.splitext(os.path.basename(path))[0]
+
+    for key in deformer_weights:
+        if mc.objExists(deformer_node):
+            if not key in mc.deformer(deformer_node, q=True, g=True):
+                addGeosToDeformer(geos=key, deformer=deformer_node)
+    setDeformerWgts(deformer=deformer_node, weights_data=deformer_weights)
+
+    for geo, order in deformer_order.items():
+        set_deformer_order(geo, order)
+
+
+def getDeformerSet(node):
+    """
+    Finds deformer set on given deformer node
+    """
+    outs = mc.listConnections(node + '.message', plugs=True) or [None]
+    for out in outs:
+        if '.usedBy[' in out:
+            return out.split('.')[0]
+
+
+def copyLattice(source, targets):
+    """
+    deforms target geos using the same lattice on source geo
+    copies lattice weights from source to targets too
+    :param source: source geo that has lattice on it
+    :param targets: geometries to add the same lattice found on source
+    :return: N/A
+    """
+    # find lattice on source
+    ffds = findDeformersByType(source, deformer_type='ffd')
+    if not ffds:
+        return
+
+    # apply lattice to targets
+    for ffd in ffds:
+        addGeosToDeformer(geos=targets, deformer=ffd)
+
+        # copy weights to targets
+        copyDeformerWeights(source, targets, ffd)
+
+
+def copyDeformer(source, targets, deformer, Weights_only=False, target_deformer=None):
+    """
+    deforms target geos using the same deformer on source geo
+    copies deformer weights from source to targets too
+
+    :usage:
+        import maya.cmds as mc
+        import iRig.iRig_maya.lib.deformLib as deformLib
+        reload(deformLib)
+
+        source = 'Body_Geo'
+        targets = mc.ls(sl=True)
+        deformers = [
+            'C_HeadSquash_SquashY_Def',
+            'C_HeadSquash_BendX_Def',
+            'C_HeadSquash_BendZ_Def'
+        ]
+        for deformer in deformers:
+            deformLib.copyDeformer(source, targets, deformer)
+
+    :param source: source geo that has deformer on it
+    :param targets: geometries to add the same deformer found on source
+    :param deformer: the deform we want to copy from source to targets
+    :return: N/A
+    """
+    # apply deformer to targets
+    if not Weights_only:
+        addGeosToDeformer(geos=targets, deformer=deformer)
+
+    # copy weights to targets
+    copyDeformerWeights(source, targets, deformer, target_deformer=target_deformer)
+
+
+def findDeformersByType(geo, deformer_type='ffd'):
+    """
+    finds deformers of given type on given geo
+    :param geo: geometry to find deformers for
+    :param deformer_type: type of deformers to look for on given geo
+    :return: list of found deformers on geo
+    """
+    deformers = mc.findDeformers(geo)
+
+    nodes = []
+    for node in deformers:
+        if mc.nodeType(node) == deformer_type:
+            nodes.append(node)
+
+    return nodes
+
+
+def addGeosToDeformer(geos, deformer):
+    """
+    deforms given geos by given deformer
+    :param geos: name of geometries to deform
+    :param deformer: name of deformer node which will deform geos
+    :return: N/A
+    """
+    mc.deformer(deformer, geometry=geos, edit=True)
+
+
+def getDeformerWeights(deformer):
+    """
+    gets weights of all geos for given deformer as a dictionary
+    with geo name as key and weights as value
+    :param deformer: name of deformer to get weigths from
+    :return: OrderedDict of geos and weights
+    """
+    geo_indices_dict = getGeoIndicesFromDeformer(deformer)
+
+    deformer_weights = OrderedDict()
+    for geo in geo_indices_dict.keys():
+        deformer_weights[geo] = getDeformerWgtsForGeo(geo, deformer)
+
+    return deformer_weights
+
+
+def setDeformerWgts(deformer, weights_data):
+    """
+    sets deformer weights for given deformer
+    :param deformer: deformer to set weights for
+    :param weights_data: dictionary of weights with geo_name as keys
+           and weights as values. eg: {'pCube1': [0.0, 1.0, ...]}
+    :return: N/A
+    """
+    for geo, weights in weights_data.items():
+        setDeformerWgtsForGeo(geo, deformer, weights)
+
+
+def setDeformerWgtsForGeo(geo, deformer, weights):
+    """
+    sets deformer weights for given geometry
+    :param geo: geo to set deformer weights for
+    :param deformer: deformer node to set weights for
+    :param weights: list of weights for given geo. eg: [1.0, 0.0, ...]
+    :return: N/A
+    """
+    # attribute name was saved as key, eg: 'deltaMush1.weightList[0].weights' (old system)
+    if geo.endswith('weights'):
+        attr = geo
+
+    # geo name is saved as key (new system)
+    else:
+        index = getGeoIndexFromDeformer(geo, deformer)
+        if index is None:
+            mc.warning('Weights were not set for "{}" as it is not deformed by "{}"'.format(geo, deformer))
+            return
+        attr = '{}.weightList[{}].weights'.format(deformer, index)
+
+    # set weights
+    for i in range(len(weights)):
+        mc.setAttr('{}[{}]'.format(attr, i), weights[i])
+
+
+def getDeformerWgtsForGeo(geo, deformer):
+    """
+    Get deformer weights for given geo on given deformer
+    :param geo: name of geo to get its weights
+    :param deformer: name of deformer on geo we want to get weights for
+    :return: list of vertex weights. eg: [1.0, 0.0, ...]
+    """
+    geo_idx = getGeoIndexFromDeformer(geo, deformer)
+
+    numVerts = mc.polyEvaluate(geo, v=True)
+    # find out vertices of the geo that are deforming
+    deformer_set = getDeformerSet(deformer)
+    all_deformed_verts = mc.sets(deformer_set, query=True)
+    this_geos_deformed_verts = [x for x in all_deformed_verts if geo in x or mc.listRelatives(geo, p=True)[0] in x]
+    deformed_verts = mc.ls(this_geos_deformed_verts, fl=True)
+    deformed_vert_ids = [int(x.split('[')[1][:-1]) for x in deformed_verts]
+
+    # get a list of weights for all verts (the ones out of deformer set have 0.0 weight)
+    wgts = []
+    for i in range(numVerts):
+        if i in deformed_vert_ids:
+            attr = '{}.weightList[{}].weights[{}]'.format(deformer, geo_idx, i)
+            wgt = mc.getAttr(attr)
+            wgts.append(wgt)
+        else:
+            wgts.append(0.0)
+
+    return wgts
+
+def get_corresponding_verts(geo, deformed_vert_ids, tolerance = 0.001):
+
+    mSel = om2.MSelectionList()
+    mSel.add(geo)
+    mObj = mSel.getDagPath(0)
+    mfnMesh = om2.MFnMesh(mObj)
+    baseShape = mfnMesh.getPoints()
+    mfnMesh.setPoints(baseShape)
+
+    lVerts = []
+    rVerts = []
+    corresponding_Verts = {}
+
+    for i in deformed_vert_ids:
+        thisPoint = mfnMesh.getPoint(i)
+        if thisPoint.x == 0:
+            continue
+        if thisPoint.x > 0 + tolerance:
+            lVerts.append((i, thisPoint))
+
+        elif thisPoint.x < 0 - tolerance:
+            rVerts.append((i, thisPoint))
+
+    rVertspoints = [i for v, i in rVerts]
+    for vert, mp in lVerts:
+        nmp = om2.MPoint(-mp.x, mp.y, mp.z)
+        rp = mfnMesh.getClosestPoint(nmp)
+        if rp[0] in rVertspoints:
+            corresponding_Verts[vert] = rVerts[rVertspoints.index(rp[0])][0]
+        else:
+            dList = [nmp.distanceTo(rVert) for rVert in rVertspoints]
+            mindist = min(dList)
+            corresponding_Verts[vert] = rVerts[dList.index(mindist)][0]
+
+    return(corresponding_Verts)
+
+#@decoratorLib.timeIt
+def mirror_deformer_wgts(geo, deformer):
+    geo_idx = getGeoIndexFromDeformer(geo, deformer)
+
+    # find out vertices of the geo that are deforming
+    deformer_set = getDeformerSet(deformer)
+    all_deformed_verts = mc.sets(deformer_set, query=True)
+    this_geos_deformed_verts = [x for x in all_deformed_verts if geo in x or mc.listRelatives(geo, p=True)[0] in x]
+    deformed_verts = mc.ls(this_geos_deformed_verts, fl=True)
+    deformed_vert_ids = [int(x.split('[')[1][:-1]) for x in deformed_verts]
+
+    # get a list of weights for all verts (the ones out of deformer set have 0.0 weight)
+    dict_vert_ids = get_corresponding_verts(geo, deformed_vert_ids)
+    left_vert_ids = [x for x in dict_vert_ids]
+    deformed_left_vert_ids = [x for x in deformed_vert_ids if x in left_vert_ids]
+
+    wgts = []
+    rightAttrs = []
+    for i in (deformed_left_vert_ids):
+        attr = '{}.weightList[{}].weights[{}]'.format(deformer, geo_idx, i)
+        wgt = mc.getAttr(attr)
+        wgts.append(wgt)
+        rightId = dict_vert_ids[i]
+        right_attr = '{}.weightList[{}].weights[{}]'.format(deformer, geo_idx, rightId)
+        rightAttrs.append(right_attr)
+
+
+    set_side_deformer_wgts(wgts, rightAttrs)
+
+def set_side_deformer_wgts(weights, rightAttr):
+    # set weights
+    for i, j in zip(weights, rightAttr):
+        mc.setAttr('{}'.format(j), i)
+    logger.info('weights for selected deformer got mirrored')
+
+def getGeoIndexFromDeformer(geo, deformer):
+    """
+    finds index of geo on given deformer
+    :param geo: geo name to find deformer index for
+    :param deformer: node deforming geo
+    :return: (int) index of given geometry on given deformer
+    """
+    shapes = getShapes(geo)
+    if not shapes:
+        return
+    shape = shapes[0]
+
+    geo_indices_dict = getGeoIndicesFromDeformer(deformer)
+
+    return geo_indices_dict.get(shape, None)
+
+
+def getGeoIndicesFromDeformer(deformer):
+    """
+    get a dictionary of all geos and indices on a deformer
+    :param deformer: deformer to find geos and indices from
+    :return: (OrderedDict) geos and their indices on given deformer
+             eg: {'pCube1Shape': 0, 'pSphere1Shape': 1}
+    """
+    geos = mc.deformer(
+        deformer,
+        query=True,
+        geometry=True
+    )
+    indices = mc.deformer(
+        deformer,
+        query=True,
+        geometryIndices=True
+    )
+
+    geo_indices_dict = OrderedDict()
+
+    for geo, index in zip(geos, indices):
+        geo_indices_dict[geo] = index
+
+    return geo_indices_dict
+
+
+def copyDeformerWeights(source, targets, deformer, target_deformer=None):
+    """
+    copies deformer weights from source to targets
+
+    :param source: source geo to copy weights from
+    :type source: string
+    :param targets: geometries to paste weights on
+    :type targets: list
+    :param deformer: deformer node driving source and targets
+                     to set weights for
+    :return: N/A
+    """
+    src_weights = getDeformerWgtsForGeo(source, deformer)
+    searchPoints = getPoints(source, asMPoint=True)
+    for target in targets:
+        targetPoints = getPoints(target, asMPoint=True)
+        approximate_weights = approximateWeights(
+            searchPoints,
+            targetPoints,
+            src_weights
+        )
+        if target_deformer:
+            setDeformerWgtsForGeo(target, target_deformer, approximate_weights)
+            logger.info('Copied weights from "{0}_{1}" on  "{2}_{3}"'.format(source, deformer, target, target_deformer))
+
+        else:
+            setDeformerWgtsForGeo(target, deformer, approximate_weights)
+            logger.info('Copied deformer from "{0}_{1}" on  "{2}"'.format(source, deformer, target))
+
+
+def approximateWeights(searchPoints, targetPoints, weights):
+    """
+    find the best possible weight value for given target geometry.
+    for each target vertex, finds the 3 closest verts on source, then
+    finds all vertex weights of that face, and calculates the best
+    weight using barrycentric coordinates.
+
+    :param searchPoints: source points that has given weights
+    :type searchPoints: list of vertex positions, eg: MPoint
+    :param targetPoints: target points to find weights for
+    :type targetPoints: list of vertex positions, eg: MPoint
+    :param weights: list of deformer weights of source geo
+    :return: list of weights. eg: [1.0, 0.0, ...]
+    """
+    triangle_indices = getClosestPointsIDs(
+        searchPoints=[[x.x, x.y, x.z] for x in searchPoints],
+        targetPoints=[[x.x, x.y, x.z] for x in targetPoints],
+        count=3,
+    )
+    triangle_points = []
+    for indices in triangle_indices:
+        triangle_points.append(
+            [
+                searchPoints[indices[0]],
+                searchPoints[indices[1]],
+                searchPoints[indices[2]],
+            ]
+        )
+    approximate_weights = []
+    for i in range(len(triangle_indices)):
+        indices = triangle_indices[i]
+        w_1, w_2, w_3 = get_barrycentric_coords(
+            point=targetPoints[i],
+            triangle_points=triangle_points[i],
+        )
+        wgt_1 = weights[indices[0]] * w_1
+        wgt_2 = weights[indices[1]] * w_2
+        wgt_3 = weights[indices[2]] * w_3
+        approximate_weights.append(wgt_1 + wgt_2 + wgt_3)
+
+    return approximate_weights
+
+
+def get_barrycentric_coords(point, triangle_points):
+    """
+    find barrycentric coordinates from given point on given triangle
+
+    :param point: the point we want to find its barrycentric coordinates for
+    :type point: MPoint or list of 3 floats
+    :param triangle_points: triangle corners we want to get coordinates on
+    :type triangle_points: list of 3 MPoint or list of 3 lists of 3 floats
+    :return: 3 barrycentric coordinate values
+    :return type: list of 3 floats
+    """
+    point = om2.MVector(point)
+    p_1, p_2, p_3 = [om2.MVector(x) for x in triangle_points]
+
+    tri_area = get_triangle_area(p_1, p_2, p_3)
+
+    # for faster results if source and target points are exactly on top of each other
+    # we can use the source weights directly without any interpolation
+    point_len = point.length()
+    p_1_len = p_1.length()
+    p_2_len = p_2.length()
+    p_3_len = p_3.length()
+    if point_len - p_1_len < 0.0001:
+        return 1.0, 0.0, 0.0
+    elif point_len - p_2_len < 0.0001:
+        return 0.0, 1.0, 0.0
+    elif point_len - p_3_len < 0.0001:
+        return 0.0, 0.0, 1.0
+
+    # points don't make a triangle, they make a line
+    # project point on the line and linearly interpolate weights based on distances
+    if tri_area < 0.0000001:
+        w_1, w_2, w_3 = get_point_ratio_on_line(point, [p_1, p_2, p_3])
+
+    else:
+        # project point on triangle plane
+        projected_point = project_point_on_plane(point, [p_1, p_2, p_3])
+
+        # calculate sub triangles areas
+        area_1 = get_triangle_area(p_2, p_3, projected_point)
+        area_2 = get_triangle_area(p_3, p_1, projected_point)
+        area_3 = get_triangle_area(p_1, p_2, projected_point)
+
+        # get area ratio (barrycentric coordinates)
+        w_1 = area_1 / tri_area
+        w_2 = area_2 / tri_area
+        w_3 = area_3 / tri_area
+
+        point_outside_triangle = w_1 < 0.0 or \
+                                 w_2 < 0.0 or \
+                                 w_3 < 0.0 or \
+                                 w_1 + w_2 + w_3 > 1.0
+
+        if point_outside_triangle:
+            closest_1 = closest_point_on_line(point, [p_1, p_2])
+            closest_2 = closest_point_on_line(point, [p_1, p_3])
+            closest_3 = closest_point_on_line(point, [p_2, p_3])
+
+            len_1 = (closest_1 - point).length()
+            len_2 = (closest_2 - point).length()
+            len_3 = (closest_3 - point).length()
+
+            if len_1 <= len_2 and len_1 <= len_3:
+                w_1, w_2, w_3 = get_point_ratio_on_line(point, [p_1, p_2, p_2])
+            elif len_2 <= len_1 and len_2 <= len_3:
+                w_1, w_2, w_3 = get_point_ratio_on_line(point, [p_1, p_3, p_3])
+            elif len_3 <= len_1 and len_3 <= len_2:
+                w_1, w_2, w_3 = get_point_ratio_on_line(point, [p_2, p_3, p_3])
+
+    return w_1, w_2, w_3
+
+
+def get_triangle_area(A, B, C):
+    AC = C - A
+    AB = B - A
+    dot = AB.normal() * AC.normal()
+    if dot > 0.9999999 or dot < -0.9999999:
+        return 0.0
+    area = (AC.length() * AB.length()) * math.sin(math.acos(dot)) / 2.0
+    return area
+
+
+def project_point_on_plane(point, triangle_points):
+    p_1, p_2, p_3 = triangle_points
+
+    tri_normal = ((p_2 - p_1) ^ (p_3 - p_1)).normal()
+
+    p1_to_point = point - p_1
+
+    perpendular_distance = p1_to_point * tri_normal
+
+    projected_point = point - (tri_normal * perpendular_distance)
+
+    return projected_point
+
+
+def project_point_on_line(point, line_points):
+    p_1, p_2 = line_points
+
+    p1_to_p2_normal = (p_2 - p_1).normal()
+
+    p1_to_point = point - p_1
+
+    dist_from_p1 = p1_to_point * p1_to_p2_normal
+
+    projected_p = p_1 + (p1_to_p2_normal * dist_from_p1)
+
+    return projected_p
+
+
+def closest_point_on_line(point, line_points):
+    p_1, p_2 = line_points
+    line = p_2 - p_1
+    line_len = line.length()
+
+    project_point = project_point_on_line(point, line_points)
+    p1_to_proj_pnt = project_point - p_1
+
+    dot = p1_to_proj_pnt * line
+    sign = 1 if dot > 0.0 else -1
+
+    p1_to_proj_pnt_dist = p1_to_proj_pnt.length() * sign
+
+    if 0 < p1_to_proj_pnt_dist < line_len:
+        return p_1 + p1_to_proj_pnt
+    if p1_to_proj_pnt_dist < line_len:
+        return p_1
+    elif p1_to_proj_pnt_dist > line_len:
+        return p_2
+
+
+def get_point_ratio_on_line(point, line_points):
+    p_1, p_2, p_3 = line_points
+
+    projected_point = project_point_on_line(point, [p_1, p_2])
+
+    d_1 = (p_1 - projected_point).length()
+    d_2 = (p_2 - projected_point).length()
+    d_3 = (p_3 - projected_point).length()
+    dists = [d_1, d_2, d_3]
+
+    biggest_dist_value_index = dists.index(max(dists))
+
+    if biggest_dist_value_index == 0:
+        w_1 = 0.0
+        # point is outside the full line,  farthest weight is 0.0
+        line_len = (p_3 - p_2).length()
+        if d_2 > line_len:  # point is too far from p_2
+            w_2 = 0.0
+            w_3 = 1.0
+        elif d_3 > line_len:  # point is too far from p_3
+            w_3 = 0.0
+            w_2 = 1.0
+        else:  # point is somewhere between p_2 and p_3
+            w_2 = 1.0 - (d_2 / line_len)
+            w_3 = 1.0 - w_2
+
+    elif biggest_dist_value_index == 1:
+        w_2 = 0.0
+        # point is outside the full line,  farthest weight is 0.0
+        line_len = (p_3 - p_1).length()
+        if d_1 > line_len:  # point is too far from p_1
+            w_1 = 0.0
+            w_3 = 1.0
+        elif d_3 > line_len:  # point is too far from p_3
+            w_3 = 0.0
+            w_1 = 1.0
+        else:  # point is somewhere between p_1 and p_3
+            w_1 = 1.0 - (d_1 / line_len)
+            w_3 = 1.0 - w_1
+
+    elif biggest_dist_value_index == 2:
+        w_3 = 0.0
+        # point is outside the full line,  farthest weight is 0.0
+        line_len = (p_2 - p_1).length()
+        if d_2 > line_len:  # point is too far from p_2
+            w_2 = 0.0
+            w_1 = 1.0
+        elif d_1 > line_len:  # point is too far from p_1
+            w_1 = 0.0
+            w_2 = 1.0
+        else:  # point is somewhere between p_1 and p_2
+            w_1 = 1.0 - (d_1 / line_len)
+            w_2 = 1.0 - w_1
+
+    return w_1, w_2, w_3
+
+def set_deformer_order(item_name, deformers):
+    for deformer_1, deformer_2 in zip(deformers[:-1], deformers[1:]):
+        try:
+            mc.reorderDeformers(
+                deformer_1,
+                deformer_2,
+                item_name
+            )
+
+        except RuntimeError:
+            logger.info(
+                'could not reorder: `%s` with `%s` on `%s`'
+                % (deformer_1, deformer_2, item_name)
+            )
+
+
+def get_deformer_order(item_name):
+
+    return [
+        x for x in (
+            mc.listHistory(
+                item_name,
+                pruneDagObjects=True,
+                interestLevel=1
+            )
+            or []
+        )
+        if 'geometryFilter' in mc.nodeType(x, inherited=True)
+    ]
+
+
+# import sys
+#
+# if path in sys.path:
+#     sys.path.remove(path)
+#
+# keys = sys.modules.keys()
+# for key in keys:
+#     if key.startswith('rt_tools'):
+#         del sys.modules[key]
+# path = "D:/all_works/redtorch_tools/src"
+# sys.path.insert(0, path)
+# from rt_tools.maya.lib import mirror_deformer_ui
+#
+# reload(mirror_deformer_ui)
+# mirror_deformer_ui.launch()
+#
+
+

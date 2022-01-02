@@ -1,324 +1,414 @@
+
+import logging
+from collections import OrderedDict
+
 import maya.cmds as mc
 
-from . import template
-from ...lib import attrLib
 from ...lib import crvLib
 from ...lib import trsLib
+from ...lib import attrLib
+from ...lib import container
+from ...lib import strLib
+from ...lib import deformLib
+from ...lib import keyLib
 from ...lib import jntLib
-from ...lib import control
 from ...lib import connect
-from ...lib import display
-from ..command import fk
-from ..command import splineIkTwist
-from ..command import splineIkStretch
+from . import spineTemplate
+from . import funcs
 
-reload(splineIkStretch)
-reload(display)
-reload(fk)
-reload(splineIkTwist)
-reload(connect)
-reload(control)
 reload(jntLib)
-reload(trsLib)
 reload(crvLib)
+reload(connect)
+reload(funcs)
+reload(keyLib)
+reload(deformLib)
+reload(spineTemplate)
+reload(trsLib)
 reload(attrLib)
-reload(template)
+reload(container)
+reload(strLib)
 
-class SpineB(template.Template):
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
-    def __init__(self, side = 'C' , prefix = 'spine', numJnts = 6, **kwargs):
 
-
+class SpineB(spineTemplate.SpineTemplate):
+    """
+    base class for neck template
+    """
+    def __init__(self, side='C', prefix='spine', **kwargs):
         kwargs['side'] = side
         kwargs['prefix'] = prefix
-
-        self.numJnts = numJnts
-
-
         super(SpineB, self).__init__(**kwargs)
+        self.aliases = {'hipIk':'hipIk',
+                        'spineIk1':'spineIk1',
+                        'spineIk2':'spineIk2',
+                        'spineIk3':'spineIk3',
+                        'spineIkEnd':'spineIkEnd',
+                        'crotch':'crotch',
+                        'blend1Breather':'blend1Breather',
+                        'blend2Breather':'blend2Breather'}
 
     def createBlueprint(self):
         super(SpineB, self).createBlueprint()
 
-        self.blueprints['start'] = '{}_start_BLU'.format(self.name)
-        self.blueprints['mid'] = '{}_mid'.format(self.name)
-        self.blueprints['end'] = '{}_end_BLU'.format(self.name)
+        self.blueprints['hipIk'] = '{}_hipIk_BLU'.format(self.side)
+        if not mc.objExists(self.blueprints['hipIk']):
+            mc.joint(self.blueprintGrp, name=self.blueprints['hipIk'])
+            mc.xform(self.blueprints['hipIk'], ws=True, t=(0, 100.261, -5.118))
 
-        print(self.blueprints['start'])
-        attrLib.addString(self.blueprintGrp, ln='blu_inputs', v=str(self.blueprints))
+        self.blueprints['spineIk1'] = '{}_spineIk1_BLU'.format(self.side)
+        if not mc.objExists(self.blueprints['spineIk1']):
+            mc.joint(self.blueprints['hipIk'], name=self.blueprints['spineIk1'])
+            mc.xform(self.blueprints['spineIk1'], ws=True, t=(0, 110.322, -5.118))
 
+        self.blueprints['spineIk2'] = '{}_spineIk2_BLU'.format(self.side)
+        if not mc.objExists(self.blueprints['spineIk2']):
+            mc.joint(self.blueprints['spineIk1'], name=self.blueprints['spineIk2'])
+            mc.xform(self.blueprints['spineIk2'], ws=True, t=(0, 124.155, -5.118))
 
-        if not mc.objExists(self.blueprints['start']):
-            mc.joint(self.blueprintGrp, name = self.blueprints['start'])
-            mc.xform(self.blueprints['start'], ws = True, t = (0, 10.5, 0))
+        self.blueprints['spineIk3'] = '{}_spineIk3_BLU'.format(self.side)
+        if not mc.objExists(self.blueprints['spineIk3']):
+            mc.joint(self.blueprints['spineIk2'], name=self.blueprints['spineIk3'])
+            mc.xform(self.blueprints['spineIk3'], ws=True, t=(0, 137.968, -5.118))
 
-        if not mc.objExists(self.blueprints['mid']):
-            mc.joint(self.blueprintGrp, name = self.blueprints['mid'])
-            mc.xform(self.blueprints['mid'], ws = True, t = (0, 13, 0))
+        self.blueprints['spineIkEnd'] = '{}_spineIkEnd_BLU'.format(self.side)
+        if not mc.objExists(self.blueprints['spineIkEnd']):
+            mc.joint(self.blueprints['spineIk3'], name=self.blueprints['spineIkEnd'])
+            mc.xform(self.blueprints['spineIkEnd'], ws=True, t=(0, 151.864, -5.118))
 
-        if not mc.objExists(self.blueprints['end']):
-            mc.joint(self.blueprintGrp, name = self.blueprints['end'])
-            mc.xform(self.blueprints['end'], ws = True, t = (0, 16, 0))
+        self.blueprints['crotch'] = '{}_crotch_BLU'.format(self.side)
+        if not mc.objExists(self.blueprints['crotch']):
+            mc.joint(self.blueprintGrp, name=self.blueprints['crotch'])
+            mc.xform(self.blueprints['crotch'], ws=True, t=(0, 97.812, 2.837))
+
+        self.blueprints['blend1Breather'] = '{}_blend1Breather_BLU'.format(self.side)
+        if not mc.objExists(self.blueprints['blend1Breather']):
+            mc.joint(self.blueprintGrp, name=self.blueprints['blend1Breather'])
+            mc.xform(self.blueprints['blend1Breather'], ws=True, t=(0, 110.355, 3.416))
+
+        self.blueprints['blend2Breather'] = '{}_blend2Breather_BLU'.format(self.side)
+        if not mc.objExists(self.blueprints['blend2Breather']):
+            mc.joint(self.blueprintGrp, name=self.blueprints['blend2Breather'])
+            mc.xform(self.blueprints['blend2Breather'], ws=True, t=(0, 124.161, 3.416))
 
 
     def createJoints(self):
-        print('aaa')
+        par = self.moduleGrp
+        self.spineIkJnts = []
+        for alias, blu in self.blueprints.items():
+            if  alias in ('crotch','blend1Breather','blend2Breather' ):
+                continue
+            jnt = '{}_{}_JNT'.format(self.side, self.aliases[alias])
+            jnt = mc.joint(par, n=jnt, rad = 1)
+            self.spineIkJnts.append(jnt)
+            trsLib.setTRS(jnt, self.blueprintPoses[alias], space='world')
+            self.joints[alias] = jnt
+            par = jnt
+
+        par = self.moduleGrp
+        self.crotchJnt = []
+        for alias, blu in self.blueprints.items():
+            if  not alias in ('crotch'):
+                continue
+            jnt = '{}_{}_JNT'.format(self.side, self.aliases[alias])
+            jnt = mc.joint(par, n=jnt, rad = 1)
+            self.crotchJnt.append(jnt)
+            trsLib.setTRS(jnt, self.blueprintPoses[alias], space='world')
+            self.joints[alias] = jnt
+            par = jnt
+
+        par = self.moduleGrp
+        self.blendBreatherJnts = []
+        for alias, blu in self.blueprints.items():
+            if  not alias in ('blend1Breather','blend2Breather'):
+                continue
+            jnt = '{}_{}_JNT'.format(self.side, self.aliases[alias])
+            jnt = mc.joint(par, n=jnt, rad = 1)
+            self.blendBreatherJnts.append(jnt)
+            trsLib.setTRS(jnt, self.blueprintPoses[alias], space='world')
+            self.joints[alias] = jnt
 
 
-        blueprints = self.blueprints['start'], self.blueprints['mid'], self.blueprints['end']
 
-        crv = crvLib.fromJnts(jnts = blueprints, degree = 1, fit = False)[0]
-        mc.rebuildCurve(crv, degree = 3, spans = 2)
-
-        self.joints['baseJnt'] = mc.joint(self.moduleGrp, n = self.name + '_base_JNT')
-        trsLib.setTRS(self.joints['baseJnt'], self.blueprintPoses['start'],space = 'world')
-        mc.move(0, -0.01, 0, self.joints['baseJnt'], ws = True, r = True)
-
-
-        self.joints['spineJnts'] = []
-        jnts = jntLib.create_on_curve(curve = crv, numOfJoints = self.numJnts, parent = True)
-        mc.parent(jnts[0], self.joints['baseJnt'])
-
-        for i in range(self.numJnts):
-            jnt = '{}_{:02}_JNT'.format(self.name, i + 1)
-            jnt = mc.rename(jnts[i], jnt)
-            self.joints['spineJnts'].append(jnt)
-            self.joints['spineJnts'].append(jnt)
-
-        mc.delete(crv)
-
-
+    def orientJnts(self, jnts):
+        upLoc = mc.createNode('transform')
+        trsLib.match(upLoc, jnts[0])
+        mc.move(0, 100000, 0, upLoc, r=True, ws=True)
+        jntLib.orientUsingAim(jnts=jnts, upAim=upLoc,
+                              aimAxes='z', upAxes='y')
+        mc.delete(upLoc)
 
     def build(self):
         super(SpineB, self).build()
 
+        # spine fk joints
+        self.spineFkJnts = trsLib.duplicate(self.spineIkJnts[0],search='Ik', replace='Fk', hierarchy=True)
+        self.spineFkJnts.sort()
 
-        # create curve for ikspline
-        ikCrvTemp= crvLib.fromJnts(jnts = self.joints['spineJnts'], degree = 3, fit = False)[0]
-        ikCrv = mc.rebuildCurve(ikCrvTemp, ch = 1, rpo = 1, rt = 0, end = 1, kr = 0,kcp = 0,
-                                kep = 1, kt = 0, s =  1, d = 3, tol = 0.01,)
+        self.spineBlendJnts = trsLib.duplicate(self.spineIkJnts[0],search='Ik', replace='Blend', hierarchy=True)
+        self.spineBlendJnts.sort()
 
+        # create ikHandle for spine ik jnts
+        self.spineIkCurve, self.spineIkCurveShape = crvLib.fromJnts(jnts= self.spineIkJnts, degree=3, name='spineIk_CRV')
 
-        mc.rename(ikCrvTemp, 'spineCurve')
+        self.spineIkh = mc.ikHandle(sj = self.spineIkJnts[0] ,ee = self.spineIkJnts[-1] ,
+                             name = self.name + '_IKH',solver = 'ikSplineSolver',
+                             c = 'spineIk_CRV', ccv = False)[0]
 
-        #create ikspline
-        ikHand = mc.ikHandle(sj = self.joints['spineJnts'][0] ,ee = self.joints['spineJnts'][-1],
-                             name = 'C_spineIkHandle',solver = 'ikSplineSolver',
-                             c = 'spineCurve', ccv = False)[0]
-
-        mc.parent(ikHand, self.moduleGrp)
-
-
-        iconSize = trsLib.getDistance(self.joints['spineJnts'][0], self.joints['spineJnts'][-1])
-
-        # create ik controls
-        conss = self.ctlGrp
-        self.ctls = {'ikCtls': []}
-        ct = []
-        for i in range(3):
-            ctl = control.Control(descriptor='{}_ik_{}'.format(self.prefix, i + 1),
-                                  side=self.side,
-                                  color='cyan',
-                                  orient=[0, 1, 0],
-                                  scale=[iconSize * 1.3] * 3,
-                                  lockHideAttrs=['s', 'v'],
-                                  parent=conss)
-            pos = 1.0 / (2 + 1) * (i + 1)
-
-            ct.append(ctl.zro)
-            conss = ctl.name
-            self.ctls['ikCtls'].append(ctl.name)
-            if i > 0:
-                mc.parent(ctl.zro, self.ctlGrp)
-
-        # Move ik controls positions
-        counter = 0
-        for i,c in enumerate(ct):
-            for j in (0, 5, -1):
-                if counter < 3:
-
-                    startcon = connect.weightConstraint(self.joints['spineJnts'][j],
-                                                        ct[counter + i],
-                                                        type='pointConstraint',
-                                                        weights=[1 - pos, pos])
-                    mc.delete(startcon)
-                counter += 1
-
-        
-        # advance twist for ik spline
-        splineIkTwist.run(ik_handle="C_spineIkHandle", 
-                          base_control=self.ctls['ikCtls'][0], 
-                          end_control=self.ctls['ikCtls'][-1], 
-                          method="advanced",
-                          up_axis="z", up_vector1=(1, 0, 0), up_vector2=(1, 0, 0))
-        mc.setAttr("C_spineIkHandle.dForwardAxis", 2)
-
-        n = ct[1] + '_POC'
-        # parent mid control between start and end
-        mc.pointConstraint(self.ctls['ikCtls'][0], self.ctls['ikCtls'][-1], ct[1], 
-                            mo  = True , skip = ['x', 'z'], name = n)
-
-        # clustrize
-        specificCvs = {'cvStart': [],'cvMid': [],'cvEnd': []}
-
-        cv_list = crvLib.getCVs('spineCurve')
-
-        specificCvs['cvStart'] = (cv_list[0])
-        specificCvs['cvMid'] = (cv_list[1:-1])
-        specificCvs['cvEnd'] = (cv_list[-1])
-
-        cls_list = []
-
-        counter = 0
-        for i in specificCvs['cvStart'] ,specificCvs['cvMid'],specificCvs['cvEnd']:
-            print(i)
-            cls = mc.cluster(i, name="{}{}_CLS".format(self.name, counter))[1]
-            cls = mc.rename(cls, "{}{}_CLH".format(self.name, counter))
-            cls_list.append(cls)
-            counter += 1
-
-        counter = 0
-        for i in cls_list:
-            mc.parent(i,self.ctls['ikCtls'][counter])
-            counter += 1
-
-        # create spine joints
-        fkJnts = trsLib.duplicate(self.joints['spineJnts'][0],search = 'JNT', 
-                                  replace = 'fk_JNT', hierarchy = True)
+        # spine stretch
+        funcs.spineStretch(name=self.name , jnts= self.spineIkJnts, curve= self.spineIkCurveShape)
 
 
-        # create spine fk controls
-        fkCons = self.ctlGrp
-        self.ctls.update({'fkCtls': []})
-        ctList = []
-        for i in range(2):
-            cts = control.Control(descriptor='{}_fk_{}'.format(self.prefix, i + 1),
-                                  side=self.side,
-                                  color='pink',
-                                  orient=[0, 1, 0],
-                                  scale=[iconSize * 1] * 3,
-                                  lockHideAttrs=['s', 'v'],
-                                  parent=fkCons)
-            pos = 1.0 / (2 + 1) * (i + 1)
+        # parent blendSpine jnts under stuf
+        mc.parent(self.spineBlendJnts[0],self.hipBlendModGrp)
+        #todo create left and right hip space locators on leg module and parent them under hipBlendJnts
+        #todo parent left twister ik Handles under hipBlend joint later
 
-            ctList.append(cts.zro)
-            fkCons = cts.name
-            self.ctls['fkCtls'].append(fkCons)
+        # create stuf on crotch position
+        self.crotchJnt = self.crotchJnt[0]
+        self.crotchOriGrp = mc.createNode('transform', name =  'crotchOri_GRP', p = self.spineBlendJnts[0])
+        trsLib.match(self.crotchOriGrp, self.crotchJnt)
 
+        # create crotch ctl
+        ctl, grp = funcs.createCtl(parent = self.crotchOriGrp,side = 'C',scale = [1, 1, 1],shape = 'cube',
+                                   orient = (0,1,0),moveShape=[0,0,3])
+        name = self.crotchOriGrp.replace('Ori_GRP', '_GRP')
+        self.crotchCtlGrp = mc.rename(grp , name)
+        name = self.crotchOriGrp.replace('Ori_GRP', '_CTL')
+        self.crotchCtl = mc.rename(ctl, name)
+        mc.parent(self.crotchCtlGrp, self.crotchOriGrp)
 
-        # move fk controls positions
-        counter = 0
-        for i,c in enumerate(ct):
-            for j in (0,4):
-                if counter < 2:
+        self.crotchJntOriGrp = mc.createNode('transform', name = 'crotchJntOriGrp', p = self.crotchCtl)
+        self.crotchJntModGrp = mc.createNode('transform', name = 'crotchJntModGrp', p = self.crotchJntOriGrp)
+        mc.parent(self.crotchJnt, self.crotchJntModGrp)
 
-                    startcon = connect.weightConstraint(fkJnts[j],
-                                                        ctList[counter + i],
-                                                        type='pointConstraint',
-                                                        weights=[1 - pos, pos])
-                    mc.delete(startcon)
-                counter += 1
+        self.spineBlend1OriGrp = mc.createNode('transform' , name = 'spineBlend1Ori_GRP', p = self.spineBlendJntGrp)
+        trsLib.match(self.spineBlend1OriGrp,self.spineBlendJnts[1])
+        self.spineBlend1ModGrp = mc.createNode('transform' , name = 'spineBlend1Mod_GRP', p = self.spineBlend1OriGrp)
+        mc.parent(self.spineBlendJnts[1], self.spineBlend1ModGrp)
 
+        self.spineBlend2OriGrp = mc.createNode('transform' , name = 'spineBlend2Ori_GRP', p = self.spineBlendJntGrp)
+        trsLib.match(self.spineBlend2OriGrp,self.spineBlendJnts[2])
+        self.spineBlend2ModGrp = mc.createNode('transform' , name = 'spineBlend2Mod_GRP', p = self.spineBlend2OriGrp)
+        mc.parent(self.spineBlendJnts[2], self.spineBlend2ModGrp)
 
-        connect.direct(self.ctls['fkCtls'][0], fkJnts[0], attrs=['r'])
-        connect.direct(self.ctls['fkCtls'][-1], fkJnts[4], attrs=['r'])
+        self.spineBlend3OriGrp = mc.createNode('transform' , name = 'spineBlend3Ori_GRP', p = self.spineBlendJntGrp)
+        trsLib.match(self.spineBlend3OriGrp,self.spineBlendJnts[3])
+        self.spineBlend3ModGrp = mc.createNode('transform' , name = 'spineBlend3Mod_GRP', p = self.spineBlend3OriGrp)
+        mc.parent(self.spineBlendJnts[3], self.spineBlend3ModGrp)
 
-        mc.pointConstraint(fkJnts[1],ct[-1], mo = True )
-
-        #rename stuff
-        chestCtl = mc.rename(self.ctls['ikCtls'][-1], self.side + '_chest_CTL')
-        self.chestCtl_zro = mc.rename(ct[-1], self.side + '_chest_ZRO')
-        midCtl = mc.rename(self.ctls['ikCtls'][1], self.name + '_mid_CTL')
-        self.midCtl_zro = mc.rename(ct[1], self.name + '_mid_ZRO')
-        hipCtl = mc.rename(self.ctls['ikCtls'][0], self.side + '_hip_CTL')
-        self.hipCtl_zro  = mc.rename(ct[0], self.side + '_hip_ZRO')
-        spineFkStart = mc.rename(self.ctls['fkCtls'][0], self.name+ '_fk_start_CTL')
-        self.spineFkStart_zro = mc.rename(ctList[0], self.name + '_fk_start_ZRO')
-        spineFkMid =mc.rename(self.ctls['fkCtls'][-1], self.name+ '_fk_mid_CTL')
-        self.spineFkMid_zro = mc.rename(ctList[-1], self.name + '_fk_mid_ZRO')
-
-        # edit shapes and colors and set out controls
-        crvLib.editShape(hipCtl, shape = 'cube')
-        display.setColor(hipCtl, 'yellow')
-        crvLib.scaleShape(hipCtl, [iconSize, iconSize * 0.5, iconSize])
-        attrLib.lockHideAttrs(hipCtl, attrs=['s', 'v','rz', 'rx'])
-        self.setOut('hipCtl', hipCtl)
-
-        crvLib.editShape(chestCtl, shape = 'cube')
-        display.setColor(chestCtl, 'yellow')
-        crvLib.scaleShape(chestCtl, [iconSize, iconSize * 0.5 , iconSize])
-        attrLib.lockHideAttrs(chestCtl, attrs=['s', 'v',])
-        self.setOut('chestCtl', chestCtl)
-
-        crvLib.editShape(midCtl, shape = 'circle')
-        display.setColor(midCtl, 'redDark')
-        crvLib.scaleShape(midCtl, [iconSize * 1.5, iconSize , iconSize * 1.5])
-        attrLib.lockHideAttrs(midCtl, attrs=['s', 'v','r'])
-        self.setOut('midCtl', midCtl)
-
-        crvLib.editShape(spineFkStart, shape = 'circle')
-        display.setColor(spineFkStart, "cyan")
-        crvLib.scaleShape(spineFkStart, [iconSize * 1.2 , iconSize , iconSize * 1.2 ])
-        attrLib.lockHideAttrs(spineFkStart, attrs=['s', 'v','t'])
-        self.setOut('spineFkStart', spineFkStart)
-
-        crvLib.editShape(spineFkMid, shape = 'circle')
-        display.setColor(spineFkMid, "cyan")
-        crvLib.scaleShape(spineFkMid, [iconSize * 1.2 , iconSize , iconSize * 1.2 ])
-        attrLib.lockHideAttrs(spineFkMid, attrs=['s', 'v','t'])
-        self.setOut('spineFkMid', spineFkMid)
-
-        # make curve ik stretchy
-        splineIkStretch.run(ik_curve = 'spineCurve',volume = True, scale = 'scaleY')
-
-        # clean up outliner
-        print(cls_list)
-        for i in cls_list:
-            mc.setAttr(i + '.v', 0)
-
-        mc.setAttr(fkJnts[0] + '.v', 0)
-
-        mc.setAttr(ikHand + '.v', 0)
+        self.spineBlend4OriGrp = mc.createNode('transform' , name = 'spineBlend4Ori_GRP', p = self.spineBlendJnts[3])
+        trsLib.match(self.spineBlend4OriGrp,self.spineBlendJnts[4])
+        self.spineBlend4ModGrp = mc.createNode('transform' , name = 'spineBlend4Mod_GRP', p = self.spineBlend4OriGrp)
+        mc.parent(self.spineBlendJnts[4], self.spineBlend4ModGrp)
 
 
-        mc.parent('spineCurve',self.settingGrp)
-        mc.setAttr('spineCurve' + '.v', 0)
+        # create transform for breath joints
+        self.spineBlendBreatherOriGrp = mc.createNode('transform', name = self.name + '_blend1BreatherOri_GRP',
+                                                      p = self.spineBlendJnts[1])
+        trsLib.match(self.spineBlendBreatherOriGrp, self.blendBreatherJnts[0])
+        self.spineBlendBreatherModGrp = mc.createNode('transform', name = self.name + '_blend1BreatherMod_GRP',
+                                                      p = self.spineBlendBreatherOriGrp)
+        mc.parent(self.blendBreatherJnts[0], self.spineBlendBreatherModGrp)
 
-        mc.parentConstraint(hipCtl, self.joints['baseJnt'],
-                            mo=True, st=('x', 'y', 'z'))
+        self.spineBlendBreather2OriGrp = mc.createNode('transform', name = self.name + '_blend2BreatherOri_GRP',
+                                                      p = self.spineBlendJnts[2])
+        trsLib.match(self.spineBlendBreather2OriGrp, self.blendBreatherJnts[1])
+        self.spineBlendBreather2ModGrp = mc.createNode('transform', name = self.name + '_blend2BreatherMod_GRP',
+                                                      p = self.spineBlendBreather2OriGrp)
+        mc.parent(self.blendBreatherJnts[1], self.spineBlendBreather2ModGrp)
 
+        # create spine ik hip ctl
+        ctl, grp = funcs.createCtl(parent = self.spineIkHipDrvrOriGrp,side = 'C',scale = [30, 5, 30],shape = 'cube',
+                                   orient = (0,1,0),moveShape=[0,0,0])
+        name = self.spineIkHipDrvrOriGrp.replace('Ori_GRP', '_GRP')
+        self.spineIkHipCtlGrp = mc.rename(grp , name)
+        name = self.spineIkHipDrvrOriGrp.replace('Ori_GRP', '_CTL')
+        self.spineIkHipCtl = mc.rename(ctl, name)
+        mc.parent(self.spineIkHipCtlGrp, self.spineIkHipDrvrOriGrp)
 
-        # pevlis jnt
-        guessed = 'C_pelvis_JNT'
-        self.hipJnt = mc.ls(guessed)
-        if self.hipJnt:
-            self.hipJnt = self.hipJnt[0]
-            self.setOut('hipJnt', self.hipJnt)
+        # create spine ik offset ctl
+        ctl, grp = funcs.createCtl(parent = self.spineIkHipCtl,side = 'C',scale = [28, 5, 28],shape = 'cube',
+                                   orient = (0,1,0),moveShape=[0,0,0])
+        name = self.spineIkHipCtl.replace('_CTL', '_offset_CTL')
+        self.spineIkHipOffsetCtl = mc.rename(ctl, name)
+        mc.parent(self.spineIkHipOffsetCtl, self.spineIkHipCtl)
+        mc.delete(grp)
 
+        self.spineIkHipDrvrJnt = mc.joint(self.spineIkHipOffsetCtl, name = 'spineIkHipDrvr_JNT')
 
+        # create locators under offsetCtl
+        self.spineIkTwistButtomLoc = mc.createNode('transform', name = 'spineIkTwist_pivot_LOC', p = self.spineIkHipOffsetCtl)
+        self.spineIkTwistButtomLocShape = mc.createNode('locator', name = 'spineIkTwist_pivotShape_LOC', p = self.spineIkTwistButtomLoc)
+        mc.move(0,0,-44, self.spineIkTwistButtomLoc,r = True, ws = True)
 
-        # use child of last jnt as chest jnt
-        chestJnt = self.joints['spineJnts'][-1]
-        [attrLib.disconnectAttr(chestJnt + '.' + a) for a in ('r', 'rx', 'ry', 'rz')]
-        mc.orientConstraint(chestCtl, chestJnt, mo=True, name=chestJnt + '_ORI')
-        self.setOut('chestJnt', chestJnt)
+        self.spineIkHipPivotLoc = mc.createNode('transform', name = 'spineIkHip_pivot_LOC', p = self.spineIkHipOffsetCtl)
+        self.spineIkHipPivotLocShape = mc.createNode('locator', name = 'spineIkHip_pivotShape_LOC', p = self.spineIkHipPivotLoc)
+
+        # create spine ik chest ctl
+        ctl, grp = funcs.createCtl(parent = self.spineIkChestDrvrOriGrp,side = 'C',scale = [35, 17, 30],shape = 'cube',
+                                   orient = (0,1,0),moveShape=[0,-10,0])
+        name = self.spineIkChestDrvrOriGrp.replace('Ori_GRP', '_GRP')
+        self.spineIkChestCtlGrp = mc.rename(grp , name)
+        name = self.spineIkChestDrvrOriGrp.replace('Ori_GRP', '_CTL')
+        self.spineIkChestCtl = mc.rename(ctl, name)
+        mc.parent(self.spineIkChestCtlGrp, self.spineIkChestDrvrOriGrp)
+
+        # create spineIkChestOffsetCtl
+        ctl, grp = funcs.createCtl(parent = self.spineIkChestCtl,side = 'C',scale = [26, 15, 26],shape = 'cube',
+                                   orient = (0,1,0),moveShape=[0,-10,0])
+        name = self.spineIkChestCtl.replace('_CTL', '_offset_CTL')
+        self.spineIkChestOffsetCtl = mc.rename(ctl, name)
+        mc.parent(self.spineIkChestOffsetCtl, self.spineIkChestCtl)
+        mc.delete(grp)
+
+        # create spineIkChestOffsetTopCtl
+        ctl, grp = funcs.createCtl(parent = self.spineIkChestOffsetCtl,side = 'C',scale = [24, 13, 24],shape = 'cube',
+                                   orient = (0,1,0),moveShape=[0,-5,0])
+        name = self.spineIkChestOffsetCtl.replace('offset', 'offsetTop')
+        self.spineIkChestOffsetTopCtl = mc.rename(ctl, name)
+        mc.parent(self.spineIkChestOffsetTopCtl, self.spineIkChestOffsetCtl)
+        mc.delete(grp)
+
+        self.spineIkChestDrvrJnt = mc.joint(self.spineIkChestOffsetTopCtl, name = 'spineIk_chestDrvr_JNT')
+
+        self.spineIkTwistTopLoc = mc.createNode('transform', name = 'spineIkTwistTop_LOC', p = self.spineIkChestOffsetTopCtl)
+        self.spineIkTwistTopLocShape = mc.createNode('locator', name = 'spineIkTwistTopShape_LOC', p = self.spineIkTwistTopLoc)
+        mc.move(0,0,-44, self.spineIkTwistTopLoc,r = True, ws = True)
+
+        self.spineIkChestPivotLoc = mc.createNode('transform', name = 'spineIkChest_pivot_LOC', p = self.spineIkChestOffsetCtl)
+        self.spineIkChestPivotLocShape = mc.createNode('locator', name = 'spineIkChest_pivotShape_LOC', p = self.spineIkChestPivotLoc)
+
+        # create spine ik waist ctl
+        ctl, grp = funcs.createCtl(parent = self.spineIkWaistDrvrOriGrp,side = 'C',scale = [35, 3, 30],shape = 'cube',
+                                   orient = (0,1,0),moveShape=[0,0,0])
+        name = self.spineIkWaistDrvrOriGrp.replace('Ori_GRP', '_GRP')
+        self.spineIkWaistCtlGrp = mc.rename(grp , name)
+        name = self.spineIkWaistDrvrOriGrp.replace('Ori_GRP', '_CTL')
+        self.spineIkWaistCtl = mc.rename(ctl, name)
+        mc.parent(self.spineIkWaistCtlGrp, self.spineIkWaistDrvrOriGrp)
+
+        self.spineIkWaistDrvrJnt = mc.joint(self.spineIkWaistCtl, name = 'spineIkWaistDrvr_JNT')
+
+        # create fk ctls
+        self.fkOriGrps = []
+        self.fkCtlGrps = []
+        self.fkCtls = []
+        par = self.spineFkGrp
+        for i in self.spineFkJnts[1:-1]:
+            n = i.split('JNT')[0]
+            oriGrp = mc.createNode('transform', name  = n + 'ori_GRP', p  = par)
+            self.fkOriGrps.append(oriGrp)
+            trsLib.match(oriGrp, i)
+            ctl, grp = funcs.createCtl(parent=oriGrp, side='C', scale=[35, 3, 30], shape='circle',
+                                       orient=(0, 1, 0), moveShape=[0, 0, 0])
+            ctl = mc.rename(ctl, n + 'CTL')
+            grp = mc.rename(grp, n + 'GRP')
+            self.fkCtlGrps.append(grp)
+            self.fkCtls.append(ctl)
+            mc.parent(grp, oriGrp)
+            mc.parent(i, ctl)
+            par = i
+
+        # create hipFk ctl
+        self.hipFkOriGrp = mc.createNode('transform', name = 'hipFKOri_GRP', p = self.spineFkGrp)
+        trsLib.match(self.hipFkOriGrp, self.spineFkJnts[0])
+        ctl, grp = funcs.createCtl(parent = self.hipFkOriGrp,side = 'C',scale = [35, 17, 30],shape = 'cube',
+                                   orient = (0,1,0),moveShape=[0,0,0])
+        name = self.hipFkOriGrp.replace('Ori_GRP', '_GRP')
+        self.spineFkHipCtlGrp = mc.rename(grp , name)
+        name = self.hipFkOriGrp.replace('Ori_GRP', '_CTL')
+        self.spineFKHipCtl = mc.rename(ctl, name)
+        mc.parent(self.spineFkHipCtlGrp, self.hipFkOriGrp)
+        mc.parent(self.spineFkJnts[0],self.spineFKHipCtl )
+
+        # ***************connect stuf****************
+        # parent and scale constraint hip fk and ik joints to hip blendOriGrp
+        mc.parentConstraint(self.spineFkJnts[0],self.spineIkJnts[0],self.hipBlendOriGrp, mo = True)
+        mc.scaleConstraint(self.spineFkJnts[0],self.spineIkJnts[0],self.hipBlendOriGrp, mo = True)
+
+        for i in ['sx', 'sy', 'sz']:
+            mc.connectAttr(self.hipBlendOriGrp + '.' + i,self.hipBlendModGrp + '.' + i)
+
+        # parent and scale constraint spine ik and fk joints tp spineBlendOri grp
+        mc.parentConstraint(self.spineFkJnts[1], self.spineIkJnts[1],self.spineBlend1OriGrp, mo = True)
+        mc.scaleConstraint(self.spineFkJnts[1], self.spineIkJnts[1],self.spineBlend1OriGrp, mo = True)
+
+        # create breath ctls
+        self.breathOriGrps = []
+        self.breathGrps = []
+        self.breathCtls = []
+        for i, j  in zip(self.spineFkJnts[1:4], ['low', 'mid', 'top']):
+            n = self.name + '_breath_' + '{}'.format(j)
+            oriGrp = mc.createNode('transform', name  = n + 'Ori_GRP', p  = self.extrasGrp)
+            trsLib.match(oriGrp, i)
+            self.breathOriGrps.append(oriGrp)
+            ctl, grp = funcs.createCtl(parent=oriGrp, side='C', scale=[1, 1, 1], shape='cube',
+                                       orient=(0, 1, 0), moveShape=[0, 0, 0])
+            ctl = mc.rename(ctl, n + '_CTL')
+            grp = mc.rename(grp, n + '_GRP')
+            self.breathGrps.append(grp)
+            self.breathCtls.append(ctl)
+            mc.parent(grp, oriGrp)
+            mc.move(0, 0, 20, oriGrp, r=True, ws=True)
+
+        mc.setAttr(self.breathOriGrps[2] + '.rx', 65)
+        mc.move(0, 8, -3, self.breathOriGrps[2], r=True, ws=True)
+
+        # connect breath low ctl to the spineBlend breathMod grp
+        [mc.connectAttr(self.breathCtls[0] + '.{}{}'.format(a, v), self.spineBlendBreatherModGrp + '.{}{}'.format(a, v)) for a in'trs' for v in 'xyz']
+
+        # parent and scale constraint spine2 ik and fk to the spine blend 2 grp
+        mc.parentConstraint(self.spineFkJnts[2], self.spineIkJnts[2],self.spineBlend2OriGrp, mo = True)
+        mc.scaleConstraint(self.spineFkJnts[2], self.spineIkJnts[2],self.spineBlend2OriGrp, mo = True)
+
+        # connect breath mic ctl to the spineBlend breathMod grp
+        [mc.connectAttr(self.breathCtls[1] + '.{}{}'.format(a, v), self.spineBlendBreather2OriGrp + '.{}{}'.format(a, v)) for a in'trs' for v in 'xyz']
+
+        # parent and scale constraint spine3 ik and fk to the spine blend 3 grp
+        mc.parentConstraint(self.spineFkJnts[3], self.spineIkJnts[3],self.spineBlend3OriGrp, mo = True)
+        mc.scaleConstraint(self.spineFkJnts[3], self.spineIkJnts[3],self.spineBlend3OriGrp, mo = True)
+
+        # parent and scale constraint spine4 ik and fk to the spine blend 4 grp
+        mc.parentConstraint(self.spineFkJnts[4], self.spineIkJnts[4],self.spineBlend4OriGrp, mo = True)
+        mc.scaleConstraint(self.spineFkJnts[4], self.spineIkJnts[4],self.spineBlend4OriGrp, mo = True)
+
+        #todo scale constraint global ctl to the spineIkdrivers grp later
+
+        #todo parent constraint body and global locas to the spine hip drvrOri grp later
+
+        # add attr on spineIkHipCtl and spineIkOffsetHipCtl
+        attrLib.addFloat(self.spineIkHipCtl, ln = 'offsetCtl', min = 0, max = 1, dv = 0)
+        attrLib.addFloat(self.spineIkHipCtl, ln = 'globalScale', min = 0, max = 1, dv = 0)
+        attrLib.addFloat(self.spineIkHipCtl, ln = 'rotPivotHeight', min = 4, max = 16, dv = 4)
+
+        attrLib.addFloat(self.spineIkHipOffsetCtl, ln = 'globalScale', min = 0, max = 1, dv = 0)
+
+        # connect spineIkHipCtl to the spineIkHipPivotLoc
+        mc.connectAttr(self.spineIkHipCtl + '.rotPivotHeight',self.spineIkHipPivotLoc + '.ty')
+
+        #todo parent constraint body and global locas to the spine chest drvrOri grp later
+        attrLib.addFloat(self.spineIkChestCtl, ln = 'offsetCtl', min = 0, max = 1, dv = 0)
+        attrLib.addFloat(self.spineIkChestCtl, ln = 'globalScale', min = 0, max = 1, dv = 0)
+        attrLib.addFloat(self.spineIkChestCtl, ln = 'offsetTopCtl', min = 0, max = 1, dv = 0)
+        attrLib.addFloat(self.spineIkChestCtl, ln = 'rotPivotHeight', min = -30, max = 0, dv = -30)
+
+        # connect spineIkChestCtl to the spineIkChestPivotLoc
+        mc.connectAttr(self.spineIkChestCtl + '.rotPivotHeight',self.spineIkChestPivotLoc + '.ty')
+
+        # parent constraint chest and hip ctl to the spineIkWaistDrvrGrp
+        mc.parentConstraint(self.spineIkChestCtl,self.spineIkHipCtl,self.spineIkWaistDrvrOriGrp, mo = True)
+
+        #todo scale constarint global ctl to the spine ik jnt grp later
+        #todo scale constarint global ctl to the spine fk jnt grp later
+
+        #todo parent constraint bodyOffset ctl to the spineFK1OriGrp and hip fk ori grp later
+
 
 
     def connect(self):
-        """
-        connection of created nodes
-        """
         super(SpineB, self).connect()
-
-        # get handle to outputs
-        ctlParent = self.getOut('ctlParent')
-
-        # outliner clean up
-        connect.matrix(ctlParent, self.moduleGrp)
-        connect.matrix(ctlParent, self.ctlGrp)
-
-        mc.parent(self.hipCtl_zro, ctlParent)
-        mc.parent(self.spineFkStart_zro, ctlParent)
 
 
     def createSettings(self):
@@ -327,23 +417,6 @@ class SpineB(template.Template):
         so user can change settings
         """
         super(SpineB, self).createSettings()
-
-        attrLib.addString(self.blueprintGrp, 'blu_ctlParent', v='C_root.bodyCtl')
-        attrLib.addInt(self.blueprintGrp, 'blu_numOfJnts', v=self.numJnts or 6)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

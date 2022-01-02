@@ -74,6 +74,71 @@ def additive(drvrAttr, drvnAttr):
     else:
         mc.connectAttr(drvrAttr, drvnAttr)
 
+def clearTransformInputs(obj):
+    mc.delete(obj + ".tx", icn = True)
+    mc.delete(obj + ".ty", icn = True)
+    mc.delete(obj + ".tz", icn = True)
+    mc.delete(obj + ".rx", icn = True)
+    mc.delete(obj + ".ry", icn = True)
+    mc.delete(obj + ".rz", icn = True)
+    mc.delete(obj + ".sx", icn = True)
+    mc.delete(obj + ".sy", icn = True)
+    mc.delete(obj + ".sz", icn = True)
+
+def motionPath(obj, crv, uValue = 0.5, freeChannel = False):
+    motionPath = mc.pathAnimation(obj, crv, f = True, fm = True)
+    MotionPathAnimationInput = motionPath + "_uValue.output"
+    mc.disconnectAttr(MotionPathAnimationInput, motionPath + ".uValue")
+    mc.setAttr(motionPath + ".uValue", uValue)    
+    if freeChannel:
+        print "freeing channel"
+        clearTransformInputs(obj)
+        mc.delete(motionPath)
+
+
+def connectTranslate(connectFrom=None, connectTo=None, connections=['tx', 'ty', 'tz']):
+    if connectFrom == None and connectTo == None:
+        connectFrom = mc.ls(sl=True)[0]
+        connectTo = mc.ls(sl=True)[1]
+    if 'tx' in connections and (not mc.isConnected(connectFrom + ".tx", connectTo + ".tx")):
+        mc.connectAttr(connectFrom + ".tx", connectTo + ".tx")
+    if 'ty' in connections and (not mc.isConnected(connectFrom + ".ty", connectTo + ".ty")):
+        mc.connectAttr(connectFrom + ".ty", connectTo + ".ty")
+    if 'tz' in connections and (not mc.isConnected(connectFrom + ".tz", connectTo + ".tz")):
+        mc.connectAttr(connectFrom + ".tz", connectTo + ".tz")
+
+
+def connectRotation(connectFrom=None, connectTo=None, connections=['rx', 'ry', 'rz']):
+    if connectFrom == None and connectTo == None:
+        connectFrom = mc.ls(sl=True)[0]
+        connectTo = mc.ls(sl=True)[1]
+
+    if 'rx' in connections and (not mc.isConnected(connectFrom + ".rx", connectTo + ".rx")):
+        mc.connectAttr(connectFrom + ".rx", connectTo + ".rx")
+    if 'ry' in connections and (not mc.isConnected(connectFrom + ".ry", connectTo + ".ry")):
+        mc.connectAttr(connectFrom + ".ry", connectTo + ".ry")
+    if 'rz' in connections and (not mc.isConnected(connectFrom + ".rz", connectTo + ".rz")):
+        mc.connectAttr(connectFrom + ".rz", connectTo + ".rz")
+
+
+def connectScale(connectFrom=None, connectTo=None, connections=['sx', 'sy', 'sz']):
+    if connectFrom == None and connectTo == None:
+        connectFrom = mc.ls(sl=True)[0]
+        connectTo = mc.ls(sl=True)[1]
+
+    if 'sx' in connections and (not mc.isConnected(connectFrom + ".sx", connectTo + ".sx")):
+        mc.connectAttr(connectFrom + ".sx", connectTo + ".sx")
+    if 'sy' in connections and (not mc.isConnected(connectFrom + ".sy", connectTo + ".sy")):
+        mc.connectAttr(connectFrom + ".sy", connectTo + ".sy")
+    if 'sz' in connections and (not mc.isConnected(connectFrom + ".sz", connectTo + ".sz")):
+        mc.connectAttr(connectFrom + ".sz", connectTo + ".sz")
+
+
+def connectAllChannel(connectFrom=None, connectTo=None):
+    connectTranslate(connectFrom, connectTo)
+    connectRotation(connectFrom, connectTo)
+    connectScale(connectFrom, connectTo)
+
 
 def reverse(drvrAttr, drvnAttr):
     """
