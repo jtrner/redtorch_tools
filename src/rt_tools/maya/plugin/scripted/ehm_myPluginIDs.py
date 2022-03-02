@@ -29,8 +29,8 @@ for id in IDs:
 0x0011E191 RBF_Solver
 0x0011E192 parent_cons
 0x0011E193 aim_cons
-0x0011E194
-0x0011E195
+0x0011E194 skirt
+0x0011E195 Collision_deformer
 0x0011E196
 0x0011E197
 0x0011E198
