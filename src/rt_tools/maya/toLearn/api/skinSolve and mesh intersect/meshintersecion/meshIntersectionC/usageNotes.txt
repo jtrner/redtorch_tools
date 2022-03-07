@@ -1,0 +1,30 @@
+
+USAGE NOTES for compiled plugin MollerIntersect
+
+Make sure MollerIntersect.mll is in your Maya plugins directory,
+and you have it loaded. 
+
+
+
+For intersections between meshes - 
+
+1. Select two meshes that have transforms frozen
+2. Execute: 
+
+import maya.cmds as mc
+mc.mollerIntersect()
+
+
+
+For self intersections - 
+
+1. Select a mesh with transforms frozen
+2. Execute:
+
+import maya.cmds as mc
+mc.mollerSelfIntersect()
+
+
+
+
+

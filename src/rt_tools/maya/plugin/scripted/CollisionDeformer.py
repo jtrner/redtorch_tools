@@ -31,6 +31,7 @@ class CollisionDeformer(ompx.MPxDeformerNode):
         cls.colliderList = typedAttr.create("colliderList", "collist", om.MFnData.kMesh)
         typedAttr.setArray(True)
         typedAttr.setReadable(False)
+        typedAttr.setKeyable(True)
         typedAttr.setDisconnectBehavior(0)
 
         # add interp_type enum attr
@@ -221,7 +222,7 @@ def uninitializePlugin(plugin):
 '''
 from maya import cmds as mc
 def main():
-    pluginPath = r'C:\Users\User\Documents\maya\2020\plug-ins\CollisionDeformer.py'
+    pluginPath = r'D:\all_works\redtorch_tools\src\rt_tools\maya\plugin\scripted\CollisionDeformer.py'
     nodeName = 'CollisionDeformer'
     if mc.pluginInfo(nodeName, q=True, loaded=True):
         mc.file(new=True, f=True)

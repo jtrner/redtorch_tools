@@ -1,0 +1,44 @@
+#
+# Python implementation of Tomas Moller's triangle-triangle intersection algorithm
+# for intersections between objects
+# Python implementation of the Moller Trumbore ray-triangle intersection for 
+# self intersections of polygons sharing an edge.
+#
+# Andy van Straten
+#
+#
+# --------- ESSENTIAL NOTES  -------------- #
+#
+# YOU WILL NEED the numpy library installed on your machine. 
+# www.numpy.org
+#
+#
+#
+# ---------- USAGE ------------------------ # 
+#
+# --  For intersections between objects: -- # 
+# 
+# 1. Make sure TriangleTriangleIntersection.py and RayTriangleIntersection.py are 
+#    in your scripts directory. 
+#
+# 2. Select two meshes. ( Make sure transforms are frozen! )
+#
+# 3. Execute the following commands from your script editor: 
+#
+#    import TriangleTriangleIntersection as tti
+#    tti.mollerIntersect()
+#
+#
+#
+# -- For self intersections: -------------- # 
+#
+# 1. Make sure TriangleTriangleIntersection.py and RayTriangleIntersection.py are 
+#    in your scripts directory. 
+# 
+# 2. Select a mesh ( Make sure transforms are frozen )
+#
+# 3. Execute the following commands from your script editor: 
+#    
+#    import TriangleTriangleIntersection as tti
+#    tti.mollerSelfIntersect()
+    

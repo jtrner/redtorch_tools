@@ -258,7 +258,7 @@ class RBF_Solver(om.MPxNode):
                 target_pos.append(target)
 
 
-            distMatrix = get_dist_mat(positions)
+            dist_pos = get_dist_pos(positions)
 
             target_distances = []
 
@@ -290,9 +290,9 @@ class RBF_Solver(om.MPxNode):
 
             blend_matrix_weights = []
             if linearType.asShort() == 0:
-                blend_matrix_weights = solve_equations(distMatrix, blend_list)
+                blend_matrix_weights = solve_equations(dist_pos, blend_list)
             if linearType.asShort()  == 1:
-                blend_matrix_weights = solve_equations(distMatrix, new_blend_weight)
+                blend_matrix_weights = solve_equations(dist_pos, new_blend_weight)
 
             final_blend = get_final_weights(target_distances, blend_matrix_weights)
             ##################################################################
@@ -303,9 +303,9 @@ class RBF_Solver(om.MPxNode):
 
             matrix_weights = []
             if linearType.asShort() == 0:
-                matrix_weights = solve_equations(distMatrix, rotations)
+                matrix_weights = solve_equations(dist_pos, rotations)
             if linearType.asShort() == 1:
-                matrix_weights = solve_equations(distMatrix, new_rotations)
+                matrix_weights = solve_equations(dist_pos, new_rotations)
 
             final_poses = get_final_weights(target_distances, matrix_weights)
 
@@ -334,14 +334,21 @@ class RBF_Solver(om.MPxNode):
             dataBlock.setClean(plug)
 
 
-def get_dist_mat(matrix):
-    arr = []
-    for mat in matrix:
-        arr.append(mat)
-    m = np.array(arr)
-    distMatrix = cdist(m, m, "euclidean")
 
-    return distMatrix
+# Compute distance between each pair of the two collections of inputs.
+# a = np.array([[0, 0, 0],[0, 0, 1], [0, 1, 0],[0, 1, 1], [1, 0, 0],
+#               [1, 0, 1], [1, 1, 0],[1, 1, 1]])
+# b = np.array([[ 0.1,  0.2,  0.4]])
+# distance.cdist(a, b, 'cityblock')
+# array([[ 0.7],[ 0.9],[ 1.3],[ 1.5],[ 1.5],[ 1.7],[ 2.1], [ 2.3]])
+def get_dist_pos(poses):
+    arr = []
+    for p in poses:
+        arr.append(p)
+    t = np.array(arr)
+    dist_c= cdist(t, t, "euclidean")
+
+    return dist_c
 
 
 def solve_equations(array_a, array_b):
@@ -360,9 +367,20 @@ def get_target_dist(target, value):
     return newVec.length()
 
 
-def gaussian(matrix, radius):
+
+
+# The exponential function is e^x where e is a mathematical constant called Euler's number, ' \
+# 'approximately 2.718281. This value has a close mathematical relationship with pi and ' \
+# 'the slope of the curve e^x is equal to its value at every point. np.exp() calculates e^x for each value of x in your input array.
+# import numpy as np
+# ar=np.array([1,2,3])
+# ar=np.exp(ar)
+# print ar
+# outputs:
+# [ 2.71828183  7.3890561  20.08553692]
+def gaussian(poses, radius):
     radius *= 0.707
-    result = np.exp(-(matrix * matrix) / (2.0 * radius * radius))
+    result = np.exp(-(poses * poses) / (2.0 * radius * radius))
 
     return result
 
